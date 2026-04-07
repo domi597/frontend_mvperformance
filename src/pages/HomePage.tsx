@@ -1,5 +1,7 @@
-import { Box, Button, Card, CardContent, Container, Grid, Stack, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Alert, Box, Button, Card, CardContent, Container, Grid, Snackbar, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import RegisterService from "../service/RegisterService";
 
 const LEISTUNGEN = [
   { name: "Ölwechsel", preis: "ab 49 \u20AC" },
@@ -11,8 +13,28 @@ const LEISTUNGEN = [
 export default function HomePage() {
   const navigate = useNavigate();
 
+  // Erfolgsmeldung aus dem localStorage lesen (gesetzt von RegisterService) -N 07.04.2026
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const msg = RegisterService.popSuccessMessage();
+    if (msg) setSuccessMsg(msg);
+  }, []);
+
   return (
     <Container maxWidth="lg">
+
+      {/* Erfolgsmeldung nach Registrierung -N 07.04.2026 */}
+      <Snackbar
+        open={!!successMsg}
+        autoHideDuration={5000}
+        onClose={() => setSuccessMsg(null)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setSuccessMsg(null)} sx={{ width: "100%" }}>
+          {successMsg}
+        </Alert>
+      </Snackbar>
       {/* Hero */}
       <Box sx={{ py: { xs: 6, md: 8 } }}>
         <Typography variant="h3" component="h1" fontWeight={800}>

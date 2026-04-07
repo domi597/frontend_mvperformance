@@ -28,7 +28,7 @@ export const AuthLayout = () => {
 
       {/* Content */}
       <Container
-        maxWidth="xs"
+        maxWidth="sm"
         sx={{
           flex: 1,
           display: "flex",
@@ -41,7 +41,7 @@ export const AuthLayout = () => {
           variant="outlined"
           sx={{
             width: "100%",
-            maxWidth: 440,
+            maxWidth: 560,
             overflow: "hidden",
           }}
         >
