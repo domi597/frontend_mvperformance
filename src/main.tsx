@@ -37,6 +37,7 @@ import AdminAngebotePage from "./pages/admin/AdminAngebotePage";
 import AdminLeistungenPage from "./pages/admin/AdminLeistungenPage";
 import KundenPage from "./pages/admin/KundenPage";
 import EinstellungenPage from "./pages/admin/EinstellungenPage";
+import {AGBPage} from "./pages/AGBPage.tsx";
 
 function RequireAdmin({ children }: { children: ReactElement }) {
   const token = localStorage.getItem("token");
@@ -80,10 +81,12 @@ const router = createBrowserRouter([
           { path: "/kontakt", element: <KontaktPage /> },
           { path: "/ueber-uns", element: <UeberUnsPage /> },
           { path: "/termin", element: <TerminPage /> },
-          { path: "/impressum", element: <ImpressumPage /> },
-          { path: "/datenschutz", element: <DatenschutzPage /> },
         ],
       },
+      { path: "/impressum", element: <ImpressumPage /> },
+      { path: "/datenschutz", element: <DatenschutzPage /> },
+      { path: "/agbs", element: <AGBPage /> },
+
       {
         element: <AuthLayout />,
         children: [

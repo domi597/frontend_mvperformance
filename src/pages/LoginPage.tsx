@@ -1,8 +1,16 @@
-// LoginPage.tsx
-// Anmeldeseite für bestehende Kunden.
-// Der Nutzer gibt E-Mail und Passwort ein. Nach erfolgreichem Login
-// wird er je nach Rolle (ADMIN / KUNDE) weitergeleitet.
-// Token und Kundendaten werden vom AuthService im localStorage gespeichert. -N 27.03.2026
+/**
+ * @file LoginPage.tsx
+ * @description Login page for existing customers.
+ *
+ * The user enters their email address and password. On a successful login
+ * the JWT token and customer data are persisted by {@link AuthService} in
+ * `localStorage`. The user is then redirected based on their role:
+ * - `ADMIN` → `/admin`
+ * - `KUNDE` → `/` (home)
+ *
+ * @author N
+ * @since 27.03.2026
+ */
 
 import { useState } from "react";
 import {
@@ -22,25 +30,53 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";
 
+/**
+ * `LoginPage` renders the sign-in form with email and password fields.
+ *
+ * ## State
+ * | Variable       | Purpose                                                |
+ * |----------------|--------------------------------------------------------|
+ * | `email`        | Controlled value of the email input                    |
+ * | `password`     | Controlled value of the password input                 |
+ * | `showPassword` | Toggles the password field between `text` and `password` |
+ * | `loading`      | Shows a spinner while the API request is in flight     |
+ * | `error`        | Holds an error message string on login failure         |
+ *
+ * ## Validation (inline, shown while typing)
+ * - `emailError`    — email contains at least one character but no `@`
+ * - `passwordError` — password has been started but is shorter than 6 characters
+ * - `formValid`     — both fields pass; enables the submit button
+ *
+ * @returns The login form wrapped in a MUI `Stack`.
+ */
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  // State -N 27.03.2026
   const [email, setEmail]               = useState("");
   const [password, setPassword]         = useState("");
+  /** Controls whether the password is rendered as plain text or dots. */
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState<string | null>(null);
 
-  // Validierung
-  // Einfache Inline-Validierung: Fehler werden direkt am Feld angezeigt -N 27.03.2026
+  /**
+   * Inline validation flags.
+   * Errors appear as soon as the user starts typing (no submit required),
+   * giving immediate feedback without blocking the initial render.
+   */
   const emailError    = email.length > 0 && !email.includes("@");
   const passwordError = password.length > 0 && password.length < 6;
-  // Formular ist nur gültig wenn E-Mail und Passwort korrekt befüllt sind -N 27.03.2026
+  /** The form is only considered valid when both fields are non-empty and error-free. */
   const formValid     = email.length > 0 && password.length >= 6 && !emailError;
 
-  //Submit
-  // Sendet die Login-Daten an das Backend via AuthService -N 27.03.2026
+  /**
+   * Submits the login credentials to the backend via {@link AuthService}.
+   *
+   * HTTP error codes are mapped to user-friendly messages:
+   * - `401` — wrong email or password
+   * - `404` — no account found for this email
+   * - anything else — server unreachable / unexpected error
+   */
   const handleLogin = async () => {
     if (!formValid) return;
     setLoading(true);
@@ -49,16 +85,14 @@ export default function LoginPage() {
     try {
       const result = await AuthService.login({ email, password });
 
-      // Weiterleitung je nach Rolle -N 27.03.2026
+      // Redirect based on the authenticated user's role.
       if (result.kunde.role === "ADMIN") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (err: unknown) {
-      // HTTP-Statuscodes aus der Fehlerantwort auslesen -N 27.03.2026
       const status = (err as { response?: { status?: number } })?.response?.status;
-      // 401 = falsche Credentials, 404 = E-Mail unbekannt, sonst Serverproblem -N 27.03.2026
       if (status === 401) {
         setError("E-Mail oder Passwort ist falsch.");
       } else if (status === 404) {
@@ -71,7 +105,12 @@ export default function LoginPage() {
     }
   };
 
-  // Enter-Taste löst den Login aus — verbessert die Tastaturnutzung -N 27.03.2026
+  /**
+   * Allows the user to submit the form by pressing **Enter**,
+   * improving keyboard accessibility.
+   *
+   * @param e - The keyboard event from the surrounding `Stack`.
+   */
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleLogin();
   };
@@ -79,14 +118,14 @@ export default function LoginPage() {
   return (
     <Stack spacing={2.5} onKeyDown={handleKeyDown}>
 
-      {/* Fehlermeldung -N 27.03.2026 */}
+      {/* Error banner — dismissed by the user via the close button */}
       {error && (
         <Alert severity="error" onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
-      {/* E-Mail -N 27.03.2026 */}
+      {/* Email field */}
       <TextField
         label="E-Mail"
         type="email"
@@ -100,7 +139,7 @@ export default function LoginPage() {
         size="small"
       />
 
-      {/* Passwort -N 27.03.2026 */}
+      {/* Password field with show/hide toggle */}
       <TextField
         label="Passwort"
         type={showPassword ? "text" : "password"}
@@ -129,7 +168,7 @@ export default function LoginPage() {
         }}
       />
 
-      {/* Passwort vergessen -N 27.03.2026 */}
+      {/* Forgot password link */}
       <Box sx={{ textAlign: "right", mt: -1.5 }}>
         <Link
           component={RouterLink}
@@ -142,7 +181,7 @@ export default function LoginPage() {
         </Link>
       </Box>
 
-      {/* Login Button — deaktiviert solange Formular ungültig oder Request läuft -N 27.03.2026 */}
+      {/* Submit button — disabled while the form is invalid or the request is in flight */}
       <Button
         variant="contained"
         fullWidth
@@ -151,7 +190,6 @@ export default function LoginPage() {
         size="large"
         sx={{ mt: 0.5 }}
       >
-        {/* Ladeindikator während des API-Calls -N 27.03.2026 */}
         {loading ? (
           <CircularProgress size={20} color="inherit" />
         ) : (
@@ -165,7 +203,7 @@ export default function LoginPage() {
         </Typography>
       </Divider>
 
-      {/* Registrieren -N 27.03.2026 */}
+      {/* Link to registration */}
       <Box sx={{ textAlign: "center" }}>
         <Typography variant="body2" color="text.secondary">
           Noch kein Konto?{" "}
