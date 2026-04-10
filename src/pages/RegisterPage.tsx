@@ -1,16 +1,29 @@
-// RegisterPage.tsx
-// Registrierungsseite für neue Kunden.
-// Felder: persönliche Daten + Fahrzeugdaten (optional).
-// Nach erfolgreicher Registrierung → Weiterleitung zur Startseite
-// mit einer Erfolgsmeldung (via RegisterService + localStorage). -N 07.04.2026
+/**
+ * @file RegisterPage.tsx
+ * @description Registration page for new customers.
+ *
+ * The form is split into two sections:
+ * - **Personal data** (required): first name, last name, email, password, phone, address
+ * - **Vehicle data** (optional): brand, model, year of manufacture, licence plate
+ *
+ * Validation runs on every field after the first submit attempt.
+ * On success the user is redirected to the home page and a welcome
+ * message is stored via {@link RegisterService.setSuccessMessage}.
+ *
+ * @author N
+ * @since 07.04.2026
+ */
 
 import { useState } from "react";
 import {
   Alert,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Divider,
+  FormControlLabel,
+  FormHelperText,
   Link,
   Stack,
   TextField,
@@ -20,13 +33,36 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
 
-// Hilfsfunktion: Ist das Feld ausgefüllt?
+/**
+ * Returns `true` when the trimmed string contains at least one character.
+ * Used to check whether a required text field has been filled in.
+ *
+ * @param val - The field value to check.
+ */
 const required = (val: string) => val.trim().length > 0;
 
+/**
+ * `RegisterPage` renders the customer registration form.
+ *
+ * ## State
+ * | Variable    | Purpose                                              |
+ * |-------------|------------------------------------------------------|
+ * | `form`      | Controlled form values mapped to {@link RegisterRequest} |
+ * | `submitted` | Whether the user has attempted to submit at least once |
+ * | `loading`   | Shows a spinner while the API request is in flight   |
+ * | `error`     | Holds an error message string when registration fails |
+ *
+ * ## Validation rules (required fields only)
+ * - `vorname`, `nachname`, `telefon`, `strasse`, `plz`, `ort` — must not be blank
+ * - `email` — must contain `@`
+ * - `password` — minimum 6 characters
+ *
+ * @returns The registration form wrapped in a MUI `Stack`.
+ */
 export default function RegisterPage() {
   const navigate = useNavigate();
 
-  // Formular-State
+  /** Controlled state for every form field. */
   const [form, setForm] = useState<RegisterRequest>({
     vorname:    "",
     nachname:   "",
@@ -42,12 +78,18 @@ export default function RegisterPage() {
     kennzeichen:"",
   });
 
-  // UI-State
-  const [submitted, setSubmitted] = useState(false); // wurde schon versucht abzusenden?
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  /** `true` after the first submit attempt — enables per-field error display. */
+  const [submitted, setSubmitted]   = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState<string | null>(null);
+  /** Whether the user has accepted the Terms of Service and Privacy Policy. */
+  const [agbAccepted, setAgbAccepted] = useState(false);
 
-  // Feldfehler (nur nach erstem Submit sichtbar)
+  /**
+   * Per-field error flags.
+   * Errors are only shown after the first submit attempt (`submitted === true`)
+   * so the form does not look broken when the user first opens the page.
+   */
   const errors = {
     vorname:  submitted && !required(form.vorname),
     nachname: submitted && !required(form.nachname),
@@ -59,7 +101,7 @@ export default function RegisterPage() {
     ort:      submitted && !required(form.ort),
   };
 
-  // Formular ist gültig wenn kein Pflichtfeld fehlt
+  /** `true` when all required fields pass their validation rules and AGB is accepted. */
   const isValid =
     required(form.vorname) &&
     required(form.nachname) &&
@@ -68,9 +110,15 @@ export default function RegisterPage() {
     required(form.telefon) &&
     required(form.strasse) &&
     required(form.plz) &&
-    required(form.ort);
+    required(form.ort) &&
+    agbAccepted;
 
-  // Feldwert ändern
+  /**
+   * Returns a generic `onChange` handler for a given form field.
+   * The `baujahr` field is coerced to `number | null`; all others stay as strings.
+   *
+   * @param field - The key of the {@link RegisterRequest} field to update.
+   */
   const set = (field: keyof RegisterRequest) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const val = field === "baujahr"
@@ -79,7 +127,16 @@ export default function RegisterPage() {
       setForm((prev) => ({ ...prev, [field]: val }));
     };
 
-  // Submit
+  /**
+   * Handles form submission.
+   *
+   * 1. Marks the form as submitted to reveal validation errors.
+   * 2. Aborts early if any required field is invalid.
+   * 3. Calls {@link RegisterService.register} with the current form values.
+   * 4. On success: stores a welcome message via {@link RegisterService.setSuccessMessage}
+   *    and navigates the user to the home page (`/`).
+   * 5. On failure: displays a generic error alert.
+   */
   const handleRegister = async () => {
     setSubmitted(true);
     if (!isValid) return;
@@ -90,7 +147,7 @@ export default function RegisterPage() {
     try {
       await RegisterService.register(form);
 
-      // Erfolgsmeldung für die HomePage vorbereiten
+      // Store a success message that the HomePage will pick up and display.
       RegisterService.setSuccessMessage(
         `Willkommen, ${form.vorname}! Ihr Konto wurde erfolgreich erstellt.`
       );
@@ -103,7 +160,6 @@ export default function RegisterPage() {
     }
   };
 
-  // Render
   return (
     <Stack spacing={2.5}>
 
@@ -260,6 +316,37 @@ export default function RegisterPage() {
           placeholder="z.B. GZ-12345"
         />
       </Stack>
+
+      {/* ── AGB & Datenschutz ── */}
+      <Box>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={agbAccepted}
+              onChange={(e) => setAgbAccepted(e.target.checked)}
+              size="small"
+              color={submitted && !agbAccepted ? "error" : "primary"}
+            />
+          }
+          label={
+            <Typography variant="body2" color={submitted && !agbAccepted ? "error" : "text.secondary"}>
+              Ich akzeptiere die {" "}
+              <Link href="/agbs" underline="hover" sx={{ color: "primary.light", fontWeight: 600 }}>
+                AGBs
+              </Link>{" "}
+              und{" "}
+              <Link href="/datenschutz" underline="hover" sx={{ color: "primary.light", fontWeight: 600 }}>
+                Datenschutzerklärung
+              </Link>
+            </Typography>
+          }
+        />
+        {submitted && !agbAccepted && (
+          <FormHelperText error sx={{ ml: 4 }}>
+            Ich habe die AGB und die Datenschutzerklärung gelesen und akzeptiert
+          </FormHelperText>
+        )}
+      </Box>
 
       {/* ── Registrieren Button ── */}
       <Button
