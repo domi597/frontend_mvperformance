@@ -120,7 +120,7 @@ export const MOCK_TERMINE: ITermin[] = [
     kundeId: 3,
     kundeName: "Stefan Bauer",
     leistung: "Bremsenservice",
-    datum: "2025-03-21",
+    datum: "2026-04-10",
     uhrzeit: "14:00",
     marke: "Audi",
     modell: "A4",
