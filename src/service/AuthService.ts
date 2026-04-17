@@ -1,17 +1,24 @@
-import type { IKunde } from "../interface/IKunde";
-import { MOCK_KUNDEN } from "../mockdata/mock_data";
+/**
+ * @file AuthService.ts
+ * @description Authentifizierungs-Service — Login, Logout, Token- und Userdaten-Verwaltung.
+ * Kommuniziert mit dem Spring Boot Backend über /api/auth/login.
+ */
 
+import type { ICustomer } from "../interface/ICustomer";
+import { loginApi } from "../api/auth";
 
 // Typen
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+    email: string;
+    password: string;
 }
 
 export interface LoginResponse {
-  token: string;
-  kunde: IKunde;
+    token: string;
+    user: ICustomer;
+    // Alias damit LoginPage weiterhin result.kunde nutzen kann
+    kunde: ICustomer;
 }
 
 // LocalStorage Keys
@@ -22,77 +29,62 @@ const KUNDE_KEY = "loggedInKunde";
 // Auth Service
 
 const AuthService = {
-  /**
-   * Mock-Login: sucht den Kunden anhand der E-Mail in den Mockdaten.
-   * Passwort wird nicht geprüft (beliebig, min. 6 Zeichen via Formular-Validierung).
-   * Gibt einen gefakten Token + Kundendaten zurück. -N 27.03.2026
-   */
-  async login(data: LoginRequest): Promise<LoginResponse> {
-    // Kunde anhand der E-Mail in den Mockdaten suchen
-    const kunde = MOCK_KUNDEN.find(
-      (k) => k.email.toLowerCase() === data.email.toLowerCase()
-    );
+    /**
+     * Login gegen das echte Backend (POST /api/auth/login).
+     * Speichert JWT-Token und User-Daten im localStorage.
+     */
+    async login(data: LoginRequest): Promise<LoginResponse> {
+        const res = await loginApi(data);
 
-    // Kein Treffer → 404 simulieren
-    if (!kunde) {
-      return Promise.reject({ response: { status: 404 } });
-    }
+        localStorage.setItem(TOKEN_KEY, res.token);
+        localStorage.setItem(KUNDE_KEY, JSON.stringify(res.user));
 
-    // Passwort prüfen → 401 simulieren bei falschem Passwort
-    if (kunde.passwort !== data.password) {
-      return Promise.reject({ response: { status: 401 } });
-    }
+        // "kunde" als Alias zurückgeben — LoginPage nutzt result.kunde.role
+        return { ...res, kunde: res.user };
+    },
 
-    // Gefakter JWT-Token (enthält keine echten Daten)
-    const token = `mock-token-${kunde.kundeId}`;
+    /**
+     * Logout: Token und Userdaten aus localStorage entfernen.
+     */
+    logout(): void {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(KUNDE_KEY);
+    },
 
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(KUNDE_KEY, JSON.stringify(kunde));
+    /**
+     * Gibt den gespeicherten JWT-Token zurück (oder null).
+     */
+    getToken(): string | null {
+        return localStorage.getItem(TOKEN_KEY);
+    },
 
-    return { token, kunde };
-  },
+    /**
+     * Gibt den eingeloggten User zurück (oder null).
+     */
+    getKunde(): ICustomer | null {
+        const raw = localStorage.getItem(KUNDE_KEY);
+        if (!raw) return null;
+        try {
+            return JSON.parse(raw) as ICustomer;
+        } catch {
+            return null;
+        }
+    },
 
-  /**
-   * Logout: entfernt JWT + Kundendaten aus localStorage -N 27.03.2026
-   */
-  logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(KUNDE_KEY);
-  },
+    /**
+     * Ist ein Benutzer eingeloggt?
+     */
+    isLoggedIn(): boolean {
+        return !!this.getToken();
+    },
 
-  /**
-   * Gibt den gespeicherten JWT-Token zurück (oder null) -N 27.03.2026
-   */
-  getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
-  },
-
-  /**
-   * Gibt den eingeloggten Kunden zurück (oder null) -N 27.03.2026
-   */
-  getKunde(): IKunde | null {
-    const raw = localStorage.getItem(KUNDE_KEY);
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as IKunde;
-    } catch {
-      return null;
-    }
-  },
-
-  /**
-   * Ist ein Benutzer eingeloggt? -N 27.03.2026
-   */
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  },
-
-  /**
-   * Ist der eingeloggte Benutzer ein Admin? -N 27.03.2026
-   */
-  isAdmin(): boolean {
-    return this.getKunde()?.role === "ADMIN";
-  },
+    /**
+     * Ist der eingeloggte Benutzer ein Admin?
+     */
+    isAdmin(): boolean {
+        return this.getKunde()?.role === "ADMIN";
+    },
 };
 
 export default AuthService;
+

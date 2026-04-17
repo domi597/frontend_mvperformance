@@ -1,4 +1,4 @@
-export interface ILeistung {
+export interface IService {
   leistungId: number;
   name: string;
   beschreibung: string;

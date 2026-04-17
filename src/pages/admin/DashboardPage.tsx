@@ -1,10 +1,9 @@
-import {useEffect, useState} from "react";
+import {useMemo, useState} from "react";
 import {MOCK_TERMINE} from "../../mockdata/mock_data.ts";
-import {ITermin} from "../../interface/ITermin.ts";
+import {IAppointment} from "../../interface/IAppointment.ts";
+import {AppointmentStatus} from "../../types/AppointmentStatus.ts";
 import "../../css/dashboard.css";
 import {useNavigate} from "react-router-dom";
-import {AppointmentStatus} from "../../types/AppointmentStatus.ts";
-import {fetchAppointments} from "../../api/appointmentApi.ts";
 
 /*
 * NAME : JAN HARKAMP
@@ -13,52 +12,30 @@ import {fetchAppointments} from "../../api/appointmentApi.ts";
 
 export default function DashboardPage() {
   // Admin Dashboard: Statistik-Cards, offene Terminanfragen, aktuelle Angebote
-    const [anfragenCounter, setAnfragenCounter] = useState<number>(0);
-    const [termineHeute, setTermineHeute] = useState<number>(0);
-    const [bewertungenCounter, setBewertungCounter] = useState<number>(612);
-
-    const [termine, setTermine] = useState<ITermin[]>([]);
+    const [termine, setTermine] = useState<IAppointment[]>(MOCK_TERMINE);
 
     const navigate = useNavigate();
 
+    const heute = new Date().toISOString().split("T")[0];
+    const anfragenCounter = useMemo(() => termine.filter((t) => t.status === "NEU").length, [termine]);
+    const termineHeute = useMemo(() => termine.filter((t) => t.date === heute).length, [termine, heute]);
+    const bewertungenCounter = 612;
 
-
-    useEffect(() => {
-        const getAppointments = async () => {
-            try {
-                const data = await fetchAppointments();
-                setTermine(data.content);
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        getAppointments();
-
-        const heute = new Date().toISOString().split("T")[0];
-
-        const todayCount = termine.filter((t) => t.date === heute).length;
-        const newRequestCount = termine.filter((t) => t.status === "NEU").length
-
-        setAnfragenCounter(newRequestCount);
-        setTermineHeute(todayCount);
-    }, [termine]);
-
-    const onAccept = (terminId: number) => {
+    const onAccept = (id: number) => {
         setTermine((prev) =>
-            prev.map((t) =>
-                t.id === terminId
-                    ? { ...t, status : "ABGESCHLOSSEN" }
+            prev.map((t): IAppointment =>
+               t.id === id
+                    ? { ...t, status: "BESTÄTIGT" as AppointmentStatus }
                     : t
             )
         );
     };
 
-    const onDecline = (terminId: number) => {
+    const onDecline = (id: number) => {
         setTermine((prev) =>
-            prev.map((t) =>
-                t.id === terminId
-                    ? { ...t, status: "ABGELEHNT" }
+            prev.map((t): IAppointment =>
+                t.id === id
+                    ? { ...t, status: "ABGELEHNT" as AppointmentStatus }
                     : t
             )
         );
@@ -118,7 +95,7 @@ export default function DashboardPage() {
                                 <td>{t.customerName}</td>
                                 <td>{t.serviceType}</td>
                                 <td>
-                                    {t.brand} {t.model} ({t.createdAt})
+                                    {t.brand} {t.model} ({t.year})
                                 </td>
                                 <td>
                                     {t.date} · {t.time}

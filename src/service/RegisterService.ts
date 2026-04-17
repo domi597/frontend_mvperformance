@@ -1,64 +1,56 @@
 // RegisterService.ts
-// Enthält die gesamte Logik für die Registrierung eines neuen Kunden.
-// Die RegisterPage selbst ist nur für die UI zuständig. -N 07.04.2026
+// Registrierungs-Logik: kommuniziert mit dem Backend über /api/auth/register.
 
-import type { IKunde } from "../interface/IKunde";
 import type { RegisterRequest, RegisterResponse } from "../types/RegisterTypes";
-
-// Register Service
+import { registerApi } from "../api/auth";
 
 const RegisterService = {
-  /**
-   * Mock-Registrierung: simuliert einen erfolgreichen API-Call.
-   * Wenn das Backend fertig ist, diesen Block durch einen echten
-   * api.post("/api/auth/register", data) Call ersetzen. -N 07.04.2026
-   */
-  async register(data: RegisterRequest): Promise<RegisterResponse> {
-    // TODO: echten API-Call einbauen wenn Backend fertig ist
-    // const res = await api.post<RegisterResponse>("/api/auth/register", data);
-    // return res.data;
+    /**
+     * Registrierung gegen das echte Backend (POST /api/auth/register).
+     * Speichert bei Erfolg Token + User im localStorage (Auto-Login).
+     */
+    async register(data: RegisterRequest): Promise<RegisterResponse> {
+        // Felder auf Backend-Format mappen (Frontend nutzt deutsche Namen)
+        const backendPayload = {
+            firstName:            data.vorname,
+            lastName:             data.nachname,
+            email:                data.email,
+            password:             data.password,
+            phone:                data.telefon,
+            street:               data.strasse,
+            city:                 data.ort,
+            vehicleBrand:         data.marke        || undefined,
+            vehicleModel:         data.modell       || undefined,
+            vehicleBuildYear:     data.baujahr      ?? undefined,
+            vehicleLicensePlate:  data.kennzeichen  || undefined,
+        };
 
-    // Mock: kurze Verzögerung simuliert Netzwerk-Request
-    await new Promise((resolve) => setTimeout(resolve, 800));
+        const res = await registerApi(backendPayload as never);
 
-    // Mock-Antwort: neuer Kunde wird zurückgegeben
-    const neuerKunde: IKunde = {
-      kundeId: Date.now(),
-      vorname: data.vorname,
-      nachname: data.nachname,
-      email: data.email,
-      telefon: data.telefon,
-      strasse: data.strasse,
-      plz: data.plz,
-      ort: data.ort,
-      marke: data.marke,
-      modell: data.modell,
-      baujahr: data.baujahr,
-      kennzeichen: data.kennzeichen,
-      role: "KUNDE",
-      createdAt: new Date().toISOString(),
-    };
+        // Auto-Login: Token und User direkt speichern
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("loggedInKunde", JSON.stringify(res.user));
 
-    return { kunde: neuerKunde };
-  },
+        return { kunde: res.user };
+    },
 
-  /**
-   * Speichert eine Erfolgsmeldung im localStorage.
-   * Die HomePage liest diese aus und zeigt sie als Snackbar an. -N 07.04.2026
-   */
-  setSuccessMessage(message: string): void {
-    localStorage.setItem("successMessage", message);
-  },
+    /**
+     * Speichert eine Erfolgsmeldung im localStorage.
+     * Die HomePage liest diese aus und zeigt sie als Snackbar an.
+     */
+    setSuccessMessage(message: string): void {
+        localStorage.setItem("successMessage", message);
+    },
 
-  /**
-   * Liest die Erfolgsmeldung aus und löscht sie danach sofort.
-   * So wird sie nur einmal angezeigt. -N 07.04.2026
-   */
-  popSuccessMessage(): string | null {
-    const msg = localStorage.getItem("successMessage");
-    if (msg) localStorage.removeItem("successMessage");
-    return msg;
-  },
+    /**
+     * Liest die Erfolgsmeldung aus und löscht sie danach sofort (einmalige Anzeige).
+     */
+    popSuccessMessage(): string | null {
+        const msg = localStorage.getItem("successMessage");
+        if (msg) localStorage.removeItem("successMessage");
+        return msg;
+    },
 };
 
 export default RegisterService;
+

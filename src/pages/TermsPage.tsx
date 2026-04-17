@@ -24,7 +24,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-export const AGBPage = () => {
+export const TermsPage = () => {
   const navigate = useNavigate();
 
   return (

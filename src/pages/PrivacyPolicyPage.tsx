@@ -24,7 +24,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-export default function DatenschutzPage() {
+export default function PrivacyPolicyPage() {
   const navigate = useNavigate();
 
   return (
