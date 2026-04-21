@@ -112,112 +112,116 @@ export default function LoginPage() {
    * @param e - The keyboard event from the surrounding `Stack`.
    */
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleLogin();
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleLogin();
+    }
   };
 
   return (
-    <Stack spacing={2.5} onKeyDown={handleKeyDown}>
+      <Stack spacing={2.5} onKeyDown={handleKeyDown}>
 
-      {/* Error banner — dismissed by the user via the close button */}
-      {error && (
-        <Alert severity="error" onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Email field */}
-      <TextField
-        label="E-Mail"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        error={emailError}
-        helperText={emailError ? "Bitte eine gültige E-Mail eingeben" : ""}
-        autoComplete="email"
-        autoFocus
-        fullWidth
-        size="small"
-      />
-
-      {/* Password field with show/hide toggle */}
-      <TextField
-        label="Passwort"
-        type={showPassword ? "text" : "password"}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        error={passwordError}
-        helperText={passwordError ? "Passwort muss mindestens 6 Zeichen haben" : ""}
-        autoComplete="current-password"
-        fullWidth
-        size="small"
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword((v) => !v)}
-                  edge="end"
-                  size="small"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
-
-      {/* Forgot password link */}
-      <Box sx={{ textAlign: "right", mt: -1.5 }}>
-        <Link
-          component={RouterLink}
-          to="/passwort-vergessen"
-          variant="caption"
-          underline="hover"
-          sx={{ color: "text.secondary" }}
-        >
-          Passwort vergessen?
-        </Link>
-      </Box>
-
-      {/* Submit button — disabled while the form is invalid or the request is in flight */}
-      <Button
-        variant="contained"
-        fullWidth
-        disabled={!formValid || loading}
-        onClick={handleLogin}
-        size="large"
-        sx={{ mt: 0.5 }}
-      >
-        {loading ? (
-          <CircularProgress size={20} color="inherit" />
-        ) : (
-          "Anmelden"
+        {/* Error banner — dismissed by the user via the close button */}
+        {error && (
+            <Alert severity="error" onClose={() => setError(null)}>
+              {error}
+            </Alert>
         )}
-      </Button>
 
-      <Divider>
-        <Typography variant="caption" color="text.secondary">
-          oder
-        </Typography>
-      </Divider>
+        {/* Email field */}
+        <TextField
+            label="E-Mail"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={emailError}
+            helperText={emailError ? "Bitte eine gültige E-Mail eingeben" : ""}
+            autoComplete="email"
+            autoFocus
+            fullWidth
+            size="small"
+        />
 
-      {/* Link to registration */}
-      <Box sx={{ textAlign: "center" }}>
-        <Typography variant="body2" color="text.secondary">
-          Noch kein Konto?{" "}
+        {/* Password field with show/hide toggle */}
+        <TextField
+            label="Passwort"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={passwordError}
+            helperText={passwordError ? "Passwort muss mindestens 6 Zeichen haben" : ""}
+            autoComplete="current-password"
+            fullWidth
+            size="small"
+            slotProps={{
+              input: {
+                endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                          onClick={() => setShowPassword((v) => !v)}
+                          edge="end"
+                          size="small"
+                          tabIndex={-1}
+                      >
+                        {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                      </IconButton>
+                    </InputAdornment>
+                ),
+              },
+            }}
+        />
+
+        {/* Forgot password link */}
+        <Box sx={{ textAlign: "right", mt: -1.5 }}>
           <Link
-            component={RouterLink}
-            to="/registrieren"
-            underline="hover"
-            sx={{ color: "primary.light", fontWeight: 600 }}
+              component={RouterLink}
+              to="/passwort-vergessen"
+              variant="caption"
+              underline="hover"
+              sx={{ color: "text.secondary" }}
           >
-            Jetzt registrieren
+            Passwort vergessen?
           </Link>
-        </Typography>
-      </Box>
+        </Box>
 
-    </Stack>
+        {/* Submit button — disabled while the form is invalid or the request is in flight */}
+        <Button
+            type="button"
+            variant="contained"
+            fullWidth
+            disabled={!formValid || loading}
+            onClick={handleLogin}
+            size="large"
+            sx={{ mt: 0.5 }}
+        >
+          {loading ? (
+              <CircularProgress size={20} color="inherit" />
+          ) : (
+              "Anmelden"
+          )}
+        </Button>
+
+        <Divider>
+          <Typography variant="caption" color="text.secondary">
+            oder
+          </Typography>
+        </Divider>
+
+        {/* Link to registration */}
+        <Box sx={{ textAlign: "center" }}>
+          <Typography variant="body2" color="text.secondary">
+            Noch kein Konto?{" "}
+            <Link
+                component={RouterLink}
+                to="/registrieren"
+                underline="hover"
+                sx={{ color: "primary.light", fontWeight: 600 }}
+            >
+              Jetzt registrieren
+            </Link>
+          </Typography>
+        </Box>
+
+      </Stack>
   );
 }
