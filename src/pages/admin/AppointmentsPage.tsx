@@ -1,16 +1,17 @@
 import {useEffect, useState} from "react";
-import "../../css/termine.css";
+import "../../css/appointments.css";
 import { MOCK_TERMINE } from "../../mockdata/mock_data";
-import { ITermin } from "../../interface/ITermin";
+import { IAppointment } from "../../interface/IAppointment";
 import {fetchAppointments} from "../../api/appointmentApi.ts";
+import {AppointmentStatus} from "../../types/AppointmentStatus.ts";
 
 /*
 * NAME : JAN HARKAMP
 * DATE : 24.03
 * */
 
-export default function TerminePage() {
-    const [termine, setTermine] = useState<ITermin[]>(MOCK_TERMINE);
+function AppointmentsPage() {
+    const [termine, setTermine] = useState<IAppointment[]>(MOCK_TERMINE);
     const [filter, setFilter] = useState<string>("ALLE");
     const [page, setPage] = useState<number>(1);
 
@@ -32,21 +33,21 @@ export default function TerminePage() {
     }, []);
 
     // Aktionen
-    const onAccept = (terminId: number) => {
+    const onAccept = (id: number) => {
         setTermine((prev) =>
-            prev.map((t) =>
-                t.id === terminId
-                    ? { ...t, status: "BESTÄTIGT" }
+            prev.map((t): IAppointment =>
+                t.id === id
+                    ? {...t, status: "BESTÄTIGT" as AppointmentStatus}
                     : t
             )
         );
     };
 
-    const onDecline = (terminId: number) => {
+    const onDecline = (id: number) => {
         setTermine((prev) =>
-            prev.map((t) =>
-                t.id === terminId
-                    ? { ...t, status: "ABGELEHNT" }
+            prev.map((t): IAppointment =>
+                t.id === id
+                    ? {...t, status: "ABGELEHNT" as AppointmentStatus}
                     : t
             )
         );
@@ -83,8 +84,9 @@ export default function TerminePage() {
         HEUTE: "Heute",
         NEU: "Neu",
         AUSSTEHEND: "Ausstehend",
-        BESTAETIGT: "Bestätigt",
+        "BESTÄTIGT": "Bestätigt",
         ABGELEHNT: "Abgelehnt",
+        ABGESCHLOSSEN: "Abgeschlossen",
     };
 
     return (
@@ -93,7 +95,7 @@ export default function TerminePage() {
 
             {/* Tabs */}
             <div className="tabs">
-                {["ALLE", "HEUTE", "NEU", "AUSSTEHEND", "BESTAETIGT", "ABGELEHNT"].map((f) => (
+                {["ALLE", "HEUTE", "NEU", "AUSSTEHEND", "BESTÄTIGT", "ABGELEHNT", "ABGESCHLOSSEN"].map((f) => (
                     <button
                         key={f}
                         className={filter === f ? "tab active" : "tab"}
@@ -179,7 +181,7 @@ export default function TerminePage() {
 
             {/* Pagination */}
             <div className="pagination">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                {Array.from({length: totalPages}, (_, i) => i + 1).map((p) => (
                     <button
                         key={p}
                         className={page === p ? "page active" : "page"}
@@ -192,3 +194,5 @@ export default function TerminePage() {
         </div>
     );
 }
+
+export default AppointmentsPage

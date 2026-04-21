@@ -1,4 +1,4 @@
-export default function KundenPage() {
+export default function CustomersPage() {
   // Kundenliste verwalten
   return <></>;
 }

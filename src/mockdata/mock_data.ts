@@ -1,9 +1,22 @@
-import type { IKunde } from "../interface/IKunde";
-import type { ITermin } from "../interface/ITermin";
-import type { IAngebot } from "../interface/IAngebot";
+import type { IAppointment } from "../interface/IAppointment";
+import type { IOffer } from "../interface/IOffer";
 
-// Erweitertes Mock-Interface mit Passwort (nur für lokale Testdaten) -N 27.03.2026
-export interface IMockKunde extends IKunde {
+// Standalone mock customer type with password — only for local test data. -N 27.03.2026
+export interface IMockKunde {
+  kundeId: number;
+  vorname: string;
+  nachname: string;
+  email: string;
+  telefon: string;
+  strasse: string;
+  plz: string;
+  ort: string;
+  marke: string;
+  modell: string;
+  baujahr: number | null;
+  kennzeichen: string;
+  role: "ADMIN" | "KUNDE";
+  createdAt: string;
   passwort: string;
 }
 
@@ -82,60 +95,60 @@ export const MOCK_KUNDEN: IMockKunde[] = [
 
 // Mock Termine - generiert
 
-export const MOCK_TERMINE: ITermin[] = [
+export const MOCK_TERMINE: IAppointment[] = [
   {
-    terminId: 1,
-    kundeId: 1,
-    kundeName: "Thomas Kauer",
-    leistung: "Ölwechsel",
-    datum: "2025-03-19",
-    uhrzeit: "10:00",
-    marke: "VW",
-    modell: "Golf",
-    baujahr: 2018,
-    kennzeichen: "LB-TK-123",
+    id: 1,
+    customerId: 1,
+    customerName: "Thomas Kauer",
+    serviceType: "Ölwechsel",
+    date: "2025-03-19",
+    time: "10:00",
+    brand: "VW",
+    model: "Golf",
+    year: 2018,
+    licensePlate: "LB-TK-123",
     status: "NEU",
-    preis: 49,
-    notiz: "",
+    price: 49,
+    note: "",
     createdAt: "2025-03-10T08:14:00",
   },
   {
-    terminId: 2,
-    kundeId: 2,
-    kundeName: "Maria Schreiner",
-    leistung: "Reifenwechsel",
-    datum: "2025-03-20",
-    uhrzeit: "09:00",
-    marke: "BMW",
-    modell: "X2",
-    baujahr: 2021,
-    kennzeichen: "LB-MS-456",
+    id: 2,
+    customerId: 2,
+    customerName: "Maria Schreiner",
+    serviceType: "Reifenwechsel",
+    date: "2025-03-20",
+    time: "09:00",
+    brand: "BMW",
+    model: "X2",
+    year: 2021,
+    licensePlate: "LB-MS-456",
     status: "AUSSTEHEND",
-    preis: 69,
-    notiz: "Bitte Winterreifen einlagern",
+    price: 69,
+    note: "Bitte Winterreifen einlagern",
     createdAt: "2025-03-11T11:30:00",
   },
   {
-    terminId: 3,
-    kundeId: 3,
-    kundeName: "Stefan Bauer",
-    leistung: "Bremsenservice",
-    datum: "2026-04-10",
-    uhrzeit: "14:00",
-    marke: "Audi",
-    modell: "A4",
-    baujahr: 2017,
-    kennzeichen: "LB-SB-789",
-    status: "BESTAETIGT",
-    preis: 95,
-    notiz: "",
+    id: 3,
+    customerId: 3,
+    customerName: "Stefan Bauer",
+    serviceType: "Bremsenservice",
+    date: "2026-04-10",
+    time: "14:00",
+    brand: "Audi",
+    model: "A4",
+    year: 2017,
+    licensePlate: "LB-SB-789",
+    status: "BESTÄTIGT",
+    price: 95,
+    note: "",
     createdAt: "2025-03-12T15:45:00",
   },
 ];
 
 // Mock Angebote - generiert
 
-export const MOCK_ANGEBOTE: IAngebot[] = [
+export const MOCK_ANGEBOTE: IOffer[] = [
   {
     angebotId: 1,
     titel: "Frühlings-Check",

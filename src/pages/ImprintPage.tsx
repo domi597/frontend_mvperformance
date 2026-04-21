@@ -23,7 +23,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-export default function ImpressumPage() {
+export default function ImprintPage() {
   const navigate = useNavigate();
 
   return (

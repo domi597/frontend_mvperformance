@@ -17,13 +17,13 @@ import AdminLayout from "./view/AdminLayout";
 
 // Public Pages
 import HomePage from "./pages/HomePage";
-import LeistungenPage from "./pages/LeistungenPage";
-import AngebotePage from "./pages/AngebotePage";
+import ServicesPage from "./pages/ServicesPage";
+import OffersPage from "./pages/OffersPage";
 import KontaktPage from "./pages/ContactPage";
-import UeberUnsPage from "./pages/UeberUnsPage";
-import TerminPage from "./pages/TerminPage";
-import ImpressumPage from "./pages/ImpressumPage";
-import DatenschutzPage from "./pages/DatenschutzPage";
+import AboutUsPage from "./pages/AboutUsPage";
+import AppointmentPage from "./pages/AppointmentPage";
+import ImprintPage from "./pages/ImprintPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 // Auth Pages
 import LoginPage from "./pages/LoginPage";
@@ -32,12 +32,12 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 // Admin Pages
 import DashboardPage from "./pages/admin/DashboardPage";
-import TerminePage from "./pages/admin/TerminePage";
-import AdminAngebotePage from "./pages/admin/AdminAngebotePage";
-import AdminLeistungenPage from "./pages/admin/AdminLeistungenPage";
-import KundenPage from "./pages/admin/KundenPage";
-import EinstellungenPage from "./pages/admin/EinstellungenPage";
-import {AGBPage} from "./pages/AGBPage.tsx";
+import AppointmentsPage from "./pages/admin/AppointmentsPage";
+import AdminOffersPage from "./pages/admin/AdminOffersPage";
+import AdminServicesPage from "./pages/admin/AdminServicesPage";
+import CustomersPage from "./pages/admin/CustomersPage";
+import SettingsPage from "./pages/admin/SettingsPage";
+import { TermsPage } from "./pages/TermsPage";
 
 function RequireAdmin({ children }: { children: ReactElement }) {
   const token = localStorage.getItem("token");
@@ -76,16 +76,16 @@ const router = createBrowserRouter([
         element: <PublicLayout />,
         children: [
           { path: "/", element: <HomePage /> },
-          { path: "/leistungen", element: <LeistungenPage /> },
-          { path: "/angebote", element: <AngebotePage /> },
+          { path: "/leistungen", element: <ServicesPage /> },
+          { path: "/angebote", element: <OffersPage /> },
           { path: "/kontakt", element: <KontaktPage /> },
-          { path: "/ueber-uns", element: <UeberUnsPage /> },
-          { path: "/termin", element: <TerminPage /> },
+          { path: "/ueber-uns", element: <AboutUsPage /> },
+          { path: "/termin", element: <AppointmentPage /> },
         ],
       },
-      { path: "/impressum", element: <ImpressumPage /> },
-      { path: "/datenschutz", element: <DatenschutzPage /> },
-      { path: "/agbs", element: <AGBPage /> },
+      { path: "/impressum", element: <ImprintPage /> },
+      { path: "/datenschutz", element: <PrivacyPolicyPage /> },
+      { path: "/agbs", element: <TermsPage /> },
 
       {
         element: <AuthLayout />,
@@ -103,11 +103,11 @@ const router = createBrowserRouter([
         ),
         children: [
           { path: "/admin", element: <DashboardPage /> },
-          { path: "/admin/termine", element: <TerminePage /> },
-          { path: "/admin/angebote", element: <AdminAngebotePage /> },
-          { path: "/admin/leistungen", element: <AdminLeistungenPage /> },
-          { path: "/admin/kunden", element: <KundenPage /> },
-          { path: "/admin/einstellungen", element: <EinstellungenPage /> },
+          { path: "/admin/termine", element: <AppointmentsPage /> },
+          { path: "/admin/angebote", element: <AdminOffersPage /> },
+          { path: "/admin/leistungen", element: <AdminServicesPage /> },
+          { path: "/admin/kunden", element: <CustomersPage /> },
+          { path: "/admin/einstellungen", element: <SettingsPage /> },
         ],
       },
     ],

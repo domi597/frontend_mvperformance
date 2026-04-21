@@ -1,4 +1,4 @@
-export interface IAngebot {
+export interface IOffer {
   angebotId: number;
   titel: string;
   beschreibung: string;
