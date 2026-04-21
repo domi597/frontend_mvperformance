@@ -1,51 +1,109 @@
-import {useMemo, useState} from "react";
-import {MOCK_TERMINE} from "../../mockdata/mock_data.ts";
-import {IAppointment} from "../../interface/IAppointment.ts";
-import {AppointmentStatus} from "../../types/AppointmentStatus.ts";
+import { useEffect, useMemo, useState } from "react";
+import { IAppointment } from "../../interface/IAppointment";
+import { AppointmentStatus } from "../../types/AppointmentStatus";
 import "../../css/dashboard.css";
-import {useNavigate} from "react-router-dom";
-
-/*
-* NAME : JAN HARKAMP
-* DATE : 24.03
-* */
+import { useNavigate } from "react-router-dom";
+import {
+    fetchAppointments,
+    updateAppointmentStatus
+} from "../../api/appointmentApi";
 
 export default function DashboardPage() {
-  // Admin Dashboard: Statistik-Cards, offene Terminanfragen, aktuelle Angebote
-    const [termine, setTermine] = useState<IAppointment[]>(MOCK_TERMINE);
-
+    const [termine, setTermine] = useState<IAppointment[]>([]);
     const navigate = useNavigate();
 
-    const heute = new Date().toISOString().split("T")[0];
-    const anfragenCounter = useMemo(() => termine.filter((t) => t.status === "NEU").length, [termine]);
-    const termineHeute = useMemo(() => termine.filter((t) => t.date === heute).length, [termine, heute]);
+    const heute = new Date().toLocaleDateString("sv-SE");
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const res = await fetchAppointments(undefined, 0, 100);
+
+                const data: IAppointment[] = Array.isArray(res)
+                    ? res
+                    : res?.content ?? [];
+
+                setTermine(data);
+            } catch (err) {
+                console.error(err);
+                setTermine([]);
+            }
+        };
+
+        load();
+    }, []);
+
+    const anfragenCounter = useMemo(
+        () => termine.filter((t) => t.status === "NEU").length,
+        [termine]
+    );
+
+    const termineHeute = useMemo(
+        () => termine.filter((t) => t.date === heute).length,
+        [termine, heute]
+    );
+
     const bewertungenCounter = 612;
 
-    const onAccept = (id: number) => {
-        setTermine((prev) =>
-            prev.map((t): IAppointment =>
-               t.id === id
-                    ? { ...t, status: "BESTÄTIGT" as AppointmentStatus }
-                    : t
-            )
-        );
+    const topTermine = useMemo(
+        () =>
+            [...termine]
+                .filter((t) => t.status === "NEU" || t.status === "AUSSTEHEND")
+                .sort(
+                    (a, b) =>
+                        new Date(`${a.date}T${a.time}`).getTime() -
+                        new Date(`${b.date}T${b.time}`).getTime()
+                )
+                .slice(0, 3),
+        [termine]
+    );
+
+    const onAccept = async (id: number) => {
+        try {
+            await updateAppointmentStatus(id, "BESTÄTIGT");
+
+            setTermine((prev) =>
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: "BESTÄTIGT" } : t
+                )
+            );
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const onDecline = (id: number) => {
-        setTermine((prev) =>
-            prev.map((t): IAppointment =>
-                t.id === id
-                    ? { ...t, status: "ABGELEHNT" as AppointmentStatus }
-                    : t
-            )
-        );
+    const onDecline = async (id: number) => {
+        try {
+            await updateAppointmentStatus(id, "ABGELEHNT");
+
+            setTermine((prev) =>
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: "ABGELEHNT" } : t
+                )
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const statusColor = (status: AppointmentStatus) => {
+        switch (status) {
+            case "NEU":
+                return "blue";
+            case "AUSSTEHEND":
+                return "yellow";
+            case "BESTÄTIGT":
+                return "green";
+            case "ABGELEHNT":
+                return "red";
+            default:
+                return "gray";
+        }
     };
 
     return (
         <div className="main full">
 
-
-            {/* Stats */}
             <div className="stats">
                 <div className="card">
                     <p>NEUE ANFRAGEN</p>
@@ -70,11 +128,12 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Tabelle */}
             <div className="section">
                 <div className="section-header">
                     <h2>Offene Terminanfragen</h2>
-                    <button onClick={() => navigate("/admin/termine")}>Alle ansehen →</button>
+                    <button onClick={() => navigate("/admin/termine")}>
+                        Alle ansehen →
+                    </button>
                 </div>
 
                 <table className="table">
@@ -88,62 +147,43 @@ export default function DashboardPage() {
                         <th>Aktionen</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    {
-                        termine.map((t) => (
-                            <tr key={t.id}>
-                                <td>{t.customerName}</td>
-                                <td>{t.serviceType}</td>
-                                <td>
-                                    {t.brand} {t.model} ({t.year})
-                                </td>
-                                <td>
-                                    {t.date} · {t.time}
-                                </td>
 
-                                {/* Status */}
-                                <td>
-                                    <span
-                                        className={`badge ${
-                                            t.status === "NEU"
-                                                ? "blue"
-                                                : t.status === "AUSSTEHEND"
-                                                    ? "yellow"
-                                                    : t.status === "BESTÄTIGT"
-                                                        ? "green"
-                                                        : "red"
-                                        }`}
-                                    >
+                    <tbody>
+                    {topTermine.map((t) => (
+                        <tr key={t.id}>
+                            <td>{t.customerName}</td>
+                            <td>{t.serviceType}</td>
+                            <td>{t.brand} {t.model} ({t.year})</td>
+                            <td>{t.date} · {t.time}</td>
+
+                            <td>
+                                    <span className={`badge ${statusColor(t.status)}`}>
                                         {t.status}
                                     </span>
-                                </td>
+                            </td>
 
-                                {/* Aktionen */}
-                                <td>
-                                    {t.status === "NEU" || t.status === "AUSSTEHEND" ? (
-                                        <>
-                                            <button
-                                                className="btn"
-                                                onClick={() => onAccept(t.id)}
-                                            >
-                                                Bestätigen
-                                            </button>
-                                            <button
-                                                className="btn danger"
-                                                onClick={() => onDecline(t.id)}
-                                            >
-                                                Ablehnen
-                                            </button>
-                                        </>
-                                    ) : t.status === "BESTÄTIGT" ? (
-                                        <span>-</span>
-                                    ) : (
-                                        <span>-</span> // bei ABGELEHNT nix mehr anzeigen
-                                    )}
-                                </td>
-                            </tr>
-                        ))
-                    }
+                            <td>
+                                {t.status === "NEU" || t.status === "AUSSTEHEND" ? (
+                                    <>
+                                        <button
+                                            className="btn"
+                                            onClick={() => onAccept(t.id)}
+                                        >
+                                            Bestätigen
+                                        </button>
+                                        <button
+                                            className="btn danger"
+                                            onClick={() => onDecline(t.id)}
+                                        >
+                                            Ablehnen
+                                        </button>
+                                    </>
+                                ) : (
+                                    <span>-</span>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </div>

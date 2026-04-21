@@ -1,115 +1,127 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import "../../css/appointments.css";
-import { MOCK_TERMINE } from "../../mockdata/mock_data";
 import { IAppointment } from "../../interface/IAppointment";
-import {fetchAppointments} from "../../api/appointmentApi.ts";
-import {AppointmentStatus} from "../../types/AppointmentStatus.ts";
+import {
+    fetchAppointments,
+    updateAppointmentStatus
+} from "../../api/appointmentApi";
+import { AppointmentStatus } from "../../types/AppointmentStatus";
 
-/*
-* NAME : JAN HARKAMP
-* DATE : 24.03
-* */
+type FilterType = "ALLE" | "HEUTE" | AppointmentStatus;
 
 function AppointmentsPage() {
-    const [termine, setTermine] = useState<IAppointment[]>(MOCK_TERMINE);
-    const [filter, setFilter] = useState<string>("ALLE");
+    const [termine, setTermine] = useState<IAppointment[]>([]);
+    const [filter, setFilter] = useState<FilterType>("ALLE");
     const [page, setPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
 
     const itemsPerPage = 5;
+    const heute = new Date().toLocaleDateString("sv-SE");
 
-    const heute = new Date().toISOString().split("T")[0];
+    const loadData = async () => {
+        try {
+            const backendPage = page - 1;
+
+            const status =
+                filter === "ALLE" || filter === "HEUTE"
+                    ? undefined
+                    : filter;
+
+            const res = await fetchAppointments(status, backendPage, itemsPerPage);
+
+            const content = res?.content ?? [];
+
+            const filtered =
+                filter === "HEUTE"
+                    ? content.filter((t) => t.date === heute)
+                    : content;
+
+            setTermine(filtered);
+            setTotalPages(res?.totalPages ?? 1);
+        } catch (err) {
+            console.error(err);
+            setTermine([]);
+            setTotalPages(1);
+        }
+    };
 
     useEffect(() => {
-        const getAppointments = async () => {
-            try {
-                const data = await fetchAppointments();
-                setTermine(data.content);
-            } catch (err) {
-                console.log(err);
-            }
+        loadData();
+    }, [filter, page]);
+
+    const onAccept = async (id: number) => {
+        try {
+            await updateAppointmentStatus(id, "BESTÄTIGT");
+
+            setTermine((prev) =>
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: "BESTÄTIGT" } : t
+                )
+            );
+        } catch (err) {
+            console.error("Accept failed", err);
         }
-
-        getAppointments();
-    }, []);
-
-    // Aktionen
-    const onAccept = (id: number) => {
-        setTermine((prev) =>
-            prev.map((t): IAppointment =>
-                t.id === id
-                    ? {...t, status: "BESTÄTIGT" as AppointmentStatus}
-                    : t
-            )
-        );
     };
 
-    const onDecline = (id: number) => {
-        setTermine((prev) =>
-            prev.map((t): IAppointment =>
-                t.id === id
-                    ? {...t, status: "ABGELEHNT" as AppointmentStatus}
-                    : t
-            )
-        );
+    const onDecline = async (id: number) => {
+        try {
+            await updateAppointmentStatus(id, "ABGELEHNT");
+
+            setTermine((prev) =>
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: "ABGELEHNT" } : t
+                )
+            );
+        } catch (err) {
+            console.error("Decline failed", err);
+        }
     };
 
-    // Filter + Sortierung
-    const gefiltert = termine
-        .filter((t) => {
-            if (filter === "ALLE") return true;
-
-            if (filter === "HEUTE") {
-                return t.date === heute && t.status !== "ABGELEHNT";
-            }
-
-            return t.status === filter;
-        })
-        .sort((a, b) => {
-            const dateA = new Date(`${a.date}T${a.time}`);
-            const dateB = new Date(`${b.date}T${b.time}`);
-            return dateA.getTime() - dateB.getTime();
-        });
-
-    // Pagination
-    const totalPages = Math.ceil(gefiltert.length / itemsPerPage);
-
-    const paginated = gefiltert.slice(
-        (page - 1) * itemsPerPage,
-        page * itemsPerPage
-    );
-
-    // Labels für UI
-    const labelMap: Record<string, string> = {
+    const labelMap: Record<FilterType, string> = {
         ALLE: "Alle",
         HEUTE: "Heute",
         NEU: "Neu",
         AUSSTEHEND: "Ausstehend",
-        "BESTÄTIGT": "Bestätigt",
+        BESTÄTIGT: "Bestätigt",
         ABGELEHNT: "Abgelehnt",
         ABGESCHLOSSEN: "Abgeschlossen",
+    };
+
+    const statusClassMap: Record<AppointmentStatus, string> = {
+        NEU: "blue",
+        AUSSTEHEND: "yellow",
+        BESTÄTIGT: "green",
+        ABGELEHNT: "red",
+        ABGESCHLOSSEN: "gray",
     };
 
     return (
         <div className="main full">
             <h1>Termine</h1>
 
-            {/* Tabs */}
             <div className="tabs">
-                {["ALLE", "HEUTE", "NEU", "AUSSTEHEND", "BESTÄTIGT", "ABGELEHNT", "ABGESCHLOSSEN"].map((f) => (
+                {[
+                    "ALLE",
+                    "HEUTE",
+                    "NEU",
+                    "AUSSTEHEND",
+                    "BESTÄTIGT",
+                    "ABGELEHNT",
+                    "ABGESCHLOSSEN",
+                ].map((f) => (
                     <button
                         key={f}
                         className={filter === f ? "tab active" : "tab"}
                         onClick={() => {
-                            setFilter(f);
+                            setFilter(f as FilterType);
                             setPage(1);
                         }}
                     >
-                        {labelMap[f]}
+                        {labelMap[f as FilterType]}
                     </button>
                 ))}
             </div>
 
-            {/* Tabelle */}
             <table className="table">
                 <thead>
                 <tr>
@@ -123,65 +135,45 @@ function AppointmentsPage() {
                 </thead>
 
                 <tbody>
-                {paginated.map((t) => (
+                {termine.map((t) => (
                     <tr key={t.id}>
                         <td>{t.customerName}</td>
                         <td>{t.serviceType}</td>
+                        <td>{t.brand} {t.model}</td>
+                        <td>{t.date} · {t.time}</td>
+
                         <td>
-                            {t.brand} {t.model}
-                        </td>
-                        <td>
-                            {t.date} · {t.time}
+                            <span className={`badge ${statusClassMap[t.status]}`}>
+                                {labelMap[t.status]}
+                            </span>
                         </td>
 
-                        {/* Status */}
                         <td>
-                <span
-                    className={`badge ${
-                        t.status === "NEU"
-                            ? "blue"
-                            : t.status === "AUSSTEHEND"
-                                ? "yellow"
-                                : t.status === "BESTÄTIGT"
-                                    ? "green"
-                                    : "red"
-                    }`}
-                >
-                  {labelMap[t.status]}
-                </span>
-                        </td>
-
-                        {/* Aktionen */}
-                        <td>
-                            {t.status === "NEU" || t.status === "AUSSTEHEND" ? (
+                            {(t.status === "NEU" || t.status === "AUSSTEHEND") && (
                                 <>
-                                    <button
-                                        className="btn"
-                                        onClick={() => onAccept(t.id)}
-                                    >
+                                    <button className="btn" onClick={() => onAccept(t.id)}>
                                         Bestätigen
                                     </button>
-                                    <button
-                                        className="btn danger"
-                                        onClick={() => onDecline(t.id)}
-                                    >
+                                    <button className="btn danger" onClick={() => onDecline(t.id)}>
                                         Ablehnen
                                     </button>
                                 </>
-                            ) : t.status === "BESTÄTIGT" ? (
-                                <button className="btn">Bearbeiten</button>
-                            ) : (
-                                <span>-</span>
                             )}
+
+                            {t.status === "BESTÄTIGT" && (
+                                <button className="btn">Bearbeiten</button>
+                            )}
+
+                            {(t.status === "ABGELEHNT" ||
+                                t.status === "ABGESCHLOSSEN") && <span>-</span>}
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </table>
 
-            {/* Pagination */}
             <div className="pagination">
-                {Array.from({length: totalPages}, (_, i) => i + 1).map((p) => (
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                     <button
                         key={p}
                         className={page === p ? "page active" : "page"}
@@ -195,4 +187,4 @@ function AppointmentsPage() {
     );
 }
 
-export default AppointmentsPage
+export default AppointmentsPage;
