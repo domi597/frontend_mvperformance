@@ -16,9 +16,15 @@ const api = axios.create({
 // Der Token wird aus dem localStorage gelesen und als Bearer-Token
 // im Authorization-Header gesetzt, sofern ein Token vorhanden ist. -N 27.03.2026
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const url = config.url ?? "";
+    const isAuthEndpoint = url.includes("/api/auth/");
+
+    // Auth-Endpoints brauchen keinen Token (Login/Register)
+    if (!isAuthEndpoint) {
+        const token = localStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
     }
     return config;
 });

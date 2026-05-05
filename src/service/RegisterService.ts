@@ -18,6 +18,7 @@ const RegisterService = {
             password:             data.password,
             phone:                data.telefon,
             street:               data.strasse,
+            zip:                  data.plz      || undefined,
             city:                 data.ort,
             vehicleBrand:         data.marke        || undefined,
             vehicleModel:         data.modell       || undefined,
@@ -53,4 +54,3 @@ const RegisterService = {
 };
 
 export default RegisterService;
-

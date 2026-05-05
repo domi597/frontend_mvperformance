@@ -124,7 +124,7 @@ export default function Navbar() {
                   "&:hover": { color: "#fff" },
                 }}
               >
-                Hallo, {kunde.vorname}
+                Hallo, {kunde.firstName}
               </Button>
 
               {/* Dropdown-Menü nach Klick auf den Namen -N 27.03.2026 */}
