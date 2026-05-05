@@ -77,6 +77,20 @@ function AppointmentsPage() {
         }
     };
 
+    const onComplete = async (id: number) => {
+        try {
+            await updateAppointmentStatus(id, "ABGESCHLOSSEN");
+
+            setTermine((prev) =>
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: "ABGESCHLOSSEN" } : t
+                )
+            );
+        } catch (err) {
+            console.error("Complete failed", err);
+        }
+    };
+
     const labelMap: Record<FilterType, string> = {
         ALLE: "Alle",
         HEUTE: "Heute",
@@ -149,23 +163,34 @@ function AppointmentsPage() {
                         </td>
 
                         <td>
-                            {(t.status === "NEU" || t.status === "AUSSTEHEND") && (
-                                <>
-                                    <button className="btn" onClick={() => onAccept(t.id)}>
+                            <>
+                                {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
+                                    <button
+                                        className="btn"
+                                        onClick={() => onAccept(t.id)}
+                                    >
                                         Bestätigen
                                     </button>
-                                    <button className="btn danger" onClick={() => onDecline(t.id)}>
+                                )}
+
+                                {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
+                                    <button
+                                        className="btn danger"
+                                        onClick={() => onDecline(t.id)}
+                                    >
                                         Ablehnen
                                     </button>
-                                </>
-                            )}
+                                )}
 
-                            {t.status === "BESTÄTIGT" && (
-                                <button className="btn">Bearbeiten</button>
-                            )}
-
-                            {(t.status === "ABGELEHNT" ||
-                                t.status === "ABGESCHLOSSEN") && <span>-</span>}
+                                {t.status === "BESTÄTIGT" && (
+                                    <button
+                                        className="btn success"
+                                        onClick={() => onComplete(t.id)}
+                                    >
+                                        Abschließen
+                                    </button>
+                                )}
+                            </>
                         </td>
                     </tr>
                 ))}

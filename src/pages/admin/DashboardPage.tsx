@@ -48,7 +48,13 @@ export default function DashboardPage() {
     const topTermine = useMemo(
         () =>
             [...termine]
-                .filter((t) => t.status === "NEU" || t.status === "AUSSTEHEND")
+                .filter(
+                    (t) =>
+                        t.status === "NEU" ||
+                        t.status === "AUSSTEHEND" ||
+                        t.status === "BESTÄTIGT" ||
+                        t.status === "ABGELEHNT"
+                )
                 .sort(
                     (a, b) =>
                         new Date(`${a.date}T${a.time}`).getTime() -
@@ -86,6 +92,20 @@ export default function DashboardPage() {
         }
     };
 
+    const onComplete = async (id: number) => {
+        try {
+            await updateAppointmentStatus(id, "ABGESCHLOSSEN");
+
+            setTermine((prev) =>
+                prev.map((t) =>
+                    t.id === id ? { ...t, status: "ABGESCHLOSSEN" } : t
+                )
+            );
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const statusColor = (status: AppointmentStatus) => {
         switch (status) {
             case "NEU":
@@ -96,6 +116,8 @@ export default function DashboardPage() {
                 return "green";
             case "ABGELEHNT":
                 return "red";
+            case "ABGESCHLOSSEN":
+                return "gray";
             default:
                 return "gray";
         }
@@ -157,30 +179,40 @@ export default function DashboardPage() {
                             <td>{t.date} · {t.time}</td>
 
                             <td>
-                                    <span className={`badge ${statusColor(t.status)}`}>
-                                        {t.status}
-                                    </span>
+                                <span className={`badge ${statusColor(t.status)}`}>
+                                    {t.status}
+                                </span>
                             </td>
 
                             <td>
-                                {t.status === "NEU" || t.status === "AUSSTEHEND" ? (
-                                    <>
+                                <>
+                                    {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
                                         <button
                                             className="btn"
                                             onClick={() => onAccept(t.id)}
                                         >
                                             Bestätigen
                                         </button>
+                                    )}
+
+                                    {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
                                         <button
                                             className="btn danger"
                                             onClick={() => onDecline(t.id)}
                                         >
                                             Ablehnen
                                         </button>
-                                    </>
-                                ) : (
-                                    <span>-</span>
-                                )}
+                                    )}
+
+                                    {t.status === "BESTÄTIGT" && (
+                                        <button
+                                            className="btn success"
+                                            onClick={() => onComplete(t.id)}
+                                        >
+                                            Abschließen
+                                        </button>
+                                    )}
+                                </>
                             </td>
                         </tr>
                     ))}
