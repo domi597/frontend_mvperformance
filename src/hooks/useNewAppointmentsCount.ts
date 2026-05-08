@@ -7,8 +7,15 @@ export function useNewAppointmentsCount(): number {
     useEffect(() => {
         const load = async () => {
             try {
-                const res = await fetchAppointments("NEU", 0, 100);
-                setCount(res?.totalElements ?? 0);
+                const [neuRes, ausstehendRes] = await Promise.all([
+                    fetchAppointments("NEU",        0, 1),
+                    fetchAppointments("AUSSTEHEND", 0, 1),
+                ]);
+
+                const neu        = neuRes?.totalElements        ?? 0;
+                const ausstehend = ausstehendRes?.totalElements ?? 0;
+
+                setCount(neu + ausstehend);
             } catch {
                 setCount(0);
             }
@@ -19,3 +26,4 @@ export function useNewAppointmentsCount(): number {
 
     return count;
 }
+
