@@ -1,4 +1,4 @@
-/** Verwaltungsseite für Angebote (Erstellen, Bearbeiten, Löschen). */
+/** Admin page for managing offers (create, edit, delete). */
 export default function AdminOffersPage() {
   return <></>;
 }

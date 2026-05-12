@@ -1,8 +1,8 @@
 /**
  * @file LoginPage.tsx
- * @description Anmeldeseite für bestehende Kunden.
- * Nach erfolgreicher Anmeldung wird der JWT-Token via {@link AuthService} gespeichert
- * und der Nutzer rollenbasiert weitergeleitet (`ADMIN` → `/admin`, sonst `/`).
+ * @description Login page for existing customers.
+ * On successful login the JWT token is stored via {@link AuthService}
+ * and the user is redirected based on their role (`ADMIN` → `/admin`, otherwise `/`).
  * @author N
  * @since 27.03.2026
  */
@@ -26,9 +26,9 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";
 
 /**
- * Rendert das Anmeldeformular mit E-Mail- und Passwortfeld.
- * Inline-Validierung gibt sofortiges Feedback während der Eingabe.
- * @returns Anmeldeformular in einem MUI `Stack`.
+ * Renders the login form with email and password fields.
+ * Inline validation provides immediate feedback while the user types.
+ * @returns Login form wrapped in a MUI `Stack`.
  */
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -44,9 +44,9 @@ export default function LoginPage() {
   const formValid     = email.length > 0 && password.length >= 6 && !emailError;
 
   /**
-   * Sendet die Anmeldedaten an den Server und leitet nach Erfolg weiter.
-   * HTTP-Fehlercodes werden auf benutzerfreundliche Meldungen gemappt
-   * (`401` falsches Passwort, `404` E-Mail nicht gefunden, sonst Server-Fehler).
+   * Submits the login credentials to the server and redirects on success.
+   * HTTP error codes are mapped to user-friendly messages
+   * (`401` wrong password, `404` email not found, otherwise server error).
    */
   const handleLogin = async () => {
     if (!formValid) return;
@@ -76,8 +76,8 @@ export default function LoginPage() {
   };
 
   /**
-   * Ermöglicht das Absenden des Formulars per Enter-Taste.
-   * @param e - Tastaturevent des umgebenden `Stack`.
+   * Allows the form to be submitted by pressing Enter.
+   * @param e - Keyboard event from the surrounding `Stack`.
    */
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
