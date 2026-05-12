@@ -17,7 +17,7 @@ Die Autowerkstatt verfügt aktuell über keine digitale Plattform. Kunden müsse
 | Name | Aufgabe |
 |------|---------|
 | **Jan** | Frontend — Design & Logik der Benutzeroberfläche |
-| **Nicolas** | Verbindung zwischen Frontend und Backend |
+| **Nicolas** | Frontend-Design, Page-Entwicklung & Verbindung zwischen Frontend und Backend |
 | **Dominik** | Backend-Routen (Controller / Endpoints) & Frontend-Entwicklung |
 
 Alle drei sind sowohl am Frontend als auch am Backend beteiligt.
