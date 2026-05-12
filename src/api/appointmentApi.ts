@@ -1,12 +1,8 @@
+// src/api/appointmentApi.ts
 
 import api from "./api";
 import { AppointmentStatus } from "../types/AppointmentStatus";
 import { IAppointment } from "../interface/IAppointment";
-
-/*
-* NAME : Dominik Ranegger
-* DATE : 14.04
-* */
 
 export type { AppointmentStatus };
 
@@ -17,7 +13,8 @@ export interface AppointmentPage {
     number: number;
 }
 
-export const getAppointments = (
+// FIX: added /api prefix to match the backend route /api/appointments
+export const fetchAppointments = (
     status?: AppointmentStatus,
     page = 0,
     size = 5
@@ -25,6 +22,9 @@ export const getAppointments = (
     api.get<AppointmentPage>("/api/appointments", {
         params: { ...(status ? { status } : {}), page, size },
     }).then((r) => r.data);
+
+export const fetchAppointmentById = (id: number): Promise<IAppointment> =>
+    api.get<IAppointment>(`/api/appointments/${id}`).then((r) => r.data);
 
 export const createAppointment = (
     body: Omit<IAppointment, "id" | "status">
