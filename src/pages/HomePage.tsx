@@ -13,7 +13,6 @@ const LEISTUNGEN = [
 export default function HomePage() {
   const navigate = useNavigate();
 
-  // Erfolgsmeldung aus dem localStorage lesen (gesetzt von RegisterService) -N 07.04.2026
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,7 +23,6 @@ export default function HomePage() {
   return (
     <Container maxWidth="lg">
 
-      {/* Erfolgsmeldung nach Registrierung -N 07.04.2026 */}
       <Snackbar
         open={!!successMsg}
         autoHideDuration={5000}
@@ -35,7 +33,6 @@ export default function HomePage() {
           {successMsg}
         </Alert>
       </Snackbar>
-      {/* Hero */}
       <Box sx={{ py: { xs: 6, md: 8 } }}>
         <Typography variant="h3" component="h1" fontWeight={800}>
           KFZ-Technik GDG –
@@ -63,7 +60,6 @@ export default function HomePage() {
         </Stack>
       </Box>
 
-      {/* Leistungen */}
       <Box sx={{ pb: 6 }}>
         <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
           Unsere Leistungen
@@ -95,7 +91,6 @@ export default function HomePage() {
         </Grid>
       </Box>
 
-      {/* CTA */}
       <Card
         variant="outlined"
         sx={{

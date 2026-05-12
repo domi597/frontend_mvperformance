@@ -1,7 +1,10 @@
-// Navbar.tsx
-// Zeigt Logo, Navigation, und rechts entweder "Anmelden" oder
-// "Hallo [Vorname]" wenn ein Kunde eingeloggt ist.
-// Klick auf den Namen öffnet ein Dropdown-Menü. -N 27.03.2026
+/**
+ * @file Navbar.tsx
+ * @description Sticky Navigationsleiste mit Logo, Nav-Links und Nutzermenü.
+ * Zeigt „Hallo [Vorname]" mit Dropdown wenn eingeloggt, sonst „Anmelden".
+ * @author N
+ * @since 27.03.2026
+ */
 
 import { useState } from "react";
 import {
@@ -28,23 +31,22 @@ const NAV_LINKS = [
 export default function Navbar() {
   const navigate = useNavigate();
 
-  // Eingeloggten Kunden aus dem localStorage lesen -N 27.03.2026
   const kunde = AuthService.getKunde();
 
-  // Anchor-Element für das Dropdown-Menü (null = geschlossen) -N 27.03.2026
+  /** Anchor-Element für das Dropdown-Menü (`null` = geschlossen). */
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
-  // Menü öffnen wenn auf den Namen geklickt wird -N 27.03.2026
+  /** Öffnet das Nutzer-Dropdown beim Klick auf den Namen. */
   const handleOpenMenu = (e: { currentTarget: HTMLElement }) => {
     setMenuAnchor(e.currentTarget);
   };
 
-  // Menü schließen -N 27.03.2026
+  /** Schließt das Nutzer-Dropdown. */
   const handleCloseMenu = () => {
     setMenuAnchor(null);
   };
 
-  // Ausloggen: Token löschen, zur Startseite weiterleiten -N 27.03.2026
+  /** Löscht den Auth-Token und leitet zur Startseite weiter. */
   const handleLogout = () => {
     AuthService.logout();
     handleCloseMenu();
@@ -64,7 +66,6 @@ export default function Navbar() {
       <Container maxWidth="lg" disableGutters>
         <Toolbar sx={{ gap: 1 }}>
 
-          {/* Logo -N 27.03.2026 */}
           <Typography
             component={NavLink}
             to="/"
@@ -82,7 +83,6 @@ export default function Navbar() {
             -Technik GDG
           </Typography>
 
-          {/* Nav Links -N 27.03.2026 */}
           <Box sx={{ display: "flex", gap: 0.5, flex: 1 }}>
             {NAV_LINKS.map((link) => (
               <Button
@@ -111,7 +111,6 @@ export default function Navbar() {
             ))}
           </Box>
 
-          {/* Eingeloggt: "Hallo [Vorname]" Button mit Dropdown — sonst "Anmelden" -N 27.03.2026 */}
           {kunde ? (
             <>
               <Button
@@ -127,7 +126,6 @@ export default function Navbar() {
                 Hallo, {kunde.firstName}
               </Button>
 
-              {/* Dropdown-Menü nach Klick auf den Namen -N 27.03.2026 */}
               <Menu
                 anchorEl={menuAnchor}
                 open={Boolean(menuAnchor)}
@@ -138,7 +136,6 @@ export default function Navbar() {
                   },
                 }}
               >
-                {/* Admin-Link nur für Admins anzeigen -N 27.03.2026 */}
                 {kunde.role === "ADMIN" && (
                   <MenuItem
                     onClick={() => {
@@ -158,7 +155,6 @@ export default function Navbar() {
                   Mein Konto
                 </MenuItem>
                 <Divider />
-                {/* Abmelden löscht Token und leitet zur Startseite -N 27.03.2026 */}
                 <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
                   Abmelden
                 </MenuItem>
@@ -181,7 +177,6 @@ export default function Navbar() {
             </Button>
           )}
 
-          {/* CTA -N 27.03.2026 */}
           <Button
             variant="contained"
             size="small"

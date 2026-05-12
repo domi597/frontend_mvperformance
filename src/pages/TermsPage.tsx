@@ -1,13 +1,7 @@
 /**
- * @file AGBPage.tsx
- * @description Standalone Terms and Conditions page (Allgemeine Geschäftsbedingungen) for
- * Devrim Gül (KFZ-Technik GDG).
- *
- * > **Note:** The legal text content on this page was generated with an online legal
- * > document generator and adapted to the company data of Devrim Gül (KFZ-Technik GDG).
- * > It is rendered outside of the main `PublicLayout` (no TopBar / Navbar / Footer)
- * > so that it can also be reached directly from the registration flow via the AGB checkbox.
- *
+ * @file TermsPage.tsx
+ * @description Allgemeine Geschäftsbedingungen für KFZ-Technik GDG. Wird außerhalb des
+ * `PublicLayout` gerendert und ist über die AGB-Checkbox im Registrierungsformular erreichbar.
  * @author N
  * @since 10.04.2026
  */
@@ -30,7 +24,6 @@ export const TermsPage = () => {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
 
-      {/* ── Header ── */}
       <Box
         sx={{
           height: 56,
@@ -56,7 +49,6 @@ export const TermsPage = () => {
         </Link>
       </Box>
 
-      {/* ── Content ── */}
       <Container maxWidth="md" sx={{ flex: 1, py: 6 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
           Allgemeine Geschäftsbedingungen (AGB)
@@ -192,7 +184,6 @@ export const TermsPage = () => {
         </Stack>
       </Container>
 
-      {/* ── Footer ── */}
       <Box
         sx={{
           borderTop: 1,

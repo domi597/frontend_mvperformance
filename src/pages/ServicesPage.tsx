@@ -25,7 +25,6 @@ export default function ServicesPage() {
     return (
         <div className="services-page">
 
-            {/* HERO */}
             <section className="hero">
                 <div className="hero-text">
                     <h1>
@@ -47,7 +46,6 @@ export default function ServicesPage() {
                 </div>
             </section>
 
-            {/* SERVICES */}
             <section className="services">
                 <p className="subtitle">WAS WIR ANBIETEN</p>
                 <h2>Unsere Leistungen</h2>

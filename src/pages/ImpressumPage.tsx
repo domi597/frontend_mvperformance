@@ -1,12 +1,7 @@
 /**
  * @file ImpressumPage.tsx
- * @description Standalone imprint page (Impressum) as required by Austrian law (§ 5 ECG).
- *
- * > **Note:** The legal text content on this page was generated with an online legal
- * > document generator and adapted to the company data of Devrim Gül (KFZ-Technik GDG).
- * > It is rendered outside of the main `PublicLayout` (no TopBar / Navbar / Footer)
- * > so that it can also be reached directly from the registration and login flows.
- *
+ * @description Impressum gemäß § 5 ECG. Wird außerhalb des `PublicLayout` gerendert
+ * und ist direkt aus dem Registrierungs- und Login-Flow erreichbar.
  * @author N
  * @since 10.04.2026
  */
@@ -23,13 +18,12 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-export default function ImprintPage() {
+export default function ImpressumPage() {
   const navigate = useNavigate();
 
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
 
-      {/* ── Header ── */}
       <Box
         sx={{
           height: 56,
@@ -55,7 +49,6 @@ export default function ImprintPage() {
         </Link>
       </Box>
 
-      {/* ── Content ── */}
       <Container maxWidth="md" sx={{ flex: 1, py: 6 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
           Impressum
@@ -136,7 +129,6 @@ export default function ImprintPage() {
         </Stack>
       </Container>
 
-      {/* ── Footer ── */}
       <Box
         sx={{
           borderTop: 1,

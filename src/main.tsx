@@ -15,22 +15,19 @@ import PublicLayout from "./view/PublicLayout";
 import { AuthLayout } from "./view/AuthLayout";
 import AdminLayout from "./view/AdminLayout";
 
-// Public Pages
 import HomePage from "./pages/HomePage";
 import ServicesPage from "./pages/ServicesPage";
 import OffersPage from "./pages/OffersPage";
 import KontaktPage from "./pages/ContactPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import AppointmentPage from "./pages/AppointmentPage";
-import ImprintPage from "./pages/ImprintPage";
+import ImpressumPage from "./pages/ImpressumPage.tsx";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
-// Auth Pages
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
-// Admin Pages
 import DashboardPage from "./pages/admin/DashboardPage";
 import AppointmentsPage from "./pages/admin/AppointmentsPage";
 import AdminOffersPage from "./pages/admin/AdminOffersPage";
@@ -83,7 +80,7 @@ const router = createBrowserRouter([
           { path: "/termin", element: <AppointmentPage /> },
         ],
       },
-      { path: "/impressum", element: <ImprintPage /> },
+      { path: "/impressum", element: <ImpressumPage /> },
       { path: "/datenschutz", element: <PrivacyPolicyPage /> },
       { path: "/agbs", element: <TermsPage /> },
 

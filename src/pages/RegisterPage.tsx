@@ -33,36 +33,18 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
 
-/**
- * Returns `true` when the trimmed string contains at least one character.
- * Used to check whether a required text field has been filled in.
- *
- * @param val - The field value to check.
- */
+/** Gibt `true` zurück wenn der Wert nach trim nicht leer ist. */
 const required = (val: string) => val.trim().length > 0;
 
 /**
- * `RegisterPage` renders the customer registration form.
- *
- * ## State
- * | Variable    | Purpose                                              |
- * |-------------|------------------------------------------------------|
- * | `form`      | Controlled form values mapped to {@link RegisterRequest} |
- * | `submitted` | Whether the user has attempted to submit at least once |
- * | `loading`   | Shows a spinner while the API request is in flight   |
- * | `error`     | Holds an error message string when registration fails |
- *
- * ## Validation rules (required fields only)
- * - `vorname`, `nachname`, `telefon`, `strasse`, `plz`, `ort` — must not be blank
- * - `email` — must contain `@`
- * - `password` — minimum 6 characters
- *
- * @returns The registration form wrapped in a MUI `Stack`.
+ * Registrierungsformular für neue Kunden.
+ * Validierung greift erst nach dem ersten Absendeversuch.
+ * Bei Erfolg wird eine Willkommensnachricht gesetzt und zur Startseite weitergeleitet.
+ * @returns Registrierungsformular in einem MUI `Stack`.
  */
 export default function RegisterPage() {
     const navigate = useNavigate();
 
-    /** Controlled state for every form field. */
     const [form, setForm] = useState<RegisterRequest>({
         vorname:    "",
         nachname:   "",
@@ -78,18 +60,12 @@ export default function RegisterPage() {
         kennzeichen:"",
     });
 
-    /** `true` after the first submit attempt — enables per-field error display. */
     const [submitted, setSubmitted]   = useState(false);
     const [loading, setLoading]       = useState(false);
     const [error, setError]           = useState<string | null>(null);
-    /** Whether the user has accepted the Terms of Service and Privacy Policy. */
     const [agbAccepted, setAgbAccepted] = useState(false);
 
-    /**
-     * Per-field error flags.
-     * Errors are only shown after the first submit attempt (`submitted === true`)
-     * so the form does not look broken when the user first opens the page.
-     */
+    /** Feldfehler — werden erst nach dem ersten Absenden angezeigt. */
     const errors = {
         vorname:  submitted && !required(form.vorname),
         nachname: submitted && !required(form.nachname),
@@ -101,7 +77,7 @@ export default function RegisterPage() {
         ort:      submitted && !required(form.ort),
     };
 
-    /** `true` when all required fields pass their validation rules and AGB is accepted. */
+    /** `true` wenn alle Pflichtfelder gültig und die AGB akzeptiert sind. */
     const isValid =
         required(form.vorname) &&
         required(form.nachname) &&
@@ -114,10 +90,9 @@ export default function RegisterPage() {
         agbAccepted;
 
     /**
-     * Returns a generic `onChange` handler for a given form field.
-     * The `baujahr` field is coerced to `number | null`; all others stay as strings.
-     *
-     * @param field - The key of the {@link RegisterRequest} field to update.
+     * Generischer onChange-Handler für ein Formularfeld.
+     * `baujahr` wird zu `number | null` konvertiert, alle anderen bleiben Strings.
+     * @param field - Schlüssel des zu aktualisierenden Feldes.
      */
     const set = (field: keyof RegisterRequest) =>
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,14 +103,8 @@ export default function RegisterPage() {
         };
 
     /**
-     * Handles form submission.
-     *
-     * 1. Marks the form as submitted to reveal validation errors.
-     * 2. Aborts early if any required field is invalid.
-     * 3. Calls {@link RegisterService.register} with the current form values.
-     * 4. On success: stores a welcome message via {@link RegisterService.setSuccessMessage}
-     *    and navigates the user to the home page (`/`).
-     * 5. On failure: displays a generic error alert.
+     * Sendet das Formular ab. Aktiviert Fehleranzeige, prüft Gültigkeit und ruft
+     * {@link RegisterService.register} auf. Bei Erfolg wird zur Startseite weitergeleitet.
      */
     const handleRegister = async () => {
         setSubmitted(true);
@@ -164,14 +133,12 @@ export default function RegisterPage() {
     return (
         <Stack spacing={2.5}>
 
-            {/* Fehlermeldung */}
             {error && (
                 <Alert severity="error" onClose={() => setError(null)}>
                     {error}
                 </Alert>
             )}
 
-            {/* ── Persönliche Daten ── */}
             <Typography variant="caption" color="text.secondary" fontWeight={600}
                         sx={{ textTransform: "uppercase", letterSpacing: 0.8 }}>
                 Persönliche Daten
@@ -265,7 +232,6 @@ export default function RegisterPage() {
                 fullWidth
             />
 
-            {/* ── Fahrzeugdaten (optional) ── */}
             <Divider />
 
             <Box>
@@ -318,7 +284,6 @@ export default function RegisterPage() {
                 />
             </Stack>
 
-            {/* ── AGB & Datenschutz ── */}
             <Box>
                 <FormControlLabel
                     control={
@@ -349,7 +314,6 @@ export default function RegisterPage() {
                 )}
             </Box>
 
-            {/* ── Registrieren Button ── */}
             <Button
                 type="button"
                 variant="contained"
@@ -365,7 +329,6 @@ export default function RegisterPage() {
                 }
             </Button>
 
-            {/* ── Link zur Login-Seite ── */}
             <Box sx={{ textAlign: "center" }}>
                 <Typography variant="body2" color="text.secondary">
                     Bereits ein Konto?{" "}

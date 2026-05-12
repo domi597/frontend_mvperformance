@@ -15,7 +15,6 @@ export default function Footer() {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          {/* Firma */}
           <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle1" fontWeight={800} gutterBottom>
               <Box component="span" sx={{ color: "primary.main" }}>
@@ -30,7 +29,6 @@ export default function Footer() {
             </Link>
           </Grid>
 
-          {/* Kontakt */}
           <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
               Kontakt
@@ -53,7 +51,6 @@ export default function Footer() {
               </Link>
           </Grid>
 
-          {/* Rechtliches */}
           <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" fontWeight={700} gutterBottom>
               Rechtliches

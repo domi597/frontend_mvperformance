@@ -1,13 +1,7 @@
 /**
- * @file DatenschutzPage.tsx
- * @description Standalone privacy policy page (Datenschutzerklärung) as required by the GDPR
- * (DSGVO) and the Austrian Data Protection Act (DSG).
- *
- * > **Note:** The legal text content on this page was generated with an online legal
- * > document generator and adapted to the company data of Devrim Gül (KFZ-Technik GDG).
- * > It is rendered outside of the main `PublicLayout` (no TopBar / Navbar / Footer)
- * > so that it can also be reached directly from the registration and login flows.
- *
+ * @file PrivacyPolicyPage.tsx
+ * @description Datenschutzerklärung gemäß DSGVO und DSG. Wird außerhalb des
+ * `PublicLayout` gerendert und ist direkt aus dem Registrierungs- und Login-Flow erreichbar.
  * @author N
  * @since 10.04.2026
  */
@@ -30,7 +24,6 @@ export default function PrivacyPolicyPage() {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
 
-      {/* ── Header ── */}
       <Box
         sx={{
           height: 56,
@@ -56,7 +49,6 @@ export default function PrivacyPolicyPage() {
         </Link>
       </Box>
 
-      {/* ── Content ── */}
       <Container maxWidth="md" sx={{ flex: 1, py: 6 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
           Datenschutzerklärung
@@ -175,7 +167,6 @@ export default function PrivacyPolicyPage() {
         </Stack>
       </Container>
 
-      {/* ── Footer ── */}
       <Box
         sx={{
           borderTop: 1,

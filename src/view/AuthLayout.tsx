@@ -4,7 +4,6 @@ import { Box, Container, Link, Paper, Typography } from "@mui/material";
 export const AuthLayout = () => {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
-      {/* Mini Navbar */}
       <Box
         sx={{
           height: 56,
@@ -26,7 +25,6 @@ export const AuthLayout = () => {
         </Link>
       </Box>
 
-      {/* Content */}
       <Container
         maxWidth="sm"
         sx={{
@@ -45,7 +43,6 @@ export const AuthLayout = () => {
             overflow: "hidden",
           }}
         >
-          {/* Header */}
           <Box sx={{ px: 3.5, pt: 3, pb: 2.5, borderBottom: 1, borderColor: "divider" }}>
             <Typography variant="h6" fontWeight={700}>
               Ihr Kundenkonto
@@ -55,12 +52,10 @@ export const AuthLayout = () => {
             </Typography>
           </Box>
 
-          {/* Page Content */}
           <Box sx={{ px: 3.5, py: 3 }}>
             <Outlet />
           </Box>
 
-          {/* Footer */}
           <Box
             sx={{
               px: 3.5,
