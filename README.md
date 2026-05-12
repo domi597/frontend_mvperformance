@@ -1,6 +1,6 @@
 # 🔧 MVPerformance — Frontend
 
-> Weboberfläche für die **MVPerformance KFZ-Werkstatt** — gebaut mit React, TypeScript und Vite.
+> Weboberfläche für die **MVPerformance KFZ-Werkstatt** — gebaut mit React 19, TypeScript, Vite und Material UI.
 
 ---
 
@@ -33,9 +33,13 @@ Die Autowerkstatt verfügt aktuell über keine digitale Plattform. Kunden müsse
 
 | Technologie | Zweck |
 |-------------|-------|
-| [React](https://react.dev/) | UI Framework |
+| [React 19](https://react.dev/) | UI Framework |
 | TypeScript | Typsicherheit |
-| [Vite](https://vite.dev/) | Build Tool & Dev Server |
+| [Vite 6](https://vite.dev/) | Build Tool & Dev Server |
+| [Material UI 7](https://mui.com/) | Komponenten-Bibliothek & Theming |
+| [React Router 7](https://reactrouter.com/) | Client-side Routing |
+| [Axios](https://axios-http.com/) | HTTP-Client für Backend-Calls |
+| ESLint | Code-Qualität |
 
 ---
 
@@ -43,24 +47,49 @@ Die Autowerkstatt verfügt aktuell über keine digitale Plattform. Kunden müsse
 
 ```
 src/
-├── assets/          # Bilder, Icons
-├── components/      # Wiederverwendbare UI-Komponenten
-├── pages/           # Einzelne Seiten der Website
-├── services/        # API-Kommunikation mit dem Backend (Nicolas)
-├── App.tsx          # Haupt-Komponente & Routing
+├── api/             # Axios-Clients & Endpoint-Wrapper (auth, customers, offers, services, appointments)
+├── components/      # Wiederverwendbare UI-Komponenten (Navbar, AdminNavbar, TopBar, Footer)
+├── css/             # Globale Styles
+├── hooks/           # Eigene React Hooks
+├── interface/       # TypeScript-Interfaces für API-Modelle
+├── mockdata/        # Beispiel-/Testdaten
+├── pages/           # Öffentliche Seiten (Home, Login, Register, Termin, ...)
+│   └── admin/       # Admin-Seiten (Dashboard, Appointments, Customers, Offers, Services, Settings)
+├── pics/            # Bilder & Grafiken
+├── service/         # Auth- & Register-Service (Session, Tokens)
+├── theme.ts         # MUI-Theme
+├── types/           # Geteilte TS-Typen
+├── view/            # Layouts (PublicLayout, AuthLayout, AdminLayout)
+├── App.tsx          # Routing & App-Shell
 └── main.tsx         # Einstiegspunkt
 ```
 
 ---
 
-## 📄 Geplante Seiten
+## 📄 Seiten
 
+### Öffentlich
+| Seite | Route | Beschreibung |
+|-------|-------|--------------|
+| **Startseite** | `/` | Hero, Leistungen, Termin-CTA |
+| **Über uns** | `/ueber-uns` | Vorstellung der Werkstatt |
+| **Leistungen** | `/leistungen` | Übersicht der Services |
+| **Angebote** | `/angebote` | Aktuelle Aktionen |
+| **Kontakt** | `/kontakt` | Adresse, Anfahrt, Kontaktdaten |
+| **Terminbuchung** | `/termin` | Leistung, Fahrzeug, Datum & Uhrzeit wählen |
+| **Login / Registrierung** | `/login`, `/register` | Kundenkonto |
+| **Passwort vergessen** | `/forgot-password` | Reset-Flow |
+| **Impressum / AGB / Datenschutz** | `/impressum`, `/agb`, `/datenschutz` | Rechtliches |
+
+### Admin-Bereich
 | Seite | Beschreibung |
-|-------|-------------|
-| **Startseite** | Präsentation der Werkstatt, Leistungen, Google-Bewertungen |
-| **Terminbuchung** | Leistung wählen, Fahrzeugdaten eingeben, Datum & Uhrzeit wählen |
-| **Login / Registrierung** | Kundenkonto anlegen oder einloggen |
-| **Admin-Dashboard** | Übersicht offener Termine, Angebote verwalten, Kunden einsehen |
+|-------|--------------|
+| **Dashboard** | Übersicht & Kennzahlen |
+| **Termine** | Offene Termine verwalten |
+| **Kunden** | Kundenliste & Details |
+| **Angebote** | Angebote pflegen |
+| **Services** | Leistungs-Katalog pflegen |
+| **Einstellungen** | Admin-Settings |
 
 ---
 
@@ -83,24 +112,30 @@ npm run dev
 
 Die Anwendung ist dann unter `http://localhost:5173` erreichbar.
 
+### Weitere Scripts
+
 ```bash
-# Build für Produktion
-npm run build
+npm run build     # Typecheck (tsc -b) + Produktions-Build via Vite
+npm run preview   # Lokale Vorschau des Builds
+npm run lint      # ESLint
 ```
 
 ---
 
-## 🔌 Backend-Verbindung (Nicolas)
+## 🔌 Backend-Verbindung
 
-Die Kommunikation mit dem Spring Boot Backend erfolgt über REST. Authentifizierung läuft via **JWT-Token**.
+Die Kommunikation mit dem Spring Boot Backend erfolgt über REST. Authentifizierung läuft via **JWT-Token** (gespeichert über `AuthService` in `src/service/`).
 
-Die API-Calls werden in `src/services/` gekapselt, damit Komponenten nichts von der HTTP-Logik wissen müssen.
+Die HTTP-Aufrufe sind in `src/api/` gekapselt — Komponenten verwenden die Wrapper, ohne Axios direkt anzusprechen:
+
+- `api.ts` — zentrale Axios-Instanz inkl. Auth-Header
+- `auth.ts`, `customers.ts`, `offers.ts`, `services.ts`, `appointmentApi.ts` — Endpoint-Module
 
 ---
 
 ## 🔗 Verwandte Repositories
 
-- **Backend:** [`backend_MVPerformance`](../backend_MVPerformance) — Spring Boot REST API
+- **Backend:** [`backend_MWPerformence`](../backend_MWPerformence) — Spring Boot REST API
 
 ---
 
