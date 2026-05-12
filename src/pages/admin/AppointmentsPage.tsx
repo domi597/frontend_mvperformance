@@ -16,47 +16,35 @@ function AppointmentsPage() {
     const [totalPages, setTotalPages] = useState<number>(1);
 
     const itemsPerPage = 5;
-    const heute = new Date().toLocaleDateString("sv-SE");
-
-    const loadData = async () => {
-        try {
-            const backendPage = page - 1;
-
-            const status =
-                filter === "ALLE" || filter === "HEUTE"
-                    ? undefined
-                    : filter;
-
-            const res = await getAppointments(status, backendPage, itemsPerPage);
-
-            const content = res?.content ?? [];
-
-            const filtered =
-                filter === "HEUTE"
-                    ? content.filter((t) => t.date === heute)
-                    : content;
-
-            setTermine(filtered);
-            setTotalPages(res?.totalPages ?? 1);
-        } catch (err) {
-            console.error(err);
-            setTermine([]);
-            setTotalPages(1);
-        }
-    };
 
     useEffect(() => {
-        loadData();
+        const load = async () => {
+            try {
+                const backendPage = page - 1;
+                const status =
+                    filter === "ALLE" || filter === "HEUTE"
+                        ? undefined
+                        : (filter as AppointmentStatus);
+                const todayOnly = filter === "HEUTE";
+
+                const res = await getAppointments(status, backendPage, itemsPerPage, todayOnly);
+                setTermine(res?.content ?? []);
+                setTotalPages(res?.totalPages ?? 1);
+            } catch (err) {
+                console.error(err);
+                setTermine([]);
+                setTotalPages(1);
+            }
+        };
+
+        load();
     }, [filter, page]);
 
     const onAccept = async (id: number) => {
         try {
             await updateAppointmentStatus(id, "BESTÄTIGT");
-
             setTermine((prev) =>
-                prev.map((t) =>
-                    t.id === id ? { ...t, status: "BESTÄTIGT" } : t
-                )
+                prev.map((t) => t.id === id ? { ...t, status: "BESTÄTIGT" } : t)
             );
         } catch (err) {
             console.error("Accept failed", err);
@@ -66,11 +54,8 @@ function AppointmentsPage() {
     const onDecline = async (id: number) => {
         try {
             await updateAppointmentStatus(id, "ABGELEHNT");
-
             setTermine((prev) =>
-                prev.map((t) =>
-                    t.id === id ? { ...t, status: "ABGELEHNT" } : t
-                )
+                prev.map((t) => t.id === id ? { ...t, status: "ABGELEHNT" } : t)
             );
         } catch (err) {
             console.error("Decline failed", err);
@@ -80,11 +65,8 @@ function AppointmentsPage() {
     const onComplete = async (id: number) => {
         try {
             await updateAppointmentStatus(id, "ABGESCHLOSSEN");
-
             setTermine((prev) =>
-                prev.map((t) =>
-                    t.id === id ? { ...t, status: "ABGESCHLOSSEN" } : t
-                )
+                prev.map((t) => t.id === id ? { ...t, status: "ABGESCHLOSSEN" } : t)
             );
         } catch (err) {
             console.error("Complete failed", err);
@@ -114,15 +96,7 @@ function AppointmentsPage() {
             <h1>Termine</h1>
 
             <div className="tabs">
-                {[
-                    "ALLE",
-                    "HEUTE",
-                    "NEU",
-                    "AUSSTEHEND",
-                    "BESTÄTIGT",
-                    "ABGELEHNT",
-                    "ABGESCHLOSSEN",
-                ].map((f) => (
+                {["ALLE", "HEUTE", "NEU", "AUSSTEHEND", "BESTÄTIGT", "ABGELEHNT", "ABGESCHLOSSEN"].map((f) => (
                     <button
                         key={f}
                         className={filter === f ? "tab active" : "tab"}
@@ -165,28 +139,17 @@ function AppointmentsPage() {
                         <td>
                             <>
                                 {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
-                                    <button
-                                        className="btn"
-                                        onClick={() => onAccept(t.id)}
-                                    >
+                                    <button className="btn" onClick={() => onAccept(t.id)}>
                                         Bestätigen
                                     </button>
                                 )}
-
                                 {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
-                                    <button
-                                        className="btn danger"
-                                        onClick={() => onDecline(t.id)}
-                                    >
+                                    <button className="btn danger" onClick={() => onDecline(t.id)}>
                                         Ablehnen
                                     </button>
                                 )}
-
                                 {t.status === "BESTÄTIGT" && (
-                                    <button
-                                        className="btn success"
-                                        onClick={() => onComplete(t.id)}
-                                    >
+                                    <button className="btn success" onClick={() => onComplete(t.id)}>
                                         Abschließen
                                     </button>
                                 )}
