@@ -3,7 +3,7 @@ import { Box, Divider, Drawer, Toolbar, Typography } from "@mui/material";
 import AdminNavbar from "../components/AdminNavbar";
 
 /**
- * Admin-Layout mit dauerhafter Seitenleiste und dynamischem Seitentitel.
+ * Admin layout with a permanent sidebar and a dynamic page title.
  * @author Dominik Ranegger
  * @since 08.05.2026
  */

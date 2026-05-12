@@ -1,25 +1,30 @@
-// api.ts
-// Zentrale axios-Instanz für alle HTTP-Anfragen an das Spring Boot Backend.
-// Alle API-Calls im Projekt sollen diese Instanz verwenden, damit
-// Token-Handling und Fehlerbehandlung automatisch greifen. -N 27.03.2026
+/**
+ * @file api.ts
+ * @description Central Axios instance for all HTTP requests to the Spring Boot backend.
+ * All API calls in the project use this instance for automatic token handling
+ * and consistent error processing.
+ * @author N
+ * @since 27.03.2026
+ */
 
 import axios from "axios";
 
-// Axios-Instanz mit der Backend-URL aus der .env Datei (VITE_API_URL).
-// Ist keine .env vorhanden, wird ein leerer String verwendet —
-// dann müssen API-Calls mit dem vollen Pfad aufgerufen werden. -N 27.03.2026
+/**
+ * Axios instance configured with the backend URL from `.env` (`VITE_API_URL`).
+ * Falls back to an empty string if the variable is not set.
+ */
 const api = axios.create({
     baseURL: (import.meta.env.VITE_API_URL as string | undefined)?.trim() || "",
 });
 
-// Request-Interceptor: JWT-Token automatisch bei jedem Request mitsenden.
-// Der Token wird aus dem localStorage gelesen und als Bearer-Token
-// im Authorization-Header gesetzt, sofern ein Token vorhanden ist. -N 27.03.2026
+/**
+ * Request interceptor: attaches the JWT token as a Bearer header to every request.
+ * Auth endpoints (`/api/auth/`) are excluded as they do not require a token.
+ */
 api.interceptors.request.use((config) => {
     const url = config.url ?? "";
     const isAuthEndpoint = url.includes("/api/auth/");
 
-    // Auth-Endpoints brauchen keinen Token (Login/Register)
     if (!isAuthEndpoint) {
         const token = localStorage.getItem("token");
         if (token) {
@@ -29,23 +34,20 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Response-Interceptor: Automatisches Ausloggen bei abgelaufenem Token.
-// Gibt das Backend einen 401-Fehler zurück (Token ungültig / abgelaufen),
-// werden Token und Kundendaten aus dem localStorage entfernt und
-// der Nutzer wird zur Login-Seite weitergeleitet.
-// Alle anderen Fehler werden unverändert weitergegeben (Promise.reject). -N 27.03.2026
+/**
+ * Response interceptor: automatically signs the user out on a `401` response.
+ * Removes the token and customer data from `localStorage` and redirects to the login page.
+ * Auth endpoints are excluded so that login errors are propagated normally.
+ */
 api.interceptors.response.use(
     (res) => res,
     (err) => {
         const url = err.config?.url ?? "";
         const isAuthEndpoint = url.includes("/api/auth/");
 
-        // Nur bei echten Session-Timeouts ausloggen, nicht beim Login/Register selbst -N
         if (err.response?.status === 401 && !isAuthEndpoint) {
-            // Gespeicherte Anmeldedaten löschen -N 27.03.2026
             localStorage.removeItem("token");
             localStorage.removeItem("loggedInKunde");
-            // Hartweiterleitung zur Login-Seite (kein React-Router, da außerhalb) -N 27.03.2026
             window.location.href = "/login";
         }
 

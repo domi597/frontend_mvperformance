@@ -1,7 +1,7 @@
 /**
  * @file ImpressumPage.tsx
- * @description Impressum gemäß § 5 ECG. Wird außerhalb des `PublicLayout` gerendert
- * und ist direkt aus dem Registrierungs- und Login-Flow erreichbar.
+ * @description Legal imprint page as required by Austrian law (§ 5 ECG).
+ * Rendered outside `PublicLayout` so it is reachable directly from the registration and login flows.
  * @author N
  * @since 10.04.2026
  */

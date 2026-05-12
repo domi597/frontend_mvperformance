@@ -1,7 +1,7 @@
 /**
  * @file PrivacyPolicyPage.tsx
- * @description Datenschutzerklärung gemäß DSGVO und DSG. Wird außerhalb des
- * `PublicLayout` gerendert und ist direkt aus dem Registrierungs- und Login-Flow erreichbar.
+ * @description Privacy policy page as required by GDPR and the Austrian DSG.
+ * Rendered outside `PublicLayout` so it is reachable directly from the registration and login flows.
  * @author N
  * @since 10.04.2026
  */

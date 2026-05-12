@@ -1,7 +1,7 @@
 /**
  * @file Navbar.tsx
- * @description Sticky Navigationsleiste mit Logo, Nav-Links und Nutzermenü.
- * Zeigt „Hallo [Vorname]" mit Dropdown wenn eingeloggt, sonst „Anmelden".
+ * @description Sticky navigation bar with logo, nav links and user menu.
+ * Shows "Hallo [first name]" with a dropdown when logged in, otherwise an "Anmelden" button.
  * @author N
  * @since 27.03.2026
  */
@@ -33,20 +33,20 @@ export default function Navbar() {
 
   const kunde = AuthService.getKunde();
 
-  /** Anchor-Element für das Dropdown-Menü (`null` = geschlossen). */
+  /** Anchor element for the dropdown menu (`null` = closed). */
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
-  /** Öffnet das Nutzer-Dropdown beim Klick auf den Namen. */
+  /** Opens the user dropdown when the name button is clicked. */
   const handleOpenMenu = (e: { currentTarget: HTMLElement }) => {
     setMenuAnchor(e.currentTarget);
   };
 
-  /** Schließt das Nutzer-Dropdown. */
+  /** Closes the user dropdown. */
   const handleCloseMenu = () => {
     setMenuAnchor(null);
   };
 
-  /** Löscht den Auth-Token und leitet zur Startseite weiter. */
+  /** Clears the auth token and redirects to the home page. */
   const handleLogout = () => {
     AuthService.logout();
     handleCloseMenu();

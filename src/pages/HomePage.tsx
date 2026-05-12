@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Box, Button, Card, CardContent, Container, Grid, Snackbar, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
+import blackBmw from "../pics/blackBmw.png";
 
 const LEISTUNGEN = [
   { name: "Ölwechsel", preis: "ab 49 \u20AC" },
@@ -21,8 +22,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <Container maxWidth="lg">
-
+    <>
       <Snackbar
         open={!!successMsg}
         autoHideDuration={5000}
@@ -33,32 +33,60 @@ export default function HomePage() {
           {successMsg}
         </Alert>
       </Snackbar>
-      <Box sx={{ py: { xs: 6, md: 8 } }}>
-        <Typography variant="h3" component="h1" fontWeight={800}>
-          KFZ-Technik GDG –
-          <br />
-          Ihre Werkstatt in Leibnitz
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ mt: 1, maxWidth: 520 }}
-        >
-          Die Autowerkstatt, der Leibnitz vertraut.
-        </Typography>
-        <Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => navigate("/termin")}
-          >
-            Termin anfragen
-          </Button>
-          <Button variant="outlined" size="large" color="inherit">
-            Bewertungen ansehen
-          </Button>
-        </Stack>
+
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          minHeight: { xs: 360, md: 520 },
+          backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%), url(${blackBmw})`,
+          backgroundSize: "cover",
+          backgroundPosition: { xs: "center", md: "right center" },
+          backgroundRepeat: "no-repeat",
+          color: "common.white",
+          display: "flex",
+          alignItems: "center",
+          mb: { xs: 4, md: 6 },
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ py: { xs: 6, md: 10 }, maxWidth: 640 }}>
+            <Typography variant="h3" component="h1" fontWeight={800} sx={{ color: "common.white" }}>
+              KFZ-Technik GDG –
+              <br />
+              Ihre Werkstatt in Leibnitz
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ mt: 2, maxWidth: 520, color: "rgba(255,255,255,0.85)" }}
+            >
+              Die Autowerkstatt, der Leibnitz vertraut.
+            </Typography>
+            <Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => navigate("/termin")}
+              >
+                Termin anfragen
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                sx={{
+                  color: "common.white",
+                  borderColor: "rgba(255,255,255,0.6)",
+                  "&:hover": { borderColor: "common.white", bgcolor: "rgba(255,255,255,0.08)" },
+                }}
+              >
+                Bewertungen ansehen
+              </Button>
+            </Stack>
+          </Box>
+        </Container>
       </Box>
+
+      <Container maxWidth="lg">
 
       <Box sx={{ pb: 6 }}>
         <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
@@ -121,6 +149,7 @@ export default function HomePage() {
           </Button>
         </CardContent>
       </Card>
-    </Container>
+      </Container>
+    </>
   );
 }

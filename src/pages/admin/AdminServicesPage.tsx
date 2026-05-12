@@ -1,4 +1,4 @@
-/** Verwaltungsseite für Leistungen (Erstellen, Bearbeiten, Löschen). */
+/** Admin page for managing services (create, edit, delete). */
 export default function AdminServicesPage() {
   return <></>;
 }

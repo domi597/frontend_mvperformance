@@ -1,4 +1,4 @@
-/** Zeigt die aktuellen Angebote der Werkstatt. */
+/** Displays the current offers of the workshop. */
 export default function OffersPage() {
   return <></>;
 }

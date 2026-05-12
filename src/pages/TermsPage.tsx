@@ -1,7 +1,7 @@
 /**
  * @file TermsPage.tsx
- * @description Allgemeine Geschäftsbedingungen für KFZ-Technik GDG. Wird außerhalb des
- * `PublicLayout` gerendert und ist über die AGB-Checkbox im Registrierungsformular erreichbar.
+ * @description Terms and Conditions page for KFZ-Technik GDG.
+ * Rendered outside `PublicLayout` and reachable via the terms checkbox in the registration form.
  * @author N
  * @since 10.04.2026
  */

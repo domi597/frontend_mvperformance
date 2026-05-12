@@ -33,14 +33,14 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
 
-/** Gibt `true` zurück wenn der Wert nach trim nicht leer ist. */
+/** Returns `true` if the trimmed value is not empty. */
 const required = (val: string) => val.trim().length > 0;
 
 /**
- * Registrierungsformular für neue Kunden.
- * Validierung greift erst nach dem ersten Absendeversuch.
- * Bei Erfolg wird eine Willkommensnachricht gesetzt und zur Startseite weitergeleitet.
- * @returns Registrierungsformular in einem MUI `Stack`.
+ * Registration form for new customers.
+ * Validation is only triggered after the first submit attempt.
+ * On success a welcome message is stored and the user is redirected to the home page.
+ * @returns Registration form wrapped in a MUI `Stack`.
  */
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -65,7 +65,7 @@ export default function RegisterPage() {
     const [error, setError]           = useState<string | null>(null);
     const [agbAccepted, setAgbAccepted] = useState(false);
 
-    /** Feldfehler — werden erst nach dem ersten Absenden angezeigt. */
+    /** Per-field error flags — only shown after the first submit attempt. */
     const errors = {
         vorname:  submitted && !required(form.vorname),
         nachname: submitted && !required(form.nachname),
@@ -77,7 +77,7 @@ export default function RegisterPage() {
         ort:      submitted && !required(form.ort),
     };
 
-    /** `true` wenn alle Pflichtfelder gültig und die AGB akzeptiert sind. */
+    /** `true` when all required fields are valid and the terms have been accepted. */
     const isValid =
         required(form.vorname) &&
         required(form.nachname) &&
@@ -90,9 +90,9 @@ export default function RegisterPage() {
         agbAccepted;
 
     /**
-     * Generischer onChange-Handler für ein Formularfeld.
-     * `baujahr` wird zu `number | null` konvertiert, alle anderen bleiben Strings.
-     * @param field - Schlüssel des zu aktualisierenden Feldes.
+     * Generic onChange handler for a form field.
+     * `baujahr` is coerced to `number | null`; all other fields remain strings.
+     * @param field - Key of the {@link RegisterRequest} field to update.
      */
     const set = (field: keyof RegisterRequest) =>
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,8 +103,8 @@ export default function RegisterPage() {
         };
 
     /**
-     * Sendet das Formular ab. Aktiviert Fehleranzeige, prüft Gültigkeit und ruft
-     * {@link RegisterService.register} auf. Bei Erfolg wird zur Startseite weitergeleitet.
+     * Submits the form. Enables error display, validates all fields and calls
+     * {@link RegisterService.register}. On success the user is redirected to the home page.
      */
     const handleRegister = async () => {
         setSubmitted(true);
