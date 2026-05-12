@@ -72,8 +72,6 @@ export default function AppointmentPage() {
   const [errorMsg, setErrorMsg]               = useState<string | null>(null);
   const [snackbar, setSnackbar]               = useState<string | null>(null);
 
-  // FIX: use correct ICustomer field names (firstName, lastName, phone)
-  // The old code used non-existent alias fields: vorname, nachname, telefon, marke, modell, baujahr, kennzeichen
   const [form, setForm] = useState<FormData>({
     firstName:    customer?.firstName ?? "",
     lastName:     customer?.lastName  ?? "",
@@ -108,7 +106,6 @@ export default function AppointmentPage() {
 
   const handleBack = () => setActiveStep((s) => s - 1);
 
-  // FIX: actually call the backend API
   const handleSubmit = async () => {
     setLoading(true);
     setErrorMsg(null);

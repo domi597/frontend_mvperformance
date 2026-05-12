@@ -2,12 +2,11 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Box, Divider, Drawer, Toolbar, Typography } from "@mui/material";
 import AdminNavbar from "../components/AdminNavbar";
 
-/*
-* NAME : Dominik Ranegger
-* DATE : 08.05
-* */
-
-
+/**
+ * Admin-Layout mit dauerhafter Seitenleiste und dynamischem Seitentitel.
+ * @author Dominik Ranegger
+ * @since 08.05.2026
+ */
 const SIDEBAR_WIDTH = 220;
 
 const pageTitles: Record<string, string> = {
@@ -48,9 +47,7 @@ export default function AdminLayout() {
                 <AdminNavbar />
             </Drawer>
 
-            {/* Main */}
             <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                {/* Header */}
                 <Box
                     sx={{
                         px: 4,
@@ -70,7 +67,6 @@ export default function AdminLayout() {
                     </Typography>
                 </Box>
 
-                {/* Content */}
                 <Box sx={{ flex: 1, p: 4 }}>
                     <Outlet />
                 </Box>

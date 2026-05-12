@@ -1,13 +1,8 @@
 /**
  * @file LoginPage.tsx
- * @description Login page for existing customers.
- *
- * The user enters their email address and password. On a successful login
- * the JWT token and customer data are persisted by {@link AuthService} in
- * `localStorage`. The user is then redirected based on their role:
- * - `ADMIN` → `/admin`
- * - `KUNDE` → `/` (home)
- *
+ * @description Anmeldeseite für bestehende Kunden.
+ * Nach erfolgreicher Anmeldung wird der JWT-Token via {@link AuthService} gespeichert
+ * und der Nutzer rollenbasiert weitergeleitet (`ADMIN` → `/admin`, sonst `/`).
  * @author N
  * @since 27.03.2026
  */
@@ -31,51 +26,27 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";
 
 /**
- * `LoginPage` renders the sign-in form with email and password fields.
- *
- * ## State
- * | Variable       | Purpose                                                |
- * |----------------|--------------------------------------------------------|
- * | `email`        | Controlled value of the email input                    |
- * | `password`     | Controlled value of the password input                 |
- * | `showPassword` | Toggles the password field between `text` and `password` |
- * | `loading`      | Shows a spinner while the API request is in flight     |
- * | `error`        | Holds an error message string on login failure         |
- *
- * ## Validation (inline, shown while typing)
- * - `emailError`    — email contains at least one character but no `@`
- * - `passwordError` — password has been started but is shorter than 6 characters
- * - `formValid`     — both fields pass; enables the submit button
- *
- * @returns The login form wrapped in a MUI `Stack`.
+ * Rendert das Anmeldeformular mit E-Mail- und Passwortfeld.
+ * Inline-Validierung gibt sofortiges Feedback während der Eingabe.
+ * @returns Anmeldeformular in einem MUI `Stack`.
  */
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const [email, setEmail]               = useState("");
   const [password, setPassword]         = useState("");
-  /** Controls whether the password is rendered as plain text or dots. */
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState<string | null>(null);
 
-  /**
-   * Inline validation flags.
-   * Errors appear as soon as the user starts typing (no submit required),
-   * giving immediate feedback without blocking the initial render.
-   */
   const emailError    = email.length > 0 && !email.includes("@");
   const passwordError = password.length > 0 && password.length < 6;
-  /** The form is only considered valid when both fields are non-empty and error-free. */
   const formValid     = email.length > 0 && password.length >= 6 && !emailError;
 
   /**
-   * Submits the login credentials to the backend via {@link AuthService}.
-   *
-   * HTTP error codes are mapped to user-friendly messages:
-   * - `401` — wrong email or password
-   * - `404` — no account found for this email
-   * - anything else — server unreachable / unexpected error
+   * Sendet die Anmeldedaten an den Server und leitet nach Erfolg weiter.
+   * HTTP-Fehlercodes werden auf benutzerfreundliche Meldungen gemappt
+   * (`401` falsches Passwort, `404` E-Mail nicht gefunden, sonst Server-Fehler).
    */
   const handleLogin = async () => {
     if (!formValid) return;
@@ -85,7 +56,6 @@ export default function LoginPage() {
     try {
       const result = await AuthService.login({ email, password });
 
-      // Redirect based on the authenticated user's role.
       if (result.kunde.role === "ADMIN") {
         navigate("/admin");
       } else {
@@ -106,10 +76,8 @@ export default function LoginPage() {
   };
 
   /**
-   * Allows the user to submit the form by pressing **Enter**,
-   * improving keyboard accessibility.
-   *
-   * @param e - The keyboard event from the surrounding `Stack`.
+   * Ermöglicht das Absenden des Formulars per Enter-Taste.
+   * @param e - Tastaturevent des umgebenden `Stack`.
    */
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -121,14 +89,12 @@ export default function LoginPage() {
   return (
       <Stack spacing={2.5} onKeyDown={handleKeyDown}>
 
-        {/* Error banner — dismissed by the user via the close button */}
         {error && (
             <Alert severity="error" onClose={() => setError(null)}>
               {error}
             </Alert>
         )}
 
-        {/* Email field */}
         <TextField
             label="E-Mail"
             type="email"
@@ -142,7 +108,6 @@ export default function LoginPage() {
             size="small"
         />
 
-        {/* Password field with show/hide toggle */}
         <TextField
             label="Passwort"
             type={showPassword ? "text" : "password"}
@@ -171,7 +136,6 @@ export default function LoginPage() {
             }}
         />
 
-        {/* Forgot password link */}
         <Box sx={{ textAlign: "right", mt: -1.5 }}>
           <Link
               component={RouterLink}
@@ -184,7 +148,6 @@ export default function LoginPage() {
           </Link>
         </Box>
 
-        {/* Submit button — disabled while the form is invalid or the request is in flight */}
         <Button
             type="button"
             variant="contained"
@@ -207,7 +170,6 @@ export default function LoginPage() {
           </Typography>
         </Divider>
 
-        {/* Link to registration */}
         <Box sx={{ textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
             Noch kein Konto?{" "}

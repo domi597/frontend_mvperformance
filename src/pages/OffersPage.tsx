@@ -1,7 +1,4 @@
+/** Zeigt die aktuellen Angebote der Werkstatt. */
 export default function OffersPage() {
-  // Aktuelle Angebote der Werkstatt anzeigen
-
-
-  return <>
-  </>;
+  return <></>;
 }
