@@ -14,7 +14,7 @@ export interface AppointmentPage {
 }
 
 // FIX: added /api prefix to match the backend route /api/appointments
-export const fetchAppointments = (
+export const getAppointments = (
     status?: AppointmentStatus,
     page = 0,
     size = 5
