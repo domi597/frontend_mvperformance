@@ -4,7 +4,7 @@ import { AppointmentStatus } from "../../types/AppointmentStatus";
 import "../../css/dashboard.css";
 import { useNavigate } from "react-router-dom";
 import {
-    fetchAppointments,
+    getAppointments,
     updateAppointmentStatus
 } from "../../api/appointmentApi";
 
@@ -17,7 +17,7 @@ export default function DashboardPage() {
     useEffect(() => {
         const load = async () => {
             try {
-                const res = await fetchAppointments(undefined, 0, 100);
+                const res = await getAppointments(undefined, 0, 100);
 
                 const data: IAppointment[] = Array.isArray(res)
                     ? res

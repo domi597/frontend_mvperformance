@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "../../css/appointments.css";
 import { IAppointment } from "../../interface/IAppointment";
 import {
-    fetchAppointments,
+    getAppointments,
     updateAppointmentStatus
 } from "../../api/appointmentApi";
 import { AppointmentStatus } from "../../types/AppointmentStatus";
@@ -27,7 +27,7 @@ function AppointmentsPage() {
                     ? undefined
                     : filter;
 
-            const res = await fetchAppointments(status, backendPage, itemsPerPage);
+            const res = await getAppointments(status, backendPage, itemsPerPage);
 
             const content = res?.content ?? [];
 

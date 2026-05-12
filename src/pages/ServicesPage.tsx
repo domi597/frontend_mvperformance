@@ -1,6 +1,6 @@
 import {Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchServices, IService } from "../api/services";
+import { getServices, IService } from "../api/services";
 import "../css/ServicePage.css";
 import carImg from "../pics/redBmw.png";
 
@@ -10,7 +10,7 @@ export default function ServicesPage() {
 
     const getServices = async () => {
         try {
-            const data = await fetchServices();
+            const data = await getServices();
             setServices(data);
         } catch (err) {
             console.log("ServicePage.tsx : " + err);

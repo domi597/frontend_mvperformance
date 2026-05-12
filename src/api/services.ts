@@ -14,11 +14,9 @@ export interface IService {
     sort: number;
 }
 
-export const fetchServices = (): Promise<IService[]> =>
+export const getServices = (): Promise<IService[]> =>
     api.get<IService[]>("/api/services").then((r) => r.data);
 
-export const fetchServiceById = (id: number): Promise<IService> =>
-    api.get<IService>(`/api/services/${id}`).then((r) => r.data);
 
 export const createService = (
     body: Omit<IService, "id">

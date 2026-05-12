@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchAppointments } from "../api/appointmentApi";
+import { getAppointments } from "../api/appointmentApi";
 
 export function useNewAppointmentsCount(): number {
     const [count, setCount] = useState(0);
@@ -8,8 +8,8 @@ export function useNewAppointmentsCount(): number {
         const load = async () => {
             try {
                 const [neuRes, ausstehendRes] = await Promise.all([
-                    fetchAppointments("NEU",        0, 1),
-                    fetchAppointments("AUSSTEHEND", 0, 1),
+                    getAppointments("NEU",        0, 1),
+                    getAppointments("AUSSTEHEND", 0, 1),
                 ]);
 
                 const neu        = neuRes?.totalElements        ?? 0;
