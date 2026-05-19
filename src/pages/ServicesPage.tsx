@@ -1,6 +1,6 @@
 import {Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchServices, IService } from "../api/services";
+import { getServices, IService } from "../api/services";
 import "../css/ServicePage.css";
 
 export default function ServicesPage() {
@@ -10,9 +10,9 @@ export default function ServicesPage() {
 
 
     useEffect(() => {
-        const getServices = async () => {
+        const fetchServices = async () => {
             try {
-                const data = await fetchServices();
+                const data = await getServices();
                 setServices(data);
             } catch (err) {
                 console.log("ServicePage.tsx : " + err);
@@ -20,7 +20,7 @@ export default function ServicesPage() {
             }
         };
         
-        getServices();
+        fetchServices();
     }, []);
 
     return (

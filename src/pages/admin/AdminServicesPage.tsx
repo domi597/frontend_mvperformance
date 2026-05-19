@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {fetchServices, IService, updateService} from "../../api/services.ts";
+import {getServices, IService, updateService} from "../../api/services.ts";
 
 export default function AdminServicesPage() {
   // Leistungen verwalten: Erstellen, Bearbeiten, Loeschen
@@ -44,13 +44,13 @@ export default function AdminServicesPage() {
     }
 
     useEffect(() => {
-        const getServices = async () => {
-            const serviceData = await fetchServices();
+        const fetchServices = async () => {
+            const serviceData = await getServices();
 
             setServices(serviceData);
         }
 
-        getServices();
+        fetchServices();
     }, []);
 
   return <>
