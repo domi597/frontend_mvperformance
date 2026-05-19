@@ -2,23 +2,24 @@ import {Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchServices, IService } from "../api/services";
 import "../css/ServicePage.css";
-import carImg from "../pics/redBmw.png";
 
 export default function ServicesPage() {
     const navigate = useNavigate();
     const [services, setServices] = useState<IService[]>([]);
 
-    const getServices = async () => {
-        try {
-            const data = await fetchServices();
-            setServices(data);
-        } catch (err) {
-            console.log("ServicePage.tsx : " + err);
-            setServices([]);
-        }
-    };
+
 
     useEffect(() => {
+        const getServices = async () => {
+            try {
+                const data = await fetchServices();
+                setServices(data);
+            } catch (err) {
+                console.log("ServicePage.tsx : " + err);
+                setServices([]);
+            }
+        };
+        
         getServices();
     }, []);
 
