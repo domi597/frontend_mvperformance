@@ -8,12 +8,16 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import theme from "./theme";
 
 import PublicLayout from "./view/PublicLayout";
 import { AuthLayout } from "./view/AuthLayout";
 import AdminLayout from "./view/AdminLayout";
+
+
 
 import HomePage from "./pages/HomePage";
 import ServicesPage from "./pages/ServicesPage";
@@ -112,10 +116,12 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
-  </StrictMode>
+    <StrictMode>
+      <ThemeProvider theme={theme}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </LocalizationProvider>
+      </ThemeProvider>
+    </StrictMode>
 );
