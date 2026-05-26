@@ -1,8 +1,36 @@
 import api from "./api";
 
-// TODO: Angebote Endpoints
-// GET    /api/angebote
-// GET    /api/angebote/:id
-// POST   /api/angebote
-// PUT    /api/angebote/:id
-// DELETE /api/angebote/:id
+export interface IService {
+    id: number;
+    icon: string;
+    title: string;
+    subtitle: string;
+}
+
+export interface IOffer {
+    id?: number;
+    title: string;
+    description: string;
+    price: number;
+    active: boolean;
+    createdAt?: string;
+    services: IService[];
+}
+
+export const getOffers = (): Promise<IOffer[]> =>
+    api.get<IOffer[]>("/api/offers").then((r) => r.data);
+
+export const getOffersByActive = (active: boolean): Promise<IOffer[]> =>
+    api.get<IOffer[]>("/api/offers", { params: { active } }).then((r) => r.data);
+
+export const getOfferById = (id: number): Promise<IOffer> =>
+    api.get<IOffer>(`/api/offers/${id}`).then((r) => r.data);
+
+export const createOffer = (body: Omit<IOffer, "id" | "createdAt">): Promise<IOffer> =>
+    api.post<IOffer>("/api/offers", body).then((r) => r.data);
+
+export const updateOffer = (id: number, body: Omit<IOffer, "id" | "createdAt">): Promise<IOffer> =>
+    api.put<IOffer>(`/api/offers/${id}`, body).then((r) => r.data);
+
+export const deleteOffer = (id: number): Promise<void> =>
+    api.delete(`/api/offers/${id}`).then(() => undefined);
