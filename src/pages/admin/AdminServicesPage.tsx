@@ -28,8 +28,7 @@ export default function AdminServicesPage() {
         const updatedService: Omit<IService, "id"> = {
             icon,
             title,
-            subtitle: description,
-            sort: 0
+            subtitle: description
         };
 
         await updateService(selectedServiceForEditing.id, updatedService);
@@ -47,8 +46,7 @@ export default function AdminServicesPage() {
         const newService: Omit<IService, "id"> = {
             icon,
             title,
-            subtitle: description,
-            sort: 0
+            subtitle: description
         };
 
         await createService(newService);
@@ -103,8 +101,21 @@ export default function AdminServicesPage() {
         setSelectedForDeleting(undefined);
     };
 
+    const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => setIcon((reader.result as string).split(",")[1]);
+        reader.readAsDataURL(file);
+    };
+
     useEffect(() => {
-        reloadServices();
+        const load = async () => {
+            const serviceData = await getServices();
+            setUnfiltered(serviceData);
+            setServices(serviceData);
+        };
+        load();
     }, []);
 
     return (
@@ -195,11 +206,9 @@ export default function AdminServicesPage() {
                                 <label htmlFor="icon">Icon</label>
                                 <input
                                     id="icon"
-                                    placeholder="z.B. 🔧"
-                                    type="text"
-                                    value={icon}
-                                    required
-                                    onChange={e => setIcon(e.target.value)}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleIconChange}
                                 />
                             </div>
                         </div>
@@ -240,11 +249,9 @@ export default function AdminServicesPage() {
                                 <label htmlFor="icon">Icon</label>
                                 <input
                                     id="icon"
-                                    placeholder="z.B. 🔧"
-                                    type="text"
-                                    value={icon}
-                                    required
-                                    onChange={e => setIcon(e.target.value)}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleIconChange}
                                 />
                             </div>
                         </div>
