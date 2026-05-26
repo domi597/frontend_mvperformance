@@ -91,9 +91,19 @@
 }
 
 .service-card .icon {
-    font-size: 30px;
-    margin-bottom: 10px;
-    color: #ff3c00;
+    width: 55px;
+    height: 55px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-card .icon img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    display: block;
 }
 
 .service-card h3 {

@@ -204,8 +204,14 @@ export default function AdminServicesPage() {
 
                             <div>
                                 <label htmlFor="icon">Icon</label>
+
+                                <label className="file-upload" htmlFor="icon">
+                                    Datei auswählen
+                                </label>
+
                                 <input
                                     id="icon"
+                                    className="file-input"
                                     type="file"
                                     accept="image/*"
                                     onChange={handleIconChange}
@@ -247,8 +253,14 @@ export default function AdminServicesPage() {
 
                             <div>
                                 <label htmlFor="icon">Icon</label>
+
+                                <label className="file-upload" htmlFor="icon">
+                                    Datei auswählen
+                                </label>
+
                                 <input
                                     id="icon"
+                                    className="file-input"
                                     type="file"
                                     accept="image/*"
                                     onChange={handleIconChange}
