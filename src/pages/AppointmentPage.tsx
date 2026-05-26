@@ -28,6 +28,8 @@ import {
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AuthService from "../service/AuthService";
 import { createAppointment } from "../api/appointmentApi";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const SERVICES = [
   { name: "Ölwechsel",    price: "ab 49 €",  duration: "ca. 45 Min." },
@@ -176,6 +178,11 @@ export default function AppointmentPage() {
       </Box>
   );
 
+  const isSlotInPast = (date: string, time: string) => {
+    const slotDateTime = new Date(`${date}T${time}`);
+    return slotDateTime <= new Date();
+  };
+
   const StepDateTime = (
       <Box>
         <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
@@ -185,33 +192,46 @@ export default function AppointmentPage() {
           Wählen Sie einen freien Termin aus.
         </Typography>
         <Stack spacing={3}>
-          <TextField
+          <DatePicker
               label="Datum"
-              type="date"
-              value={form.date}
-              onChange={set("date")}
-              slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: new Date().toISOString().split("T")[0] } }}
-              fullWidth
+              value={form.date ? dayjs(form.date) : null}
+              onChange={(newValue) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    date: newValue ? newValue.format("YYYY-MM-DD") : "",
+                  }))
+              }
+              format="DD.MM.YYYY"
+              disablePast
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                },
+              }}
           />
           {form.date && (
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
                   Verfügbare Zeitslots für{" "}
                   <strong>
-                    {new Date(form.date).toLocaleDateString("de-AT", { day: "2-digit", month: "long", year: "numeric" })}
+                    {new Date(form.date).toLocaleDateString("de-AT", { day: "2-digit", month: "2-digit", year: "numeric" })}
                   </strong>
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                  {TIME_SLOTS.map((slot) => (
-                      <Chip
-                          key={slot}
-                          label={slot}
-                          onClick={() => setSelectedTime(slot)}
-                          variant={selectedTime === slot ? "filled" : "outlined"}
-                          color={selectedTime === slot ? "primary" : "default"}
-                          sx={{ cursor: "pointer" }}
-                      />
-                  ))}
+                  {TIME_SLOTS.map((slot) => {
+                    const disable = isSlotInPast(form.date, slot)
+
+                    return (
+                        <Chip
+                            key={slot}
+                            label={slot}
+                            onClick={() => !disable && setSelectedTime(slot)}
+                            variant={selectedTime === slot ? "filled" : "outlined"}
+                            color={selectedTime === slot ? "primary" : "default"}
+                            disabled={disable}
+                            sx={{ cursor: disable ? "not-allowed" : "pointer" }}                        />
+                    );
+                  })}
                 </Box>
               </Box>
           )}

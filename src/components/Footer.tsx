@@ -23,7 +23,7 @@ export default function Footer() {
               -Technik GDG
             </Typography>
             <Link variant="caption" color="text.secondary" underline="hover" href={"https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=/maps/place//data%3D!4m2!3m1!1s0x476fa58281e7208b:0x7583b1c7a9607fd8%3Fsa%3DX%26ved%3D1t:8290%26ictx%3D111&ved=2ahUKEwj1kOvV0KGUAxVhQf4FHUZoMaIQ4kB6BAgoEAM&usg=AOvVaw3-fnMzHRou0-MorBxHXpQ_"}>
-            Gaindorf an der Sulm 1
+            Kaindorf an der Sulm 1
               <br />
               8430 Leibnitz
             </Link>
@@ -38,8 +38,7 @@ export default function Footer() {
                 underline="hover"
                 variant="caption"
                 color="text.secondary"
-            >
-              Tel: +43 (0)3452 82741
+            >E-Mail: office@kfz-gdg.at
             </Link>
               <br/>
               <Link
@@ -47,7 +46,7 @@ export default function Footer() {
                   underline="hover"
                   variant="caption"
                   color="text.secondary"
-              > E-Mail: office@kfz-gdg.at
+              >Tel: +43 (0)3452 82741
               </Link>
           </Grid>
 

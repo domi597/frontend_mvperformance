@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Box, Divider, Drawer, Toolbar, Typography } from "@mui/material";
 import AdminNavbar from "../components/AdminNavbar";
 
@@ -20,6 +20,7 @@ const pageTitles: Record<string, string> = {
 
 export default function AdminLayout() {
     const { pathname } = useLocation();
+    const navigate = useNavigate();
     const title = pageTitles[pathname] ?? "Admin";
 
     return (
@@ -38,7 +39,12 @@ export default function AdminLayout() {
                 }}
             >
                 <Toolbar>
-                    <Typography fontWeight={800} fontSize={16}>
+                    <Typography
+                        fontWeight={800}
+                        fontSize={16}
+                        onClick={() => navigate("/")}
+                        sx={{ cursor: "pointer" }}
+                    >
                         <Box component="span" sx={{ color: "primary.main" }}>KFZ-Technik</Box>
                         {" "}GDG
                     </Typography>
