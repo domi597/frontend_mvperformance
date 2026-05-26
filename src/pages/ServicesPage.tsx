@@ -59,7 +59,7 @@ export default function ServicesPage() {
                 <div className="services-grid">
                     {services.map((value) => (
                         <div className="service-card" key={value.id}>
-                            <div className="icon">{value.icon}</div>
+                            <div className="icon"><img src={`data:image/png;base64,${value.icon}`}/></div>
                             <h3>{value.title}</h3>
                             <p>{value.subtitle}</p>
                             <Link to={"/termin"} className="link">Termin anfragen →</Link>
