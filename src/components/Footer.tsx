@@ -38,8 +38,7 @@ export default function Footer() {
                 underline="hover"
                 variant="caption"
                 color="text.secondary"
-            >
-              Tel: +43 (0)3452 82741
+            >E-Mail: office@kfz-gdg.at
             </Link>
               <br/>
               <Link
@@ -47,7 +46,7 @@ export default function Footer() {
                   underline="hover"
                   variant="caption"
                   color="text.secondary"
-              > E-Mail: office@kfz-gdg.at
+              >Tel: +43 (0)3452 82741
               </Link>
           </Grid>
 
