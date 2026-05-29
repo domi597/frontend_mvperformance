@@ -1,10 +1,9 @@
-import {Link, useNavigate } from "react-router-dom";
+import {Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getServices, IService } from "../api/services";
 import "../css/ServicePage.css";
 
 export default function ServicesPage() {
-    const navigate = useNavigate();
     const [services, setServices] = useState<IService[]>([]);
 
 
@@ -25,28 +24,6 @@ export default function ServicesPage() {
 
     return (
         <div className="services-page">
-
-            {/* HERO */}
-            <section className="hero">
-                <div className="hero-text">
-                    <h1>
-                        KFZ-Technik GDG – <br />
-                        Ihre Werkstatt <br />
-                        <span>in Leibnitz</span>
-                    </h1>
-
-                    <p>Die Autowerkstatt, die Leibnitz vertraut.</p>
-
-                    <div className="hero-buttons">
-                        <button onClick={() => navigate("/termin")} className="primary-btn">
-                            Termin anfragen
-                        </button>
-                        <button className="secondary-btn">
-                            Bewertungen ansehen
-                        </button>
-                    </div>
-                </div>
-            </section>
 
             {/* SERVICES */}
             <section className="services">
