@@ -5,6 +5,7 @@ import {
     Button,
     Card,
     CardContent,
+    CircularProgress,
     Container,
     Grid,
     Snackbar,
@@ -20,6 +21,7 @@ import L from "leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { getServices, IService } from "../api/services";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -28,23 +30,30 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
-const WERKSTATT_POS: [number, number] = [46.794200, 15.538571]; 
 
-const LEISTUNGEN = [
-    { name: "Ölwechsel", sub: "Alle Fahrzeuge", preis: "ab 49 €" },
-    { name: "Reifenwechsel", sub: "Inkl. Lagerung", preis: "ab 39 €" },
-    { name: "Bremsenservice", sub: "Prüfung & Tausch", preis: "ab 89 €" },
-    { name: "§57a Begutachtung", sub: "Hauptuntersuchung", preis: "ab 35 €" },
-];
+const WERKSTATT_POS: [number, number] = [46.794200, 15.538571];
 
 export default function HomePage() {
     const navigate = useNavigate();
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [services, setServices] = useState<IService[]>([]);
+    const [servicesLoading, setServicesLoading] = useState(true);
 
     useEffect(() => {
         const msg = RegisterService.popSuccessMessage();
         if (msg) setSuccessMsg(msg);
     }, []);
+
+    useEffect(() => {
+        getServices()
+            .then((data) => {
+                console.log("services:", data);
+                setServices(data);
+            })
+            .catch(() => setServices([]))
+            .finally(() => setServicesLoading(false));
+    }, []);
+
 
     return (
         <>
@@ -59,6 +68,7 @@ export default function HomePage() {
                 </Alert>
             </Snackbar>
 
+            {/* Hero */}
             <Box
                 sx={{
                     position: "relative",
@@ -105,40 +115,77 @@ export default function HomePage() {
             </Box>
 
             <Container maxWidth="lg">
+
+                {/* Leistungen */}
                 <Box sx={{ pb: 6 }}>
                     <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
                         Unsere Leistungen
                     </Typography>
-                    <Grid container spacing={2}>
-                        {LEISTUNGEN.map((l) => (
-                            <Grid key={l.name} size={{ xs: 6, sm: 3 }}>
-                                <Card
-                                    variant="outlined"
-                                    sx={{
-                                        textAlign: "center",
-                                        bgcolor: "background.paper",
-                                        borderColor: "divider",
-                                        "&:hover": { borderColor: "primary.main" },
-                                        transition: "border-color 150ms",
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Typography variant="subtitle1" fontWeight={700}>
-                                            {l.name}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                            {l.sub}
-                                        </Typography>
-                                        <Typography variant="body2" color="primary.main" sx={{ mt: 0.5 }}>
-                                            {l.preis}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+
+                    {servicesLoading ? (
+                        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : services.length === 0 ? (
+                        <Typography color="text.secondary">Keine Leistungen verfügbar.</Typography>
+                    ) : (
+                        <Grid container spacing={2}>
+                            {services.slice(0, 4).map((s) => (
+                                <Grid key={s.id ?? s.title} size={{ xs: 6, sm: 3 }}>
+                                    <Card
+                                        variant="outlined"
+                                        sx={{
+                                            textAlign: "center",
+                                            bgcolor: "background.paper",
+                                            borderColor: "divider",
+                                            "&:hover": { borderColor: "primary.main" },
+                                            transition: "border-color 150ms",
+                                            height: "100%",
+                                            minHeight: 180,
+                                        }}
+                                    >
+                                        <CardContent sx={{ p: 2.5, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                                            {s.icon && (
+                                                <Box
+                                                    component="img"
+                                                    src={`data:image/png;base64,${s.icon}`}
+                                                    alt={s.title}
+                                                    sx={{
+                                                        width: 56,
+                                                        height: 56,
+                                                        mb: 1.5,
+                                                        objectFit: "contain",
+                                                        bgcolor: "rgba(255,255,255,0.06)",
+                                                        borderRadius: 1,
+                                                        p: 0.5,
+                                                    }}
+                                                />
+                                            )}
+                                            <Typography variant="subtitle1" fontWeight={700}>
+                                                {s.title}
+                                            </Typography>
+                                            {s.subtitle && (
+                                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                                    {s.subtitle}
+                                                </Typography>
+                                            )}
+                                            <Typography
+                                                variant="body2"
+                                                color="primary.main"
+                                                sx={{ mt: 1.5, cursor: "pointer", fontWeight: 600 }}
+                                                onClick={() => navigate("/termin")}
+                                            >
+                                                Termin anfragen →
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    )}
                 </Box>
 
+                {/* Termin CTA */}
                 <Card
                     variant="outlined"
                     sx={{ mb: 4, bgcolor: "background.paper", borderColor: "divider" }}
@@ -165,6 +212,8 @@ export default function HomePage() {
                         </Button>
                     </CardContent>
                 </Card>
+
+                {/* Karte */}
                 <Box sx={{ pb: 6 }}>
                     <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
                         So finden Sie uns
@@ -191,7 +240,6 @@ export default function HomePage() {
                             </Marker>
                         </MapContainer>
                     </Card>
-
                     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1 }}>
                         <Typography variant="body2" color="text.secondary">
                             Grazer Straße 136, 8430 Leibnitz
