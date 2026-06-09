@@ -98,6 +98,7 @@ export default function HomePage() {
                             <Button variant="contained" size="large" onClick={() => navigate("/termin")}>
                                 Termin anfragen
                             </Button>
+                            {/*
                             <Button
                                 variant="outlined"
                                 size="large"
@@ -109,6 +110,7 @@ export default function HomePage() {
                             >
                                 Bewertungen ansehen
                             </Button>
+                            */}
                         </Stack>
                     </Box>
                 </Container>
