@@ -33,20 +33,16 @@ export default function Navbar() {
 
   const kunde = AuthService.getKunde();
 
-  /** Anchor element for the dropdown menu (`null` = closed). */
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
-  /** Opens the user dropdown when the name button is clicked. */
   const handleOpenMenu = (e: { currentTarget: HTMLElement }) => {
     setMenuAnchor(e.currentTarget);
   };
 
-  /** Closes the user dropdown. */
   const handleCloseMenu = () => {
     setMenuAnchor(null);
   };
 
-  /** Clears the auth token and redirects to the home page. */
   const handleLogout = () => {
     AuthService.logout();
     handleCloseMenu();
@@ -149,7 +145,7 @@ export default function Navbar() {
                 <MenuItem
                   onClick={() => {
                     handleCloseMenu();
-                    navigate("/mein-konto");
+                    navigate("/my-account");
                   }}
                 >
                   Mein Konto

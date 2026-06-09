@@ -1,5 +1,4 @@
 /**
- * @file PrivacyPolicyPage.tsx
  * @description Privacy policy page as required by GDPR and the Austrian DSG.
  * Rendered outside `PublicLayout` so it is reachable directly from the registration and login flows.
  * @author N

@@ -1,14 +1,10 @@
 /**
- * @file RegisterPage.tsx
  * @description Registration page for new customers.
  *
  * The form is split into two sections:
  * - **Personal data** (required): first name, last name, email, password, phone, address
  * - **Vehicle data** (optional): brand, model, year of manufacture, licence plate
- *
  * Validation runs on every field after the first submit attempt.
- * On success the user is redirected to the home page and a welcome
- * message is stored via {@link RegisterService.setSuccessMessage}.
  *
  * @author N
  * @since 07.04.2026
@@ -33,14 +29,14 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
 
-/** Returns `true` if the trimmed value is not empty. */
+
 const required = (val: string) => val.trim().length > 0;
 
 /**
  * Registration form for new customers.
  * Validation is only triggered after the first submit attempt.
  * On success a welcome message is stored and the user is redirected to the home page.
- * @returns Registration form wrapped in a MUI `Stack`.
+ * Registration form wrapped in a MUI `Stack`.
  */
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -65,7 +61,6 @@ export default function RegisterPage() {
     const [error, setError]           = useState<string | null>(null);
     const [agbAccepted, setAgbAccepted] = useState(false);
 
-    /** Per-field error flags — only shown after the first submit attempt. */
     const errors = {
         vorname:  submitted && !required(form.vorname),
         nachname: submitted && !required(form.nachname),
@@ -77,7 +72,6 @@ export default function RegisterPage() {
         ort:      submitted && !required(form.ort),
     };
 
-    /** `true` when all required fields are valid and the terms have been accepted. */
     const isValid =
         required(form.vorname) &&
         required(form.nachname) &&

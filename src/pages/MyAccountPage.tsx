@@ -1,0 +1,476 @@
+/**
+ * @description Displays and manages the currently logged-in customer's account data,
+ * including personal details (name, email, phone, address) and registered vehicles.
+ * Fetches fresh data from the backend on mount and falls back to localStorage on error.
+ * @author N
+ * @since 09.06.2026
+ */
+
+import { useEffect, useState } from "react";
+import {
+    Alert,
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    CircularProgress,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid,
+    IconButton,
+    Paper,
+    Snackbar,
+    Stack,
+    TextField,
+    Typography,
+} from "@mui/material";
+import {
+    BadgeOutlined,
+    DirectionsCarOutlined,
+    Edit,
+    DeleteOutline,
+    AddOutlined,
+    LockOutlined,
+    PersonOutlined,
+    PhoneOutlined,
+    HomeOutlined,
+    EmailOutlined,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import AuthService from "../service/AuthService";
+import { getMe, updateMe, deleteMe } from "../api/customers";
+import { getVehiclesByUser, createVehicle, updateVehicle, deleteVehicle } from "../api/vehicleApi";
+import type { ICustomer } from "../interface/ICustomer";
+import type { IVehicle } from "../interface/IVehicle";
+import type { IInfoRowProps } from "../interface/IInfoRowProps";
+
+function SectionLabel({ children }: { children: string }) {
+    return (
+        <Typography
+            variant="overline"
+            fontWeight={700}
+            sx={{ color: "text.secondary", display: "block", mb: 2, letterSpacing: 1.5 }}
+        >
+            {children}
+        </Typography>
+    );
+}
+
+function InfoRow({ icon, label, value, onEdit }: IInfoRowProps) {
+    return (
+        <Stack
+            direction="row"
+            alignItems="center"
+            sx={{
+                py: 1.5,
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                "&:last-child": { borderBottom: 0 },
+                "&:hover": { bgcolor: "action.hover", borderRadius: 1 },
+                px: 1,
+                mx: -1,
+                transition: "background 0.15s",
+            }}
+        >
+            <Box sx={{ color: "primary.main", mr: 2, display: "flex", minWidth: 24 }}>{icon}</Box>
+            <Typography variant="body2" color="text.secondary" sx={{ width: 100, flexShrink: 0 }}>
+                {label}
+            </Typography>
+            <Typography variant="body2" fontWeight={500} sx={{ flex: 1, color: value ? "text.primary" : "text.disabled" }}>
+                {value || "Nicht angegeben"}
+            </Typography>
+            {onEdit && (
+                <IconButton size="small" onClick={onEdit} sx={{ color: "text.disabled", "&:hover": { color: "primary.main" } }}>
+                    <Edit sx={{ fontSize: 16 }} />
+                </IconButton>
+            )}
+        </Stack>
+    );
+}
+
+const emptyVehicleForm = { brand: "", model: "", buildYear: "", licensePlate: "" };
+
+export default function MyAccountPage() {
+    const navigate = useNavigate();
+    const kunde = AuthService.getKunde();
+
+    const [customer, setCustomer] = useState<ICustomer | null>(kunde);
+    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+    const [editField, setEditField] = useState<"name" | "email" | "phone" | "address" | null>(null);
+    const [editValue, setEditValue] = useState("");
+    const [editValue2, setEditValue2] = useState("");
+
+    const [vehicles, setVehicles] = useState<IVehicle[]>([]);
+    const [vehicleLoading, setVehicleLoading] = useState(false);
+    const [vehicleDialog, setVehicleDialog] = useState<{ open: boolean; editing: IVehicle | null }>({ open: false, editing: null });
+    const [vehicleForm, setVehicleForm] = useState(emptyVehicleForm);
+    const [vehicleSaving, setVehicleSaving] = useState(false);
+
+    const [deleteVehicleTarget, setDeleteVehicleTarget] = useState<IVehicle | null>(null);
+    const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
+
+    useEffect(() => {
+        if (!AuthService.isLoggedIn()) {
+            navigate("/login");
+            return;
+        }
+        setLoading(true);
+        getMe()
+            .then((data) => {
+                setCustomer(data);
+                return data;
+            })
+            .then((data) => {
+                setVehicleLoading(true);
+                return getVehiclesByUser(data.id)
+                    .then(setVehicles)
+                    .finally(() => setVehicleLoading(false));
+            })
+            .catch(() => { })
+            .finally(() => setLoading(false));
+    }, [navigate]);
+
+    const memberSince = customer?.createdAt ? new Date(customer.createdAt).getFullYear() : null;
+    const initials = customer
+        ? `${customer.firstName?.[0] ?? ""}${customer.lastName?.[0] ?? ""}`.toUpperCase()
+        : "??";
+    const fullName = customer ? `${customer.firstName} ${customer.lastName}` : "";
+
+    /**
+     * @description Opens the inline edit form for a given profile field and pre-fills
+     * the input(s) with the customer's current values.
+     * @param field - Which field to edit: "name", "email", "phone", or "address"
+     */
+    const openEdit = (field: typeof editField) => {
+        setEditField(field);
+        if (field === "name") { setEditValue(customer?.firstName ?? ""); setEditValue2(customer?.lastName ?? ""); }
+        else if (field === "email") { setEditValue(customer?.email ?? ""); }
+        else if (field === "phone") { setEditValue(customer?.phone ?? ""); }
+        else if (field === "address") { setEditValue(customer?.street ?? ""); setEditValue2(customer?.city ?? ""); }
+    };
+
+    const cancelEdit = () => { setEditField(null); setEditValue(""); setEditValue2(""); };
+
+    /**
+     * @description Persists the currently edited profile field to the backend via a PUT request.
+     * On success the local state and localStorage are updated without a full reload.
+     * @returns Promise that resolves once the save operation completes
+     */
+    const saveEdit = async () => {
+        if (!customer) return;
+        setSaving(true);
+        setError(null);
+        const patch: Partial<ICustomer> = {};
+        if (editField === "name") { patch.firstName = editValue.trim(); patch.lastName = editValue2.trim(); }
+        else if (editField === "email") { patch.email = editValue.trim(); }
+        else if (editField === "phone") { patch.phone = editValue.trim() || null; }
+        else if (editField === "address") { patch.street = editValue.trim() || null; patch.city = editValue2.trim() || null; }
+        try {
+            const updated = await updateMe(customer.id, patch);
+            setCustomer(updated);
+            localStorage.setItem("loggedInKunde", JSON.stringify(updated));
+            setSuccessMsg("Änderungen gespeichert.");
+            cancelEdit();
+        } catch {
+            setError("Speichern fehlgeschlagen. Bitte versuche es erneut.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const openVehicleDialog = (vehicle?: IVehicle) => {
+        setVehicleDialog({ open: true, editing: vehicle ?? null });
+        setVehicleForm(vehicle
+            ? { brand: vehicle.brand, model: vehicle.model, buildYear: vehicle.buildYear?.toString() ?? "", licensePlate: vehicle.licensePlate ?? "" }
+            : emptyVehicleForm
+        );
+    };
+
+    /**
+     * @description Saves a vehicle — creates a new one if no editing target is set, otherwise updates.
+     * Refreshes the vehicle list from the backend on success.
+     */
+    const saveVehicle = async () => {
+        if (!customer) return;
+        setVehicleSaving(true);
+        const payload = {
+            brand: vehicleForm.brand.trim(),
+            model: vehicleForm.model.trim(),
+            buildYear: vehicleForm.buildYear ? parseInt(vehicleForm.buildYear) : null,
+            licensePlate: vehicleForm.licensePlate.trim() || null,
+        };
+        try {
+            if (vehicleDialog.editing) {
+                const updated = await updateVehicle(vehicleDialog.editing.id, payload);
+                setVehicles((prev) => prev.map((v) => v.id === updated.id ? updated : v));
+            } else {
+                const created = await createVehicle(customer.id, payload);
+                setVehicles((prev) => [...prev, created]);
+            }
+            setVehicleDialog({ open: false, editing: null });
+            setSuccessMsg(vehicleDialog.editing ? "Fahrzeug aktualisiert." : "Fahrzeug hinzugefügt.");
+        } catch {
+            setError("Fahrzeug konnte nicht gespeichert werden.");
+        } finally {
+            setVehicleSaving(false);
+        }
+    };
+
+    /**
+     * @description Deletes a vehicle after the user confirms in the confirmation dialog.
+     */
+    const confirmDeleteVehicle = async () => {
+        if (!deleteVehicleTarget) return;
+        try {
+            await deleteVehicle(deleteVehicleTarget.id);
+            setVehicles((prev) => prev.filter((v) => v.id !== deleteVehicleTarget.id));
+            setSuccessMsg("Fahrzeug gelöscht.");
+        } catch {
+            setError("Fahrzeug konnte nicht gelöscht werden.");
+        } finally {
+            setDeleteVehicleTarget(null);
+        }
+    };
+
+    /**
+     * @description Permanently deletes the user account, clears localStorage and redirects to home.
+     */
+    const confirmDeleteAccount = async () => {
+        if (!customer) return;
+        try {
+            await deleteMe(customer.id);
+            localStorage.removeItem("loggedInKunde");
+            localStorage.removeItem("token");
+            navigate("/");
+        } catch {
+            setError("Konto konnte nicht gelöscht werden.");
+            setDeleteAccountOpen(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    return (
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+
+            <Grid container spacing={3} alignItems="flex-start">
+
+                {/* ── Left sidebar ── */}
+                <Grid size={{ xs: 12, md: 3 }}>
+
+                    <Paper elevation={0} sx={{ p: 3, mb: 2, borderRadius: 3, border: "1px solid", borderColor: "divider", textAlign: "center" }}>
+                        <Avatar sx={{ width: 80, height: 80, bgcolor: "primary.main", fontSize: 28, fontWeight: 700, mx: "auto", mb: 2 }}>
+                            {initials}
+                        </Avatar>
+                        <Typography variant="subtitle1" fontWeight={700} noWrap>{fullName}</Typography>
+                        <Typography variant="caption" color="text.secondary">{customer?.email}</Typography>
+                        {memberSince && (
+                            <Box sx={{ mt: 2 }}>
+                                <Chip label={`Kunde seit ${memberSince}`} size="small" variant="outlined" sx={{ fontSize: 11 }} />
+                            </Box>
+                        )}
+                    </Paper>
+
+                    <Paper elevation={0} sx={{ p: 2.5, mb: 2, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                        <SectionLabel>Sicherheit</SectionLabel>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <LockOutlined fontSize="small" sx={{ color: "text.secondary" }} />
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body2" fontWeight={500}>Passwort</Typography>
+                            </Box>
+                            <Button variant="outlined" size="small" sx={{ borderRadius: 2, fontSize: 12 }}>
+                                Ändern
+                            </Button>
+                        </Stack>
+                    </Paper>
+
+                    <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: "1px solid", borderColor: "error.light", bgcolor: "rgba(211,47,47,0.03)" }}>
+                        <SectionLabel>Konto</SectionLabel>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <BadgeOutlined fontSize="small" sx={{ color: "error.light" }} />
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body2" fontWeight={500}>Konto löschen</Typography>
+                                <Typography variant="caption" color="text.secondary">Unwiderruflich</Typography>
+                            </Box>
+                            <Button variant="outlined" size="small" color="error" sx={{ borderRadius: 2, fontSize: 12 }} onClick={() => setDeleteAccountOpen(true)}>
+                                Löschen
+                            </Button>
+                        </Stack>
+                    </Paper>
+
+                </Grid>
+
+                {/* ── Right main content ── */}
+                <Grid size={{ xs: 12, md: 9 }}>
+
+                    {/* Persönliche Daten */}
+                    <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                        <SectionLabel>Persönliche Daten</SectionLabel>
+
+                        {editField ? (
+                            <Box>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                    {editField === "name" && "Name bearbeiten"}
+                                    {editField === "email" && "E-Mail bearbeiten"}
+                                    {editField === "phone" && "Telefon bearbeiten"}
+                                    {editField === "address" && "Adresse bearbeiten"}
+                                </Typography>
+                                <Stack spacing={2} sx={{ maxWidth: 480 }}>
+                                    {(editField === "name" || editField === "address") ? (
+                                        <>
+                                            <TextField label={editField === "name" ? "Vorname" : "Straße"} value={editValue} onChange={(e) => setEditValue(e.target.value)} size="small" fullWidth autoFocus />
+                                            <TextField label={editField === "name" ? "Nachname" : "Ort"} value={editValue2} onChange={(e) => setEditValue2(e.target.value)} size="small" fullWidth />
+                                        </>
+                                    ) : (
+                                        <TextField label={editField === "email" ? "E-Mail" : "Telefon"} value={editValue} onChange={(e) => setEditValue(e.target.value)} size="small" fullWidth autoFocus type={editField === "email" ? "email" : "tel"} />
+                                    )}
+                                </Stack>
+                                {error && <Alert severity="error" sx={{ mt: 2, maxWidth: 480 }} onClose={() => setError(null)}>{error}</Alert>}
+                                <Stack direction="row" spacing={1} sx={{ mt: 2.5 }}>
+                                    <Button variant="contained" size="small" onClick={saveEdit} disabled={saving} sx={{ borderRadius: 2 }}>
+                                        {saving ? <CircularProgress size={16} color="inherit" /> : "Speichern"}
+                                    </Button>
+                                    <Button variant="text" size="small" onClick={cancelEdit} disabled={saving} sx={{ borderRadius: 2 }}>Abbrechen</Button>
+                                </Stack>
+                            </Box>
+                        ) : (
+                            <Box>
+                                <InfoRow icon={<PersonOutlined fontSize="small" />} label="Name" value={fullName || null} onEdit={() => openEdit("name")} />
+                                <InfoRow icon={<EmailOutlined fontSize="small" />} label="E-Mail" value={customer?.email} onEdit={() => openEdit("email")} />
+                                <InfoRow icon={<PhoneOutlined fontSize="small" />} label="Telefon" value={customer?.phone} onEdit={() => openEdit("phone")} />
+                                <InfoRow
+                                    icon={<HomeOutlined fontSize="small" />}
+                                    label="Adresse"
+                                    value={customer?.street ? `${customer.street}${customer.city ? `, ${customer.city}` : ""}` : null}
+                                    onEdit={() => openEdit("address")}
+                                />
+                            </Box>
+                        )}
+                    </Paper>
+
+                    {/* Meine Fahrzeuge */}
+                    <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                        <SectionLabel>Meine Fahrzeuge</SectionLabel>
+
+                        {vehicleLoading ? (
+                            <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+                                <CircularProgress size={24} />
+                            </Box>
+                        ) : (
+                            <Stack spacing={1.5} sx={{ mb: 2 }}>
+                                {vehicles.length === 0 && (
+                                    <Typography variant="body2" color="text.disabled" sx={{ py: 1 }}>
+                                        Noch keine Fahrzeuge eingetragen.
+                                    </Typography>
+                                )}
+                                {vehicles.map((v) => (
+                                    <Stack
+                                        key={v.id}
+                                        direction="row"
+                                        alignItems="center"
+                                        sx={{
+                                            px: 2, py: 1.5, borderRadius: 2,
+                                            border: "1px solid", borderColor: "divider",
+                                            bgcolor: "background.default",
+                                            "&:hover": { borderColor: "primary.light", bgcolor: "action.hover" },
+                                            transition: "all 0.15s",
+                                        }}
+                                    >
+                                        <Box sx={{ width: 40, height: 40, borderRadius: 2, bgcolor: "primary.main", display: "flex", alignItems: "center", justifyContent: "center", mr: 2, flexShrink: 0 }}>
+                                            <DirectionsCarOutlined sx={{ color: "white", fontSize: 20 }} />
+                                        </Box>
+                                        <Box sx={{ flex: 1 }}>
+                                            <Typography variant="body2" fontWeight={600}>{v.brand} {v.model}</Typography>
+                                            <Stack direction="row" spacing={0.75} sx={{ mt: 0.25, flexWrap: "wrap" }}>
+                                                {v.licensePlate && <Chip label={v.licensePlate} size="small" sx={{ fontSize: 10, height: 18 }} />}
+                                                {v.buildYear && <Chip label={v.buildYear} size="small" variant="outlined" sx={{ fontSize: 10, height: 18 }} />}
+                                            </Stack>
+                                        </Box>
+                                        <IconButton size="small" onClick={() => openVehicleDialog(v)} sx={{ color: "text.secondary", "&:hover": { color: "primary.main" }, mr: 0.5 }}>
+                                            <Edit sx={{ fontSize: 16 }} />
+                                        </IconButton>
+                                        <IconButton size="small" onClick={() => setDeleteVehicleTarget(v)} sx={{ color: "text.secondary", "&:hover": { color: "error.main" } }}>
+                                            <DeleteOutline sx={{ fontSize: 16 }} />
+                                        </IconButton>
+                                    </Stack>
+                                ))}
+                            </Stack>
+                        )}
+
+                        <Button variant="outlined" size="small" startIcon={<AddOutlined />} onClick={() => openVehicleDialog()} sx={{ borderRadius: 2, borderStyle: "dashed" }}>
+                            Fahrzeug hinzufügen
+                        </Button>
+                    </Paper>
+
+                </Grid>
+            </Grid>
+
+            {/* ── Vehicle add/edit dialog ── */}
+            <Dialog open={vehicleDialog.open} onClose={() => setVehicleDialog({ open: false, editing: null })} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+                <DialogTitle fontWeight={700}>{vehicleDialog.editing ? "Fahrzeug bearbeiten" : "Fahrzeug hinzufügen"}</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={2} sx={{ mt: 0.5 }}>
+                        <TextField label="Marke" value={vehicleForm.brand} onChange={(e) => setVehicleForm((f) => ({ ...f, brand: e.target.value }))} size="small" fullWidth autoFocus required />
+                        <TextField label="Modell" value={vehicleForm.model} onChange={(e) => setVehicleForm((f) => ({ ...f, model: e.target.value }))} size="small" fullWidth required />
+                        <TextField label="Baujahr" value={vehicleForm.buildYear} onChange={(e) => setVehicleForm((f) => ({ ...f, buildYear: e.target.value }))} size="small" fullWidth type="number" slotProps={{ htmlInput: { min: 1900, max: new Date().getFullYear() } }} />
+                        <TextField label="Kennzeichen" value={vehicleForm.licensePlate} onChange={(e) => setVehicleForm((f) => ({ ...f, licensePlate: e.target.value }))} size="small" fullWidth />
+                    </Stack>
+                    {error && <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>{error}</Alert>}
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2.5 }}>
+                    <Button onClick={() => setVehicleDialog({ open: false, editing: null })} disabled={vehicleSaving}>Abbrechen</Button>
+                    <Button variant="contained" onClick={saveVehicle} disabled={vehicleSaving || !vehicleForm.brand.trim() || !vehicleForm.model.trim()} sx={{ borderRadius: 2 }}>
+                        {vehicleSaving ? <CircularProgress size={16} color="inherit" /> : "Speichern"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Delete vehicle confirmation dialog ── */}
+            <Dialog open={!!deleteVehicleTarget} onClose={() => setDeleteVehicleTarget(null)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+                <DialogTitle fontWeight={700}>Fahrzeug löschen</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Soll <strong>{deleteVehicleTarget?.brand} {deleteVehicleTarget?.model}</strong> wirklich gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2.5 }}>
+                    <Button onClick={() => setDeleteVehicleTarget(null)}>Abbrechen</Button>
+                    <Button variant="contained" color="error" onClick={confirmDeleteVehicle} sx={{ borderRadius: 2 }}>Löschen</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Delete account confirmation dialog ── */}
+            <Dialog open={deleteAccountOpen} onClose={() => setDeleteAccountOpen(false)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+                <DialogTitle fontWeight={700}>Konto löschen</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Dein Konto und alle zugehörigen Daten werden <strong>unwiderruflich</strong> gelöscht. Bist du sicher?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2.5 }}>
+                    <Button onClick={() => setDeleteAccountOpen(false)}>Abbrechen</Button>
+                    <Button variant="contained" color="error" onClick={confirmDeleteAccount} sx={{ borderRadius: 2 }}>Konto löschen</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar open={!!successMsg} autoHideDuration={4000} onClose={() => setSuccessMsg(null)} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+                <Alert severity="success" onClose={() => setSuccessMsg(null)}>{successMsg}</Alert>
+            </Snackbar>
+
+        </Container>
+    );
+}

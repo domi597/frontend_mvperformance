@@ -1,5 +1,4 @@
 /**
- * @file AppointmentPage.tsx
  * @description Multi-step appointment booking form for workshop customers.
  *              Services and timeslots are loaded from the backend API.
  * @author N
