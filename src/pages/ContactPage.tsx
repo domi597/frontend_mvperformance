@@ -13,6 +13,12 @@ import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useNavigate } from "react-router-dom";
 
+
+/**
+ * NAME : Dominik Ranegger (KI)
+ * DATE : 14.04
+ * */
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
@@ -31,8 +37,8 @@ const CONTACT = {
     email: "kfztechnik.gdg@gmail.com",
     emailHref: "mailto:kfztechnik.gdg@gmail.com",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Grazer+Stra%C3%9Fe+136+Leibnitz",
-    facebook: "https://facebook.com",
-    instagram: "https://instagram.com",
+    facebook: "https://www.facebook.com/search/top?q=kfz%20technik%20gdg",
+    instagram: "https://www.instagram.com/kfztechnik.gdg/",
 };
 
 function isTodayInRange(days: number[]) {
