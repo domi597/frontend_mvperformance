@@ -18,7 +18,7 @@ import {
     Users,
     Settings,
 } from "lucide-react";
-import { useNewAppointmentsCount } from "../hooks/useNewAppointmentsCount";
+import { useNewAppointmentsCount } from "../../hooks/useNewAppointmentsCount.ts";
 import { KeyboardReturnSharp} from "@mui/icons-material";
 
 const systemItems = [

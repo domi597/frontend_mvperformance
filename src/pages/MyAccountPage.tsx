@@ -1,7 +1,6 @@
 /**
- * @description Displays and manages the currently logged-in customer's account data,
- * including personal details (name, email, phone, address) and registered vehicles.
- * Fetches fresh data from the backend on mount and falls back to localStorage on error.
+ * Account page — shows and edits the logged-in customer's profile and vehicles.
+ * Designed in collaboration with AI (Claude by Anthropic).
  * @author N
  * @since 09.06.2026
  */
@@ -42,12 +41,12 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";
-import { getMe, updateMe, deleteMe } from "../api/customers";
-import { getVehiclesByUser, createVehicle, updateVehicle, deleteVehicle } from "../api/vehicleApi";
+import { MyAccountService } from "../service/MyAccountService";
 import type { ICustomer } from "../interface/ICustomer";
 import type { IVehicle } from "../interface/IVehicle";
 import type { IInfoRowProps } from "../interface/IInfoRowProps";
 
+/** Small uppercase section heading. */
 function SectionLabel({ children }: { children: string }) {
     return (
         <Typography
@@ -60,6 +59,7 @@ function SectionLabel({ children }: { children: string }) {
     );
 }
 
+/** One data row with an icon, label, value and an optional edit button. */
 function InfoRow({ icon, label, value, onEdit }: IInfoRowProps) {
     return (
         <Stack
@@ -123,14 +123,14 @@ export default function MyAccountPage() {
             return;
         }
         setLoading(true);
-        getMe()
+        MyAccountService.fetchCustomer()
             .then((data) => {
                 setCustomer(data);
                 return data;
             })
             .then((data) => {
                 setVehicleLoading(true);
-                return getVehiclesByUser(data.id)
+                return MyAccountService.fetchVehicles(data.id)
                     .then(setVehicles)
                     .finally(() => setVehicleLoading(false));
             })
@@ -144,11 +144,7 @@ export default function MyAccountPage() {
         : "??";
     const fullName = customer ? `${customer.firstName} ${customer.lastName}` : "";
 
-    /**
-     * Opens the inline edit form for a given profile field and pre-fills
-     * the input(s) with the customer's current values.
-     * @param field - Which field to edit: "name", "email", "phone", or "address"
-     */
+    /** Opens the edit form for the given field and fills it with the current value. */
     const openEdit = (field: typeof editField) => {
         setEditField(field);
         if (field === "name") { setEditValue(customer?.firstName ?? ""); setEditValue2(customer?.lastName ?? ""); }
@@ -157,26 +153,18 @@ export default function MyAccountPage() {
         else if (field === "address") { setEditValue(customer?.street ?? ""); setEditValue2(customer?.city ?? ""); }
     };
 
+    /** Resets all edit state and closes the inline edit form. */
     const cancelEdit = () => { setEditField(null); setEditValue(""); setEditValue2(""); };
 
-    /**
-     * Persists the currently edited profile field to the backend via a PUT request.
-     * On success the local state and localStorage are updated without a full reload.
-     * @returns Promise that resolves once the save operation completes
-     */
+    /** Saves the edited profile field and closes the form. */
     const saveEdit = async () => {
-        if (!customer) return;
+        if (!customer || !editField) return;
         setSaving(true);
         setError(null);
-        const patch: Partial<ICustomer> = {};
-        if (editField === "name") { patch.firstName = editValue.trim(); patch.lastName = editValue2.trim(); }
-        else if (editField === "email") { patch.email = editValue.trim(); }
-        else if (editField === "phone") { patch.phone = editValue.trim() || null; }
-        else if (editField === "address") { patch.street = editValue.trim() || null; patch.city = editValue2.trim() || null; }
         try {
-            const updated = await updateMe(customer.id, patch);
+            const patch = MyAccountService.buildPatch(editField, editValue, editValue2);
+            const updated = await MyAccountService.updateProfile(customer.id, patch);
             setCustomer(updated);
-            localStorage.setItem("loggedInKunde", JSON.stringify(updated));
             setSuccessMsg("Änderungen gespeichert.");
             cancelEdit();
         } catch {
@@ -186,6 +174,7 @@ export default function MyAccountPage() {
         }
     };
 
+    /** Opens the vehicle dialog — in edit mode if a vehicle is passed, otherwise add mode. */
     const openVehicleDialog = (vehicle?: IVehicle) => {
         setVehicleDialog({ open: true, editing: vehicle ?? null });
         setVehicleForm(vehicle
@@ -194,26 +183,20 @@ export default function MyAccountPage() {
         );
     };
 
-    /**
-     * Saves a vehicle — creates a new one if no editing target is set, otherwise updates.
-     * Refreshes the vehicle list from the backend on success.
-     */
+    /** Creates or updates a vehicle and refreshes the list. */
     const saveVehicle = async () => {
         if (!customer) return;
         setVehicleSaving(true);
-        const payload = {
-            brand: vehicleForm.brand.trim(),
-            model: vehicleForm.model.trim(),
-            buildYear: vehicleForm.buildYear ? parseInt(vehicleForm.buildYear) : null,
-            licensePlate: vehicleForm.licensePlate.trim() || null,
-        };
         try {
+            const result = await MyAccountService.saveVehicle(
+                customer.id,
+                vehicleForm,
+                vehicleDialog.editing?.id,
+            );
             if (vehicleDialog.editing) {
-                const updated = await updateVehicle(vehicleDialog.editing.id, payload);
-                setVehicles((prev) => prev.map((v) => v.id === updated.id ? updated : v));
+                setVehicles((prev) => prev.map((v) => v.id === result.id ? result : v));
             } else {
-                const created = await createVehicle(customer.id, payload);
-                setVehicles((prev) => [...prev, created]);
+                setVehicles((prev) => [...prev, result]);
             }
             setVehicleDialog({ open: false, editing: null });
             setSuccessMsg(vehicleDialog.editing ? "Fahrzeug aktualisiert." : "Fahrzeug hinzugefügt.");
@@ -224,13 +207,11 @@ export default function MyAccountPage() {
         }
     };
 
-    /**
-     * Deletes a vehicle after the user confirms in the confirmation dialog.
-     */
+    /** Deletes the selected vehicle after confirmation. */
     const confirmDeleteVehicle = async () => {
         if (!deleteVehicleTarget) return;
         try {
-            await deleteVehicle(deleteVehicleTarget.id);
+            await MyAccountService.removeVehicle(deleteVehicleTarget.id);
             setVehicles((prev) => prev.filter((v) => v.id !== deleteVehicleTarget.id));
             setSuccessMsg("Fahrzeug gelöscht.");
         } catch {
@@ -240,15 +221,11 @@ export default function MyAccountPage() {
         }
     };
 
-    /**
-     * Permanently deletes the user account, clears localStorage and redirects to home.
-     */
+    /** Deletes the account, clears localStorage and redirects to home. */
     const confirmDeleteAccount = async () => {
         if (!customer) return;
         try {
-            await deleteMe(customer.id);
-            localStorage.removeItem("loggedInKunde");
-            localStorage.removeItem("token");
+            await MyAccountService.removeAccount(customer.id);
             navigate("/");
         } catch {
             setError("Konto konnte nicht gelöscht werden.");

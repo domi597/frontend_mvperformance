@@ -1,6 +1,7 @@
 /**
- * @description API calls for vehicle CRUD operations.
+ * API calls for vehicle CRUD operations.
  * All routes require a valid JWT (attached automatically by the Axios interceptor).
+ * @author N
  */
 
 import api from "./api";
