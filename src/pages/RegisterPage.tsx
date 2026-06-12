@@ -1,11 +1,6 @@
 /**
- * @description Registration page for new customers.
- *
- * The form is split into two sections:
- * - **Personal data** (required): first name, last name, email, password, phone, address
- * - **Vehicle data** (optional): brand, model, year of manufacture, licence plate
- * Validation runs on every field after the first submit attempt.
- *
+ * Registration page — two-section form for personal data and an optional vehicle.
+ * Designed in collaboration with AI (Claude by Anthropic).
  * @author N
  * @since 07.04.2026
  */
@@ -32,12 +27,7 @@ import type { RegisterRequest } from "../types/RegisterTypes";
 
 const required = (val: string) => val.trim().length > 0;
 
-/**
- * Registration form for new customers.
- * Validation is only triggered after the first submit attempt.
- * On success a welcome message is stored and the user is redirected to the home page.
- * Registration form wrapped in a MUI `Stack`.
- */
+/** Registration form — validates on first submit and redirects home on success. */
 export default function RegisterPage() {
     const navigate = useNavigate();
 
@@ -83,11 +73,7 @@ export default function RegisterPage() {
         required(form.ort) &&
         agbAccepted;
 
-    /**
-     * Generic onChange handler for a form field.
-     * `baujahr` is coerced to `number | null`; all other fields remain strings.
-     * @param field - Key of the {@link RegisterRequest} field to update.
-     */
+    /** Returns an onChange handler for the given form field. Coerces `baujahr` to number. */
     const set = (field: keyof RegisterRequest) =>
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const val = field === "baujahr"
@@ -96,10 +82,7 @@ export default function RegisterPage() {
             setForm((prev) => ({ ...prev, [field]: val }));
         };
 
-    /**
-     * Submits the form. Enables error display, validates all fields and calls
-     * {@link RegisterService.register}. On success the user is redirected to the home page.
-     */
+    /** Validates and submits the form, then redirects to home on success. */
     const handleRegister = async () => {
         setSubmitted(true);
         if (!isValid) return;

@@ -1,3 +1,8 @@
+/**
+ * Service for login, logout and reading auth state from localStorage.
+ * @author N
+ */
+
 import type { ICustomer } from "../interface/ICustomer";
 import { loginApi } from "../api/auth";
 
@@ -19,10 +24,7 @@ const KUNDE_KEY = "loggedInKunde";
 
 
 const AuthService = {
-    /**
-     * Logs in against the backend (POST /api/auth/login).
-     * Stores JWT token and user data in localStorage.
-     */
+    /** Logs in, stores JWT and user data in localStorage. */
     async login(data: LoginRequest): Promise<LoginResponse> {
         const res = await loginApi(data);
 
@@ -32,24 +34,18 @@ const AuthService = {
         return { ...res, kunde: res.user };
     },
 
-    /**
-     * Logout: removes token and user data from localStorage.
-     */
+    /** Removes token and user data from localStorage. */
     logout(): void {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(KUNDE_KEY);
     },
 
-    /**
-     * Returns the stored JWT token (or null).
-     */
+    /** Returns the stored JWT token or null. */
     getToken(): string | null {
         return localStorage.getItem(TOKEN_KEY);
     },
 
-    /**
-     * Returns the logged-in user (or null).
-     */
+    /** Returns the logged-in customer or null. */
     getKunde(): ICustomer | null {
         const raw = localStorage.getItem(KUNDE_KEY);
         if (!raw) return null;
@@ -60,16 +56,12 @@ const AuthService = {
         }
     },
 
-    /**
-     * Returns whether a user is logged in.
-     */
+    /** Returns true if a user is currently logged in. */
     isLoggedIn(): boolean {
         return !!this.getToken();
     },
 
-    /**
-     * Returns whether the logged-in user is an admin.
-     */
+    /** Returns true if the logged-in user has the ADMIN role. */
     isAdmin(): boolean {
         return this.getKunde()?.role === "ADMIN";
     },

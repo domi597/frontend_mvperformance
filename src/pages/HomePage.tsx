@@ -68,7 +68,6 @@ export default function HomePage() {
                 </Alert>
             </Snackbar>
 
-            {/* Hero */}
             <Box
                 sx={{
                     position: "relative",
@@ -116,7 +115,6 @@ export default function HomePage() {
 
             <Container maxWidth="lg">
 
-                {/* Leistungen */}
                 <Box sx={{ pb: 6 }}>
                     <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
                         Unsere Leistungen
@@ -185,7 +183,6 @@ export default function HomePage() {
                     )}
                 </Box>
 
-                {/* Termin CTA */}
                 <Card
                     variant="outlined"
                     sx={{ mb: 4, bgcolor: "background.paper", borderColor: "divider" }}
@@ -213,7 +210,6 @@ export default function HomePage() {
                     </CardContent>
                 </Card>
 
-                {/* Karte */}
                 <Box sx={{ pb: 6 }}>
                     <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
                         So finden Sie uns
