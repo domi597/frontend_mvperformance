@@ -1,9 +1,10 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Box, Divider, Drawer, Toolbar, Typography } from "@mui/material";
-import AdminNavbar from "../components/AdminNavbar";
+import AdminNavbar from "../components/admin/AdminNavbar.tsx";
 
 /**
  * Admin layout with a permanent sidebar and a dynamic page title.
+ * Designed in collaboration with AI (Claude by Anthropic).
  * @author Dominik Ranegger
  * @since 08.05.2026
  */

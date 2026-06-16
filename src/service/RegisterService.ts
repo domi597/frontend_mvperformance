@@ -1,16 +1,14 @@
-// RegisterService.ts
-// Registrierungs-Logik: kommuniziert mit dem Backend über /api/auth/register.
+/**
+ * Service for registering new customers.
+ * @author N
+ */
 
 import type { RegisterRequest, RegisterResponse } from "../types/RegisterTypes";
 import { registerApi } from "../api/auth";
 
 const RegisterService = {
-    /**
-     * Registrierung gegen das echte Backend (POST /api/auth/register).
-     * Speichert bei Erfolg Token + User im localStorage (Auto-Login).
-     */
+    /** Registers a new customer, maps form fields to backend format and stores auth data. */
     async register(data: RegisterRequest): Promise<RegisterResponse> {
-        // Felder auf Backend-Format mappen (Frontend nutzt deutsche Namen)
         const backendPayload = {
             firstName:            data.vorname,
             lastName:             data.nachname,
@@ -28,24 +26,18 @@ const RegisterService = {
 
         const res = await registerApi(backendPayload as never);
 
-        // Auto-Login: Token und User direkt speichern
         localStorage.setItem("token", res.token);
         localStorage.setItem("loggedInKunde", JSON.stringify(res.user));
 
         return { kunde: res.user };
     },
 
-    /**
-     * Speichert eine Erfolgsmeldung im localStorage.
-     * Die HomePage liest diese aus und zeigt sie als Snackbar an.
-     */
+    /** Stores a success message in localStorage for the home page to display. */
     setSuccessMessage(message: string): void {
         localStorage.setItem("successMessage", message);
     },
 
-    /**
-     * Liest die Erfolgsmeldung aus und löscht sie danach sofort (einmalige Anzeige).
-     */
+    /** Reads and removes the success message from localStorage (one-time display). */
     popSuccessMessage(): string | null {
         const msg = localStorage.getItem("successMessage");
         if (msg) localStorage.removeItem("successMessage");

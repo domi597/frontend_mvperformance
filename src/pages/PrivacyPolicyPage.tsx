@@ -1,7 +1,7 @@
 /**
- * @file PrivacyPolicyPage.tsx
- * @description Privacy policy page as required by GDPR and the Austrian DSG.
+ * Privacy policy page as required by GDPR and the Austrian DSG.
  * Rendered outside `PublicLayout` so it is reachable directly from the registration and login flows.
+ * Designed in collaboration with AI (Claude by Anthropic).
  * @author N
  * @since 10.04.2026
  */

@@ -1,5 +1,4 @@
 /**
- * @file ImpressumPage.tsx
  * @description Legal imprint page as required by Austrian law (§ 5 ECG).
  * Rendered outside `PublicLayout` so it is reachable directly from the registration and login flows.
  * @author N

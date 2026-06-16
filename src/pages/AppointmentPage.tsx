@@ -1,5 +1,4 @@
 /**
- * @file AppointmentPage.tsx
  * @description Multi-step appointment booking form for workshop customers.
  *              Services and timeslots are loaded from the backend API.
  * @author N
@@ -136,7 +135,7 @@ export default function AppointmentPage() {
 
     /**
      * Submits the appointment request to the backend.
-     * Builds the ISO-8601 `preferredDate` string from the selected date and time,
+     * Builds the `preferredDate` string from the selected date and time,
      * then calls the API. On success the success screen is shown; on failure
      * an inline error message is displayed.
      */

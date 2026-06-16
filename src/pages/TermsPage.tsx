@@ -1,7 +1,7 @@
 /**
- * @file TermsPage.tsx
- * @description Terms and Conditions page for KFZ-Technik GDG.
+ * * @description Terms and Conditions page for KFZ-Technik GDG.
  * Rendered outside `PublicLayout` and reachable via the terms checkbox in the registration form.
+ * Designed with AI (Claude by Anthropic).
  * @author N
  * @since 10.04.2026
  */

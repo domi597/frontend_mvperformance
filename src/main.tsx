@@ -16,6 +16,7 @@ import theme from "./theme";
 import PublicLayout from "./view/PublicLayout";
 import { AuthLayout } from "./view/AuthLayout";
 import AdminLayout from "./view/AdminLayout";
+import AccountLayout from "./view/AccountLayout";
 
 
 
@@ -39,6 +40,8 @@ import AdminServicesPage from "./pages/admin/AdminServicesPage";
 import CustomersPage from "./pages/admin/CustomersPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import { TermsPage } from "./pages/TermsPage";
+import MyAccountPage from "./pages/MyAccountPage";
+
 
 function RequireAdmin({ children }: { children: ReactElement }) {
   const token = localStorage.getItem("token");
@@ -94,6 +97,12 @@ const router = createBrowserRouter([
           { path: "/login", element: <LoginPage /> },
           { path: "/registrieren", element: <RegisterPage /> },
           { path: "/passwort-vergessen", element: <ForgotPasswordPage /> },
+        ],
+      },
+      {
+        element: <AccountLayout />,
+        children: [
+          { path: "/my-account", element: <MyAccountPage /> },
         ],
       },
       {

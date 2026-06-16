@@ -1,8 +1,6 @@
-// IKunde spiegelt das UserDTO vom Backend wider.
-// Backend-Felder: id, firstName, lastName, email, phone, street, city, role, createdAt
+
 
 export interface ICustomer {
-    // Backend-Felder (camelCase wie vom Backend geliefert)
     id: number;
     firstName: string;
     lastName: string;
@@ -13,7 +11,6 @@ export interface ICustomer {
     role: "ADMIN" | "CUSTOMER";
     createdAt: string;
 
-    // Alias-Felder für Frontend-Kompatibilität (werden aus firstName/lastName befüllt)
     kundeId?: number;
     vorname?: string;
     nachname?: string;

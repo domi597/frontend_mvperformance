@@ -1,26 +1,17 @@
 /**
- * @file api.ts
- * @description Central Axios instance for all HTTP requests to the Spring Boot backend.
- * All API calls in the project use this instance for automatic token handling
- * and consistent error processing.
+ * Central Axios instance for all backend requests.
+ * Attaches the JWT token to every non-auth request and redirects to login on 401.
  * @author N
  * @since 27.03.2026
  */
 
 import axios from "axios";
 
-/**
- * Axios instance configured with the backend URL from `.env` (`VITE_API_URL`).
- * Falls back to an empty string if the variable is not set.
- */
 const api = axios.create({
     baseURL: (import.meta.env.VITE_API_URL as string | undefined)?.trim() || "",
 });
 
-/**
- * Request interceptor: attaches the JWT token as a Bearer header to every request.
- * Auth endpoints (`/api/auth/`) are excluded as they do not require a token.
- */
+/** Adds the Bearer token to every request that is not an auth endpoint. */
 api.interceptors.request.use((config) => {
     const url = config.url ?? "";
     const isAuthEndpoint = url.includes("/api/auth/");
@@ -34,11 +25,7 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-/**
- * Response interceptor: automatically signs the user out on a `401` response.
- * Removes the token and customer data from `localStorage` and redirects to the login page.
- * Auth endpoints are excluded so that login errors are propagated normally.
- */
+/** Clears auth data and redirects to login on a 401 response. */
 api.interceptors.response.use(
     (res) => res,
     (err) => {

@@ -1,5 +1,4 @@
 /**
- * @file LoginPage.tsx
  * @description Login page for existing customers.
  * On successful login the JWT token is stored via {@link AuthService}
  * and the user is redirected based on their role (`ADMIN` → `/admin`, otherwise `/`).
