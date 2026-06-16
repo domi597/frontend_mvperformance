@@ -27,5 +27,5 @@ export const createOffer = (body: Omit<IOffer, "id" | "createdAt">): Promise<IOf
 export const updateOffer = (id: number, body: Omit<IOffer, "id" | "createdAt">): Promise<IOffer> =>
     api.put<IOffer>(`/api/offers/${id}`, body).then((r) => r.data);
 
-export const deleteOffer = (id: number): Promise<void> =>
+export const deleteOfferAPI = (id: number): Promise<void> =>
     api.delete(`/api/offers/${id}`).then(() => undefined);

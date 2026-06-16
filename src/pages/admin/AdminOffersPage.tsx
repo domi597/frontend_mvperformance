@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { getOffers, IOffer, updateOffer } from "../../api/offers.ts";
+import {
+    createOffer,
+    deleteOfferAPI,
+    getOffers,
+    IOffer,
+    updateOffer
+} from "../../api/offers.ts";
 import { getServices, IService } from "../../api/services.ts";
 import "../../css/AdminOffers.css";
 
@@ -8,6 +14,8 @@ export default function AdminOffersPage() {
     const [services, setServices] = useState<IService[]>([]);
 
     const [offerToEdit, setOfferToEdit] = useState<IOffer>();
+    const [offerToDelete, setOfferToDelete] = useState<IOffer>();
+    const [isCreating, setIsCreating] = useState(false);
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -24,7 +32,19 @@ export default function AdminOffersPage() {
         loadData();
     }, []);
 
+    const onCreateClick = () => {
+        setOfferToEdit(undefined);
+        setIsCreating(true);
+
+        setTitle("");
+        setDescription("");
+        setPrice(0);
+        setStatus(true);
+        setSelectedServices([]);
+    };
+
     const onEditClick = (offer: IOffer) => {
+        setIsCreating(false);
         setOfferToEdit(offer);
 
         setTitle(offer.title);
@@ -48,6 +68,8 @@ export default function AdminOffersPage() {
 
     const onCancelClick = () => {
         setOfferToEdit(undefined);
+        setIsCreating(false);
+
         setTitle("");
         setDescription("");
         setPrice(0);
@@ -55,14 +77,12 @@ export default function AdminOffersPage() {
         setSelectedServices([]);
     };
 
-    const onEditSubmitClick = async (
+    const onSubmitClick = async (
         event: React.FormEvent<HTMLFormElement>
     ) => {
         event.preventDefault();
 
-        if (!offerToEdit) return;
-
-        const updatedOffer: Omit<IOffer, "id"> = {
+        const body: Omit<IOffer, "id" | "createdAt"> = {
             title,
             description,
             price,
@@ -70,46 +90,70 @@ export default function AdminOffersPage() {
             services: selectedServices
         };
 
-        await updateOffer(offerToEdit.id, updatedOffer);
+        if (isCreating) {
+            await createOffer(body);
+        } else if (offerToEdit) {
+            await updateOffer(offerToEdit.id, body);
+        }
 
-        const refreshed = await getOffers();
-        setOffers(refreshed);
-
+        setOffers(await getOffers());
         onCancelClick();
+    };
+
+    const deleteOffer = async () => {
+        if (!offerToDelete?.id) return;
+
+        await deleteOfferAPI(offerToDelete.id);
+
+        setOffers(prev =>
+            prev.filter(offer => offer.id !== offerToDelete.id)
+        );
+
+        setOfferToDelete(undefined);
     };
 
     return (
         <>
-            {offerToEdit ? (
+            {offerToEdit || isCreating ? (
                 <div className="edit-offer-container">
                     <form
                         className="edit-offer-form"
-                        onSubmit={onEditSubmitClick}
+                        onSubmit={onSubmitClick}
                     >
-                        <h2>{title} bearbeiten</h2>
+                        <h2>
+                            {isCreating
+                                ? "Neues Angebot erstellen"
+                                : `${title} bearbeiten`}
+                        </h2>
 
                         <label>Titel</label>
                         <input
+                            required
                             value={title}
                             onChange={e => setTitle(e.target.value)}
                         />
 
                         <label>Beschreibung</label>
                         <textarea
+                            required
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                         />
 
                         <div className="price-status-row">
-
                             <div className="price-box">
                                 <label>Preis (€)</label>
                                 <input
                                     type="number"
-                                    value={price}
-                                    onChange={e =>
-                                        setPrice(Number(e.target.value))
-                                    }
+                                    required
+                                    value={price === 0 ? "" : price}
+                                    onChange={e => {
+                                        if (e.target.value === "") {
+                                            setPrice(0);
+                                        } else {
+                                            setPrice(Number(e.target.value));
+                                        }
+                                    }}
                                 />
                             </div>
 
@@ -117,7 +161,6 @@ export default function AdminOffersPage() {
                                 <label>Status</label>
 
                                 <div className="status-container">
-
                                     <button
                                         type="button"
                                         className={
@@ -141,7 +184,6 @@ export default function AdminOffersPage() {
                                     >
                                         ● Inaktiv
                                     </button>
-
                                 </div>
                             </div>
                         </div>
@@ -158,9 +200,7 @@ export default function AdminOffersPage() {
                                             ? "service-btn selected"
                                             : "service-btn"
                                     }
-                                    onClick={() =>
-                                        onServiceClick(service)
-                                    }
+                                    onClick={() => onServiceClick(service)}
                                 >
                                     {service.title}
                                 </button>
@@ -168,7 +208,6 @@ export default function AdminOffersPage() {
                         </div>
 
                         <div className="form-actions">
-
                             <button
                                 type="button"
                                 className="cancel-btn"
@@ -181,9 +220,8 @@ export default function AdminOffersPage() {
                                 type="submit"
                                 className="save-btn"
                             >
-                                Speichern
+                                {isCreating ? "Hinzufügen" : "Speichern"}
                             </button>
-
                         </div>
                     </form>
                 </div>
@@ -192,7 +230,10 @@ export default function AdminOffersPage() {
                     <div className="offers-header">
                         <h2>Aktuelle Angebote</h2>
 
-                        <button className="new-offer-btn">
+                        <button
+                            className="new-offer-btn"
+                            onClick={onCreateClick}
+                        >
                             + Neues Angebot
                         </button>
                     </div>
@@ -200,7 +241,6 @@ export default function AdminOffersPage() {
                     <div className="offers-grid">
                         {offers.map(offer => (
                             <div className="offer-card" key={offer.id}>
-
                                 <h3>{offer.title}</h3>
 
                                 <div className="service-tags">
@@ -229,24 +269,54 @@ export default function AdminOffersPage() {
                                 </span>
 
                                 <div className="offer-actions">
-
                                     <button
                                         className="edit-btn"
-                                        onClick={() =>
-                                            onEditClick(offer)
-                                        }
+                                        onClick={() => onEditClick(offer)}
                                     >
                                         ✏ Bearbeiten
                                     </button>
 
-                                    <button className="delete-btn">
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => setOfferToDelete(offer)}
+                                    >
                                         🗑 Löschen
                                     </button>
-
                                 </div>
-
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {offerToDelete && (
+                <div className="modal-overlay">
+                    <div className="delete-modal">
+                        <div className="delete-icon">🗑</div>
+
+                        <h2>Angebot löschen?</h2>
+
+                        <p>
+                            Möchtest du „{offerToDelete.title}“ wirklich löschen?
+                            Diese Aktion kann nicht rückgängig gemacht werden.
+                        </p>
+
+                        <div className="modal-actions">
+                            <button
+                                type="button"
+                                onClick={() => setOfferToDelete(undefined)}
+                            >
+                                Abbrechen
+                            </button>
+
+                            <button
+                                type="button"
+                                className="confirm-delete-btn"
+                                onClick={deleteOffer}
+                            >
+                                Löschen
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
