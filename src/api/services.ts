@@ -5,18 +5,17 @@ import api from "./api";
 * DATE : 05.05
 * */
 
-
 export interface IService {
     id?: number;
     icon: string;
     title: string;
     subtitle?: string;
-    price : number;
+    price: number;
+    duration: number;
 }
 
 export const getServices = (): Promise<IService[]> =>
     api.get<IService[]>("/api/services").then((r) => r.data);
-
 
 export const createService = (
     body: Omit<IService, "id">

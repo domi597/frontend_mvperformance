@@ -20,6 +20,7 @@ export default function AdminOffersPage() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState(0);
+    const [duration, setDuration] = useState(0);
     const [status, setStatus] = useState(true);
     const [selectedServices, setSelectedServices] = useState<IService[]>([]);
 
@@ -39,6 +40,7 @@ export default function AdminOffersPage() {
         setTitle("");
         setDescription("");
         setPrice(0);
+        setDuration(0);
         setStatus(true);
         setSelectedServices([]);
     };
@@ -50,6 +52,7 @@ export default function AdminOffersPage() {
         setTitle(offer.title);
         setDescription(offer.description);
         setPrice(offer.price);
+        setDuration(offer.duration ?? 0);
         setStatus(offer.active);
         setSelectedServices(offer.services);
     };
@@ -73,6 +76,7 @@ export default function AdminOffersPage() {
         setTitle("");
         setDescription("");
         setPrice(0);
+        setDuration(0);
         setStatus(true);
         setSelectedServices([]);
     };
@@ -86,6 +90,7 @@ export default function AdminOffersPage() {
             title,
             description,
             price,
+            duration,
             active: status,
             services: selectedServices
         };
@@ -152,6 +157,23 @@ export default function AdminOffersPage() {
                                             setPrice(0);
                                         } else {
                                             setPrice(Number(e.target.value));
+                                        }
+                                    }}
+                                />
+                            </div>
+
+                            {/* NEU */}
+                            <div className="price-box">
+                                <label>Dauer (min)</label>
+                                <input
+                                    type="number"
+                                    required
+                                    value={duration === 0 ? "" : duration}
+                                    onChange={e => {
+                                        if (e.target.value === "") {
+                                            setDuration(0);
+                                        } else {
+                                            setDuration(Number(e.target.value));
                                         }
                                     }}
                                 />
@@ -258,6 +280,13 @@ export default function AdminOffersPage() {
                                     € {offer.price}
                                 </div>
 
+                                {/* NEU */}
+                                {offer.duration && (
+                                    <div className="offer-duration">
+                                        ⏱ {offer.duration} min
+                                    </div>
+                                )}
+
                                 <span
                                     className={
                                         offer.active
@@ -297,7 +326,7 @@ export default function AdminOffersPage() {
                         <h2>Angebot löschen?</h2>
 
                         <p>
-                            Möchtest du „{offerToDelete.title}“ wirklich löschen?
+                            Möchtest du „{offerToDelete.title}" wirklich löschen?
                             Diese Aktion kann nicht rückgängig gemacht werden.
                         </p>
 

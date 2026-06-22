@@ -88,10 +88,15 @@
 }
 
 .services-table td {
-    padding: 15px 20px;
+    padding: 18px 20px;
     border-top: 1px solid #242424;
     color: #e5e5e5;
     font-size: 16px;
+    vertical-align: middle;
+}
+
+.services-table tbody tr {
+    height: 72px;
 }
 
 .services-table td:nth-child(1),
@@ -115,18 +120,37 @@
     font-size: 15px;
     cursor: pointer;
     margin-right: 7px;
+    margin-bottom: 10px;
 }
 
 .delete-small-btn {
     color: #ff5555;
 }
 
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
 .service-form {
     background: #1a1a1a;
     border: 1px solid #363636;
     border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 28px;
+    padding: 30px;
+    width: 90%;
+    max-width: 540px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .service-form h2 {
@@ -183,10 +207,13 @@
 }
 
 .delete-box {
-    background: rgba(255, 60, 60, 0.04);
+    background: #1a1a1a;
     border: 1px solid #742828;
     border-radius: 14px;
-    padding: 24px;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .delete-box h2 {
@@ -200,6 +227,7 @@
     color: #888;
     font-size: 16px;
     margin: 0;
+    line-height: 1.5;
 }
 
 .delete-actions {

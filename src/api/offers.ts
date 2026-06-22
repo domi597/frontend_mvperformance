@@ -7,6 +7,7 @@ export interface IOffer {
     title: string;
     description: string;
     price: number;
+    duration?: number;
     active: boolean;
     createdAt?: string;
     services: IService[];
