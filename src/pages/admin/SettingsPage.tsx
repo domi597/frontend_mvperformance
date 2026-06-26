@@ -1,7 +1,7 @@
-import { useAdminTheme } from "../../hooks/useAdminTheme.ts";
+import { useGlobalTheme } from "../../hooks/useGlobalTheme.ts";
 
 export default function SettingsPage() {
-    const { isDark, setIsDark } = useAdminTheme();
+    const { isDark, setIsDark } = useGlobalTheme();
 
     return (
         <div className="main full">

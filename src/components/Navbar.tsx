@@ -67,7 +67,7 @@ export default function Navbar() {
             sx={{
               fontWeight: 800,
               fontSize: 18,
-              color: "#fff",
+              color: "text.primary",
               textDecoration: "none",
               mr: 4,
             }}
@@ -92,11 +92,11 @@ export default function Navbar() {
                   px: 1.5,
                   borderRadius: 1,
                   "&.active": {
-                    color: "#fff",
+                    color: "text.primary",
                     bgcolor: "rgba(198,40,40,0.12)",
                   },
                   "&:hover": {
-                    color: "#fff",
+                    color: "text.primary",
                     bgcolor: "rgba(198,40,40,0.08)",
                   },
                 }}
@@ -115,7 +115,7 @@ export default function Navbar() {
                   color: "text.secondary",
                   fontWeight: 500,
                   fontSize: 14,
-                  "&:hover": { color: "#fff" },
+                  "&:hover": { color: "text.primary" },
                 }}
               >
                 Hallo, {kunde.firstName}
@@ -164,8 +164,8 @@ export default function Navbar() {
                 color: "text.secondary",
                 fontWeight: 500,
                 fontSize: 14,
-                "&.active": { color: "#fff" },
-                "&:hover": { color: "#fff" },
+                "&.active": { color: "text.primary" },
+                "&:hover": { color: "text.primary" },
               }}
             >
               Anmelden

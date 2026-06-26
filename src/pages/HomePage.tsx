@@ -3,6 +3,8 @@ import {Alert, Box, Button, Card, CardContent, CircularProgress, Container, Grid
 import { useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import blackBmw from "../pics/blackBmw.png";
+import redBmw from "../pics/redBmw.png";
+import { useGlobalTheme } from "../hooks/useGlobalTheme";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -30,6 +32,7 @@ const WERKSTATT_POS: [number, number] = [46.794200, 15.538571];
 
 export default function HomePage() {
     const navigate = useNavigate();
+    const { isDark } = useGlobalTheme();
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [services, setServices] = useState<IService[]>([]);
     const [servicesLoading, setServicesLoading] = useState(true);
@@ -64,11 +67,12 @@ export default function HomePage() {
                     position: "relative",
                     width: "100%",
                     minHeight: { xs: 360, md: 520 },
-                    backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%), url(${blackBmw})`,
+                    backgroundImage: isDark
+                        ? `linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%), url(${blackBmw})`
+                        : `linear-gradient(to right, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0.15) 100%), url(${redBmw})`,
                     backgroundSize: "cover",
                     backgroundPosition: { xs: "center", md: "right center" },
                     backgroundRepeat: "no-repeat",
-                    color: "common.white",
                     display: "flex",
                     alignItems: "center",
                     mb: { xs: 4, md: 6 },
@@ -76,12 +80,12 @@ export default function HomePage() {
             >
                 <Container maxWidth="lg">
                     <Box sx={{ py: { xs: 6, md: 10 }, maxWidth: 640 }}>
-                        <Typography variant="h3" component="h1" fontWeight={800} sx={{ color: "common.white" }}>
+                        <Typography variant="h3" component="h1" fontWeight={800} sx={{ color: isDark ? "common.white" : "text.primary" }}>
                             KFZ-Technik GDG –
                             <br />
                             Ihre Werkstatt in Leibnitz
                         </Typography>
-                        <Typography variant="body1" sx={{ mt: 2, maxWidth: 520, color: "rgba(255,255,255,0.85)" }}>
+                        <Typography variant="body1" sx={{ mt: 2, maxWidth: 520, color: isDark ? "rgba(255,255,255,0.85)" : "text.secondary" }}>
                             Die Autowerkstatt, der Leibnitz vertraut.
                         </Typography>
                         <Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>

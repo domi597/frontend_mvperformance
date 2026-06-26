@@ -38,9 +38,13 @@ import {
     PhoneOutlined,
     HomeOutlined,
     EmailOutlined,
+    DarkModeOutlined,
+    LightModeOutlined,
 } from "@mui/icons-material";
+import Switch from "@mui/material/Switch";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";
+import { useGlobalTheme } from "../hooks/useGlobalTheme";
 import { MyAccountService } from "../service/MyAccountService";
 import type { ICustomer } from "../interface/ICustomer";
 import type { IVehicle } from "../interface/IVehicle";
@@ -98,6 +102,7 @@ const emptyVehicleForm = { brand: "", model: "", buildYear: "", licensePlate: ""
 export default function MyAccountPage() {
     const navigate = useNavigate();
     const kunde = AuthService.getKunde();
+    const { isDark, setIsDark } = useGlobalTheme();
 
     const [customer, setCustomer] = useState<ICustomer | null>(kunde);
     const [loading, setLoading] = useState(false);
@@ -272,6 +277,20 @@ export default function MyAccountPage() {
                             <Button variant="outlined" size="small" sx={{ borderRadius: 2, fontSize: 12 }}>
                                 Ändern
                             </Button>
+                        </Stack>
+                    </Paper>
+
+                    <Paper elevation={0} sx={{ p: 2.5, mb: 2, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                        <SectionLabel>Darstellung</SectionLabel>
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                            {isDark
+                                ? <DarkModeOutlined fontSize="small" sx={{ color: "text.secondary" }} />
+                                : <LightModeOutlined fontSize="small" sx={{ color: "text.secondary" }} />
+                            }
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body2" fontWeight={500}>{isDark ? "Dark Mode" : "Light Mode"}</Typography>
+                            </Box>
+                            <Switch checked={isDark} onChange={(e) => setIsDark(e.target.checked)} size="small" color="primary" />
                         </Stack>
                     </Paper>
 

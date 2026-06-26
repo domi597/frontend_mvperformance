@@ -55,7 +55,7 @@ export default function AccountLayout() {
                         <Typography
                             component={NavLink}
                             to="/"
-                            sx={{ fontWeight: 800, fontSize: 18, color: "#fff", textDecoration: "none", mr: 3 }}
+                            sx={{ fontWeight: 800, fontSize: 18, color: "text.primary", textDecoration: "none", mr: 3 }}
                         >
                             <Box component="span" sx={{ color: "primary.main" }}>KFZ</Box>
                             -Technik GDG
@@ -76,8 +76,8 @@ export default function AccountLayout() {
                                         fontSize: 13,
                                         px: 1.5,
                                         borderRadius: 1,
-                                        "&.active": { color: "#fff", bgcolor: "rgba(198,40,40,0.12)" },
-                                        "&:hover": { color: "#fff", bgcolor: "rgba(198,40,40,0.08)" },
+                                        "&.active": { color: "text.primary", bgcolor: "rgba(198,40,40,0.12)" },
+                                        "&:hover": { color: "text.primary", bgcolor: "rgba(198,40,40,0.08)" },
                                     }}
                                 >
                                     {link.label}
@@ -90,7 +90,7 @@ export default function AccountLayout() {
                             to="/"
                             size="small"
                             startIcon={<HomeOutlined fontSize="small" />}
-                            sx={{ color: "text.secondary", fontSize: 13, mr: 1, "&:hover": { color: "#fff" } }}
+                            sx={{ color: "text.secondary", fontSize: 13, mr: 1, "&:hover": { color: "text.primary" } }}
                         >
                             Zur Website
                         </Button>

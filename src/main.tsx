@@ -10,15 +10,13 @@ import {
 import { useEffect } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import theme from "./theme";
+
+import { GlobalThemeProvider } from "../src/state/GlobalThemeContext.tsx";
 
 import PublicLayout from "./view/PublicLayout";
 import { AuthLayout } from "./view/AuthLayout";
 import AdminLayout from "./view/AdminLayout";
 import AccountLayout from "./view/AccountLayout";
-
-import { AdminThemeProvider } from "../src/state/AdminThemeContextState.tsx";
 
 import HomePage from "./pages/HomePage";
 import ServicesPage from "./pages/ServicesPage";
@@ -108,9 +106,7 @@ const router = createBrowserRouter([
             {
                 element: (
                     <RequireAdmin>
-                        <AdminThemeProvider>
-                            <AdminLayout />
-                        </AdminThemeProvider>
+                        <AdminLayout />
                     </RequireAdmin>
                 ),
                 children: [
@@ -128,11 +124,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <ThemeProvider theme={theme}>
+        <GlobalThemeProvider>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <CssBaseline />
                 <RouterProvider router={router} />
             </LocalizationProvider>
-        </ThemeProvider>
+        </GlobalThemeProvider>
     </StrictMode>
 );
