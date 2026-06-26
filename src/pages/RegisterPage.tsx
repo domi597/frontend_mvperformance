@@ -23,6 +23,7 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
+import { isValidAustrianPlate } from "../utils/validation";
 
 
 const required = (val: string) => val.trim().length > 0;
@@ -52,14 +53,15 @@ export default function RegisterPage() {
     const [agbAccepted, setAgbAccepted] = useState(false);
 
     const errors = {
-        vorname:  submitted && !required(form.vorname),
-        nachname: submitted && !required(form.nachname),
-        email:    submitted && (!required(form.email) || !form.email.includes("@")),
-        password: submitted && form.password.length < 6,
-        telefon:  submitted && !required(form.telefon),
-        strasse:  submitted && !required(form.strasse),
-        plz:      submitted && !required(form.plz),
-        ort:      submitted && !required(form.ort),
+        vorname:      submitted && !required(form.vorname),
+        nachname:     submitted && !required(form.nachname),
+        email:        submitted && (!required(form.email) || !form.email.includes("@")),
+        password:     submitted && form.password.length < 6,
+        telefon:      submitted && !required(form.telefon),
+        strasse:      submitted && !required(form.strasse),
+        plz:          submitted && !required(form.plz),
+        ort:          submitted && !required(form.ort),
+        kennzeichen:  submitted && !isValidAustrianPlate(form.kennzeichen),
     };
 
     const isValid =
@@ -257,7 +259,9 @@ export default function RegisterPage() {
                     onChange={set("kennzeichen")}
                     size="small"
                     fullWidth
-                    placeholder="z.B. GZ-12345"
+                    placeholder="z.B. GZ-12345AB"
+                    error={errors.kennzeichen}
+                    helperText={errors.kennzeichen ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
                 />
             </Stack>
 

@@ -30,6 +30,7 @@ import AuthService from "../service/AuthService";
 import { createAppointment } from "../api/appointmentApi";
 import { getServices, IService } from "../api/services";
 import { getTimeslots, ITimeslot } from "../api/timeslotApi";
+import { isValidAustrianPlate } from "../utils/validation";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
@@ -118,7 +119,8 @@ export default function AppointmentPage() {
         if (activeStep === 1) return !!form.date && !!selectedTime;
         if (activeStep === 2)
             return !!(form.firstName && form.lastName && form.email &&
-                form.phone && form.brand && form.model && form.licensePlate);
+                form.phone && form.brand && form.model && form.licensePlate &&
+                isValidAustrianPlate(form.licensePlate) && form.licensePlate.trim() !== "");
         return true;
     };
 
@@ -363,7 +365,16 @@ export default function AppointmentPage() {
                     <TextField label="Baujahr"     value={form.buildYear}    onChange={set("buildYear")}    fullWidth />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 8 }}>
-                    <TextField label="Kennzeichen" value={form.licensePlate} onChange={set("licensePlate")} fullWidth required />
+                    <TextField
+                        label="Kennzeichen"
+                        value={form.licensePlate}
+                        onChange={set("licensePlate")}
+                        fullWidth
+                        required
+                        placeholder="z.B. W-12345AB"
+                        error={form.licensePlate.trim() !== "" && !isValidAustrianPlate(form.licensePlate)}
+                        helperText={form.licensePlate.trim() !== "" && !isValidAustrianPlate(form.licensePlate) ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
+                    />
                 </Grid>
             </Grid>
 

@@ -45,6 +45,7 @@ import { MyAccountService } from "../service/MyAccountService";
 import type { ICustomer } from "../interface/ICustomer";
 import type { IVehicle } from "../interface/IVehicle";
 import type { IInfoRowProps } from "../interface/IInfoRowProps";
+import { isValidAustrianPlate } from "../utils/validation";
 
 /** Small uppercase section heading. */
 function SectionLabel({ children }: { children: string }) {
@@ -399,13 +400,22 @@ export default function MyAccountPage() {
                         <TextField label="Marke" value={vehicleForm.brand} onChange={(e) => setVehicleForm((f) => ({ ...f, brand: e.target.value }))} size="small" fullWidth autoFocus required />
                         <TextField label="Modell" value={vehicleForm.model} onChange={(e) => setVehicleForm((f) => ({ ...f, model: e.target.value }))} size="small" fullWidth required />
                         <TextField label="Baujahr" value={vehicleForm.buildYear} onChange={(e) => setVehicleForm((f) => ({ ...f, buildYear: e.target.value }))} size="small" fullWidth type="number" slotProps={{ htmlInput: { min: 1900, max: new Date().getFullYear() } }} />
-                        <TextField label="Kennzeichen" value={vehicleForm.licensePlate} onChange={(e) => setVehicleForm((f) => ({ ...f, licensePlate: e.target.value }))} size="small" fullWidth />
+                        <TextField
+                            label="Kennzeichen"
+                            value={vehicleForm.licensePlate}
+                            onChange={(e) => setVehicleForm((f) => ({ ...f, licensePlate: e.target.value }))}
+                            size="small"
+                            fullWidth
+                            placeholder="z.B. W-12345AB"
+                            error={vehicleForm.licensePlate.trim() !== "" && !isValidAustrianPlate(vehicleForm.licensePlate)}
+                            helperText={vehicleForm.licensePlate.trim() !== "" && !isValidAustrianPlate(vehicleForm.licensePlate) ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
+                        />
                     </Stack>
                     {error && <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>{error}</Alert>}
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2.5 }}>
                     <Button onClick={() => setVehicleDialog({ open: false, editing: null })} disabled={vehicleSaving}>Abbrechen</Button>
-                    <Button variant="contained" onClick={saveVehicle} disabled={vehicleSaving || !vehicleForm.brand.trim() || !vehicleForm.model.trim()} sx={{ borderRadius: 2 }}>
+                    <Button variant="contained" onClick={saveVehicle} disabled={vehicleSaving || !vehicleForm.brand.trim() || !vehicleForm.model.trim() || !isValidAustrianPlate(vehicleForm.licensePlate)} sx={{ borderRadius: 2 }}>
                         {vehicleSaving ? <CircularProgress size={16} color="inherit" /> : "Speichern"}
                     </Button>
                 </DialogActions>
