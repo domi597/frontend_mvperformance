@@ -1,3 +1,9 @@
+/**
+ * @description Top Bar over the Navbar shows all important things about the company
+ * @author N
+ * @since 27.03.2026
+ */
+
 import { Box, Link, Stack } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EmailIcon from "@mui/icons-material/Email";

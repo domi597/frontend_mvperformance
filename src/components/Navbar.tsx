@@ -1,5 +1,4 @@
 /**
- * @file Navbar.tsx
  * @description Sticky navigation bar with logo, nav links and user menu.
  * Shows "Hallo [first name]" with a dropdown when logged in, otherwise an "Anmelden" button.
  * @author N
