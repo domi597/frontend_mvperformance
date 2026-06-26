@@ -19,12 +19,11 @@ import {
     Settings,
 } from "lucide-react";
 import { useNewAppointmentsCount } from "../../hooks/useNewAppointmentsCount.ts";
-import { KeyboardReturnSharp} from "@mui/icons-material";
+import { KeyboardReturnSharp } from "@mui/icons-material";
 
 const systemItems = [
     { label: "Einstellungen", to: "/admin/einstellungen", icon: <Settings size={18} /> },
     { label: "Zurück", to: "/", icon: <KeyboardReturnSharp sx={{ fontSize: 18 }} /> },
-
 ];
 
 function NavSection({ items }: { items: { label: string; to: string; icon: React.ReactNode; end?: boolean; badge?: boolean }[] }) {
@@ -46,13 +45,25 @@ function NavSection({ items }: { items: { label: string; to: string; icon: React
                                 borderRadius: 1.5,
                                 px: 1.5,
                                 py: 0.9,
-                                color: isActive ? "primary.main" : "text.secondary",
-                                bgcolor: isActive ? "action.selected" : "transparent",
+                                // Nutzt deine CSS-Variablen für perfekte Farbwechsel
+                                color: isActive ? "var(--text)" : "var(--text-secondary)",
+                                bgcolor: isActive ? "var(--accent-soft)" : "transparent",
+                                transition: "all 0.15s ease-in-out",
+
+                                // Steuert den speziellen Aktiven-Look im Light Mode (Text wird Rot/Accent)
+                                ...(isActive && {
+                                    "body.light-mode &": {
+                                        color: "var(--accent, #e63232)",
+                                    }
+                                }),
+
                                 "&:hover": {
-                                    bgcolor: "action.hover",
-                                    color: "text.primary",
+                                    bgcolor: "var(--accent-soft)",
+                                    color: "var(--text)",
+                                    "body.light-mode &": {
+                                        color: "var(--accent, #e63232)",
+                                    }
                                 },
-                                transition: "all 0.15s",
                             }}
                         >
                             <ListItemIcon sx={{ minWidth: 32, color: "inherit" }}>
@@ -69,6 +80,7 @@ function NavSection({ items }: { items: { label: string; to: string; icon: React
                                 primaryTypographyProps={{
                                     fontSize: 13,
                                     fontWeight: isActive ? 600 : 400,
+                                    letterSpacing: "0.01em"
                                 }}
                             />
                         </ListItemButton>
@@ -95,7 +107,14 @@ export default function AdminNavbar() {
             <Box sx={{ mb: 1 }}>
                 <Typography
                     variant="caption"
-                    sx={{ px: 1.5, color: "text.disabled", fontWeight: 600, letterSpacing: 1 }}
+                    sx={{
+                        px: 1.5,
+                        color: "var(--text-secondary)",
+                        opacity: 0.7,
+                        fontWeight: 700,
+                        fontSize: 11,
+                        letterSpacing: "0.08em"
+                    }}
                 >
                     VERWALTUNG
                 </Typography>
@@ -105,10 +124,17 @@ export default function AdminNavbar() {
             </Box>
 
             <Box sx={{ mt: "auto" }}>
-                <Divider sx={{ mb: 1.5 }} />
+                <Divider sx={{ mb: 1.5, borderColor: "var(--border)" }} />
                 <Typography
                     variant="caption"
-                    sx={{ px: 1.5, color: "text.disabled", fontWeight: 600, letterSpacing: 1 }}
+                    sx={{
+                        px: 1.5,
+                        color: "var(--text-secondary)",
+                        opacity: 0.7,
+                        fontWeight: 700,
+                        fontSize: 11,
+                        letterSpacing: "0.08em"
+                    }}
                 >
                     SYSTEM
                 </Typography>

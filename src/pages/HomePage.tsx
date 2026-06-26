@@ -1,17 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-    Alert,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    CircularProgress,
-    Container,
-    Grid,
-    Snackbar,
-    Stack,
-    Typography,
-} from "@mui/material";
+import {Alert, Box, Button, Card, CardContent, CircularProgress, Container, Grid, Snackbar, Stack, Typography,} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import blackBmw from "../pics/blackBmw.png";
@@ -23,13 +11,20 @@ import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { getServices, IService } from "../api/services";
 
+
+/**
+ * Created by: Dominik Ranegger (KI)
+ * Date: 22.06.2026
+ * Time: 14:53
+ */
+
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,
     shadowUrl: markerShadow,
 });
-
 
 const WERKSTATT_POS: [number, number] = [46.794200, 15.538571];
 
@@ -46,14 +41,10 @@ export default function HomePage() {
 
     useEffect(() => {
         getServices()
-            .then((data) => {
-                console.log("services:", data);
-                setServices(data);
-            })
+            .then((data) => setServices(data))
             .catch(() => setServices([]))
             .finally(() => setServicesLoading(false));
     }, []);
-
 
     return (
         <>
@@ -97,27 +88,21 @@ export default function HomePage() {
                             <Button variant="contained" size="large" onClick={() => navigate("/termin")}>
                                 Termin anfragen
                             </Button>
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                sx={{
-                                    color: "common.white",
-                                    borderColor: "rgba(255,255,255,0.6)",
-                                    "&:hover": { borderColor: "common.white", bgcolor: "rgba(255,255,255,0.08)" },
-                                }}
-                            >
-                                Bewertungen ansehen
-                            </Button>
                         </Stack>
                     </Box>
                 </Container>
             </Box>
 
             <Container maxWidth="lg">
-
                 <Box sx={{ pb: 6 }}>
-                    <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
+                    <Typography variant="overline" sx={{ color: "primary.main", fontWeight: 700, letterSpacing: 1.5 }}>
+                        WAS WIR ANBIETEN
+                    </Typography>
+                    <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
                         Unsere Leistungen
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                        Professionelle KFZ-Arbeiten — schnell, transparent und zu fairen Preisen.
                     </Typography>
 
                     {servicesLoading ? (
@@ -129,58 +114,89 @@ export default function HomePage() {
                     ) : (
                         <Grid container spacing={2}>
                             {services.slice(0, 4).map((s) => (
-                                <Grid key={s.id ?? s.title} size={{ xs: 6, sm: 3 }}>
+                                <Grid key={s.id ?? s.title} size={{ xs: 12, sm: 6, md: 3 }}>
                                     <Card
                                         variant="outlined"
                                         sx={{
-                                            textAlign: "center",
                                             bgcolor: "background.paper",
                                             borderColor: "divider",
-                                            "&:hover": { borderColor: "primary.main" },
-                                            transition: "border-color 150ms",
+                                            "&:hover": {
+                                                borderColor: "primary.main",
+                                                transform: "translateY(-4px)",
+                                            },
+                                            transition: "border-color 150ms, transform 150ms",
                                             height: "100%",
-                                            minHeight: 180,
+                                            display: "flex",
+                                            flexDirection: "column",
                                         }}
                                     >
-                                        <CardContent sx={{ p: 2.5, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                                        <CardContent sx={{
+                                            p: 2.5,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            height: "100%",
+                                        }}>
                                             {s.icon && (
                                                 <Box
                                                     component="img"
                                                     src={`data:image/png;base64,${s.icon}`}
                                                     alt={s.title}
                                                     sx={{
-                                                        width: 56,
-                                                        height: 56,
+                                                        width: 48,
+                                                        height: 48,
                                                         mb: 1.5,
                                                         objectFit: "contain",
-                                                        bgcolor: "rgba(255,255,255,0.06)",
-                                                        borderRadius: 1,
+                                                        bgcolor: "action.hover",
+                                                        borderRadius: 2,
                                                         p: 0.5,
                                                     }}
                                                 />
                                             )}
+
                                             <Typography variant="subtitle1" fontWeight={700}>
                                                 {s.title}
                                             </Typography>
                                             {s.subtitle && (
-                                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
                                                     {s.subtitle}
                                                 </Typography>
                                             )}
-                                            <Typography
-                                                variant="body2"
-                                                color="primary.main"
-                                                sx={{ mt: 1.5, cursor: "pointer", fontWeight: 600 }}
+
+                                            <Box sx={{ flexGrow: 1 }} />
+
+                                            <Box sx={{ borderTop: "1px solid", borderColor: "divider", my: 1.5 }} />
+
+                                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                                                <Typography variant="h6" fontWeight={700} color="text.primary">
+                                                    {s.price} €
+                                                </Typography>
+                                                {s.duration && (
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        ⏱ {s.duration} min
+                                                    </Typography>
+                                                )}
+                                            </Stack>
+
+                                            <Button
+                                                variant="contained"
+                                                fullWidth
+                                                size="small"
                                                 onClick={() => navigate("/termin")}
                                             >
                                                 Termin anfragen
-                                            </Typography>
+                                            </Button>
                                         </CardContent>
                                     </Card>
                                 </Grid>
                             ))}
                         </Grid>
                     )}
+
+                    <Box sx={{ mt: 2.5, textAlign: "right" }}>
+                        <Button variant="text" onClick={() => navigate("/leistungen")}>
+                            Alle Leistungen ansehen →
+                        </Button>
+                    </Box>
                 </Box>
 
                 <Card
@@ -251,7 +267,6 @@ export default function HomePage() {
                         </Button>
                     </Stack>
                 </Box>
-
             </Container>
         </>
     );

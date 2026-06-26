@@ -69,9 +69,8 @@ export default function AppointmentPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [svcs, slots] = await Promise.all([getServices(), getTimeslots()]);
+                const svcs = await getServices();
                 setServices(svcs);
-                setTimeslots(slots);
             } catch {
                 setDataError("Leistungen und Zeitslots konnten nicht geladen werden. Bitte Seite neu laden.");
             } finally {
@@ -79,7 +78,14 @@ export default function AppointmentPage() {
             }
         };
         fetchData();
+
     }, []);
+
+    const fetchTimeslots = async (date : string) => {
+        const timeslots : ITimeslot[] = await getTimeslots(date);
+
+        setTimeslots(timeslots);
+    }
 
     const [form, setForm] = useState<FormData>({
         firstName:    customer?.firstName ?? "",
@@ -254,10 +260,14 @@ export default function AppointmentPage() {
                     label="Datum"
                     value={form.date ? dayjs(form.date) : null}
                     onChange={(newValue) =>
-                        setForm((prev) => ({
-                            ...prev,
-                            date: newValue ? newValue.format("YYYY-MM-DD") : "",
-                        }))
+                        {
+                            setForm((prev) => ({
+                                ...prev,
+                                date: newValue ? newValue.format("YYYY-MM-DD") : "",
+                            }));
+
+                            fetchTimeslots(newValue!.format("YYYY-MM-DD"));
+                        }
                     }
                     format="DD.MM.YYYY"
                     disablePast

@@ -1,17 +1,13 @@
 import api from "./api";
+import {IService} from "./services.ts";
 
-export interface IService {
-    id: number;
-    icon: string;
-    title: string;
-    subtitle: string;
-}
 
 export interface IOffer {
-    id?: number;
+    id: number;
     title: string;
     description: string;
     price: number;
+    duration?: number;
     active: boolean;
     createdAt?: string;
     services: IService[];
@@ -32,5 +28,5 @@ export const createOffer = (body: Omit<IOffer, "id" | "createdAt">): Promise<IOf
 export const updateOffer = (id: number, body: Omit<IOffer, "id" | "createdAt">): Promise<IOffer> =>
     api.put<IOffer>(`/api/offers/${id}`, body).then((r) => r.data);
 
-export const deleteOffer = (id: number): Promise<void> =>
+export const deleteOfferAPI = (id: number): Promise<void> =>
     api.delete(`/api/offers/${id}`).then(() => undefined);

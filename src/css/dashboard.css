@@ -1,4 +1,6 @@
-/* Reset + Base */
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================= */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -6,18 +8,23 @@ body {
     color: #fff;
 }
 
-/* Main Layout */
+/* Main Layout (Perfekt bündig an das Layout angepasst) */
 .main.full {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px;
+    margin: 0;                /* Radikal auf 0 gesetzt für den perfekten Links-Übergang */
+    padding: 1.25rem 1.5rem; /* Exakt das gleiche harmonische Spacing */
+    box-sizing: border-box;
+    width: 100%;
 }
 
 h1 {
+    margin-top: 0;            /* Verhindert doppelte Abstände nach oben */
     margin-bottom: 20px;
 }
 
-/* Stats Cards */
+/* ==========================================================================
+   STATS CARDS
+   ========================================================================= */
 .stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -57,7 +64,9 @@ h1 {
     color: #f5c542;
 }
 
-/* Section */
+/* ==========================================================================
+   SECTION & HEADERS
+   ========================================================================= */
 .section {
     margin-top: 40px;
 }
@@ -87,7 +96,9 @@ h1 {
     background: #1c222b;
 }
 
-/* Table */
+/* ==========================================================================
+   TABLES
+   ========================================================================= */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -116,7 +127,9 @@ h1 {
     background: #151b23;
 }
 
-/* Buttons */
+/* ==========================================================================
+   BUTTONS & BADGES
+   ========================================================================= */
 .btn {
     background: transparent;
     border: 1px solid #444;
@@ -162,7 +175,217 @@ h1 {
     background: #123a22;
     color: #4cd964;
 }
+
 .badge.red {
     background: #3a1212;
+    color: #ff4d4f;
+}
+
+/* ==========================================================================
+   DASHBOARD OFFERS (ANGEBOTE SECTION)
+   ========================================================================= */
+.dashboard-offers-section {
+    margin-top: 40px;
+}
+
+.dashboard-offers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.dashboard-offers-header h2 {
+    margin: 0;
+}
+
+.dashboard-offers-header button {
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dashboard-offers-header button:hover {
+    background: #1c222b;
+}
+
+.dashboard-offers-grid {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.dashboard-offer-card {
+    width: 220px;
+    background: #11161d;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.dashboard-offer-card h3 {
+    margin: 0 0 14px;
+    font-size: 16px;
+}
+
+.dashboard-offer-price {
+    color: #ff4d4f;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 8px;
+}
+
+.dashboard-offer-services {
+    color: #888;
+    font-size: 13px;
+    margin: 0 0 16px;
+}
+
+.dashboard-offer-edit {
+    background: transparent;
+    border: 1px solid #444;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dashboard-offer-edit:hover {
+    background: #1c222b;
+}
+
+.dashboard-new-offer {
+    align-self: center;
+    background: transparent;
+    border: none;
+    color: #ff4d4f;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES
+   ========================================================================== */
+
+.light-mode .main.full {
+    background: transparent;
+    color: #111111;
+}
+
+/* Cards im Light Mode */
+.light-mode .card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .card:hover {
+    background: #fafafa;
+}
+
+.light-mode .card p {
+    color: #666666;
+}
+
+.light-mode h1 {
+    color: #111111;
+}
+
+/* Buttons Generell */
+.light-mode .section-header button,
+.light-mode .dashboard-offers-header button {
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .section-header button:hover,
+.light-mode .dashboard-offers-header button:hover {
+    background: #eaeaea;
+}
+
+.light-mode .btn {
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .btn:hover {
+    background: #eaeaea;
+}
+
+.light-mode .btn.danger {
+    border-color: #ff4d4f;
+    color: #ff4d4f;
+}
+
+.light-mode .btn.danger:hover {
+    background: #ffeef0;
+}
+
+/* Tabellen im Light Mode */
+.light-mode .table {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.light-mode .table th {
+    color: #666666;
+    background: #fcfcfc;
+}
+
+.light-mode .table tr {
+    border-top-color: #eaeaea;
+}
+
+.light-mode .table tbody tr:hover {
+    background: #f7f7f7;
+}
+
+.light-mode .table td {
+    color: #222222;
+}
+
+/* Angebote (Cards & Grid) */
+.light-mode .dashboard-offer-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .dashboard-offer-services {
+    color: #666666;
+}
+
+.light-mode .dashboard-offer-edit {
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .dashboard-offer-edit:hover {
+    background: #eaeaea;
+}
+
+/* Farb-Akzente & Badges im Light Mode */
+.light-mode .badge.blue {
+    background: #e6f0ff;
+    color: #0066cc;
+}
+
+.light-mode .badge.yellow {
+    background: #fffbe6;
+    color: #b28200;
+}
+
+.light-mode .badge.green {
+    background: #e6fcf5;
+    color: #0ca678;
+}
+
+.light-mode .badge.red {
+    background: #ffeef0;
     color: #ff4d4f;
 }

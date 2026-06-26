@@ -1,0 +1,578 @@
+.offers-page {
+    padding: 1.25rem 1.5rem;
+    margin: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.offers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.offers-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+.new-offer-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #e63232;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.12s;
+}
+
+.new-offer-btn:hover {
+    background: #c92828;
+    transform: translateY(-1px);
+}
+
+.offers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.offer-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: border-color 0.18s, transform 0.18s;
+}
+
+.offer-card:hover {
+    border-color: #3a3a3a;
+    transform: translateY(-2px);
+}
+
+.offer-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.service-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.service-tag {
+    background: #252525;
+    color: #aaaaaa;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.offer-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #e63232;
+    letter-spacing: -0.02em;
+    margin-top: 0.25rem;
+}
+
+.offer-duration {
+    font-size: 0.8rem;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    width: fit-content;
+    letter-spacing: 0.02em;
+}
+
+.status.active {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.status.inactive {
+    background: rgba(156, 163, 175, 0.1);
+    color: #6b7280;
+    border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+.offer-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid #222;
+}
+
+.edit-btn,
+.delete-btn {
+    flex: 1;
+    padding: 0.5rem 0;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+.edit-btn {
+    background: #252525;
+    color: #dddddd;
+}
+
+.edit-btn:hover {
+    background: #2e2e2e;
+    color: #ffffff;
+}
+
+.delete-btn {
+    background: rgba(230, 50, 50, 0.1);
+    color: #e63232;
+}
+
+.delete-btn:hover {
+    background: rgba(230, 50, 50, 0.2);
+}
+
+/* Edit / Create Form Container */
+.edit-offer-container {
+    min-height: 100vh;
+    background: transparent;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+}
+
+.edit-offer-form {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 14px;
+    padding: 2rem 2.25rem;
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.edit-offer-form h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.75rem 0;
+}
+
+.edit-offer-form label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.5rem;
+}
+
+.edit-offer-form input,
+.edit-offer-form textarea {
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.92rem;
+    padding: 0.6rem 0.85rem;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.edit-offer-form input:focus,
+.edit-offer-form textarea:focus {
+    border-color: #e63232;
+}
+
+.edit-offer-form textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.price-status-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.price-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 100px;
+}
+
+.price-box label {
+    margin-top: 0;
+}
+
+.price-box input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.status-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.status-box label {
+    margin-top: 0;
+}
+
+.status-container {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+}
+
+.status-btn {
+    flex: 1;
+    padding: 0.55rem 1rem;
+    border: none;
+    background: #111;
+    color: #666;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.status-btn.active {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.status-btn.inactive {
+    background: rgba(230, 50, 50, 0.12);
+    color: #e63232;
+}
+
+.services-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.service-btn {
+    background: #111;
+    border: 1px solid #2a2a2a;
+    color: #888;
+    border-radius: 7px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.service-btn:hover {
+    border-color: #444;
+    color: #ccc;
+}
+
+.service-btn.selected {
+    background: rgba(230, 50, 50, 0.12);
+    border-color: #e63232;
+    color: #e63232;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #222;
+}
+
+.cancel-btn {
+    background: #252525;
+    border: 1px solid #333;
+    color: #aaa;
+    border-radius: 8px;
+    padding: 0.55rem 1.3rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.cancel-btn:hover {
+    background: #2e2e2e;
+    color: #fff;
+}
+
+.save-btn {
+    background: #e63232;
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.55rem 1.5rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+}
+
+.save-btn:hover {
+    background: #c92828;
+    transform: translateY(-1px);
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.delete-modal {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 14px;
+    padding: 2rem 2.25rem;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.delete-icon {
+    font-size: 2rem;
+    background: rgba(230, 50, 50, 0.1);
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.delete-modal h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.delete-modal p {
+    font-size: 0.88rem;
+    color: #888;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #333;
+    background: #252525;
+    color: #aaa;
+    transition: background 0.15s, color 0.15s;
+}
+
+.modal-actions button:hover {
+    background: #2e2e2e;
+    color: #fff;
+}
+
+.confirm-delete-btn {
+    background: rgba(230, 50, 50, 0.15) !important;
+    border-color: #e63232 !important;
+    color: #e63232 !important;
+}
+
+.confirm-delete-btn:hover {
+    background: rgba(230, 50, 50, 0.28) !important;
+}
+
+
+.light-mode .offers-page,
+.light-mode .edit-offer-container {
+    background: transparent;
+}
+
+.light-mode .offers-header h2,
+.light-mode .edit-offer-form h2,
+.light-mode .delete-modal h2 {
+    color: #111111;
+}
+
+.light-mode .offer-card,
+.light-mode .edit-offer-form,
+.light-mode .delete-modal {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .offer-card:hover {
+    border-color: #cccccc;
+}
+
+.light-mode .offer-card h3 {
+    color: #111111;
+}
+
+.light-mode .service-tag {
+    background: #eaeaea;
+    color: #444444;
+    border-color: #dddddd;
+}
+
+.light-mode .offer-duration,
+.light-mode .delete-modal p {
+    color: #555555;
+}
+
+.light-mode .status.active {
+    background: rgba(22, 163, 74, 0.1);
+    color: #15803d;
+    border-color: rgba(22, 163, 74, 0.2);
+}
+
+.light-mode .status.inactive {
+    background: rgba(107, 114, 128, 0.1);
+    color: #4b5563;
+    border-color: rgba(107, 114, 128, 0.2);
+}
+
+.light-mode .offer-actions,
+.light-mode .form-actions {
+    border-top-color: #eaeaea;
+}
+
+.light-mode .edit-btn,
+.light-mode .cancel-btn,
+.light-mode .modal-actions button {
+    background: #eaeaea;
+    border-color: #cccccc;
+    color: #333333;
+}
+
+.light-mode .edit-btn:hover,
+.light-mode .cancel-btn:hover,
+.light-mode .modal-actions button:hover {
+    background: #dcdcdc;
+    color: #000000;
+}
+
+.light-mode .edit-offer-form label {
+    color: #666666;
+}
+
+.light-mode .edit-offer-form input,
+.light-mode .edit-offer-form textarea {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .status-container {
+    border-color: #cccccc;
+}
+
+.light-mode .status-btn {
+    background: #eaeaea;
+    color: #555555;
+}
+
+.light-mode .status-btn.active {
+    background: rgba(22, 163, 74, 0.15);
+    color: #15803d;
+}
+
+.light-mode .status-btn.inactive {
+    background: rgba(230, 50, 50, 0.12);
+    color: #b91c1c;
+}
+
+.light-mode .services-select .service-btn {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #555555;
+}
+
+.light-mode .services-select .service-btn:hover {
+    border-color: #999999;
+    color: #111111;
+}
+
+.light-mode .services-select .service-btn.selected {
+    background: rgba(230, 50, 50, 0.1);
+    border-color: #e63232;
+    color: #c92828;
+}
+
+.light-mode .confirm-delete-btn {
+    background: rgba(230, 50, 50, 0.1) !important;
+    border-color: #e63232 !important;
+    color: #c92828 !important;
+}
+
+.light-mode .confirm-delete-btn:hover {
+    background: rgba(230, 50, 50, 0.2) !important;
+}

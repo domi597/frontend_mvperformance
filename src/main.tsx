@@ -1,11 +1,11 @@
 import { StrictMode, type ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  createBrowserRouter,
-  Outlet,
-  RouterProvider,
-  Navigate,
-  useLocation,
+    createBrowserRouter,
+    Outlet,
+    RouterProvider,
+    Navigate,
+    useLocation,
 } from "react-router-dom";
 import { useEffect } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -18,7 +18,7 @@ import { AuthLayout } from "./view/AuthLayout";
 import AdminLayout from "./view/AdminLayout";
 import AccountLayout from "./view/AccountLayout";
 
-
+import { AdminThemeProvider } from "../src/state/AdminThemeContextState.tsx";
 
 import HomePage from "./pages/HomePage";
 import ServicesPage from "./pages/ServicesPage";
@@ -44,93 +44,95 @@ import MyAccountPage from "./pages/MyAccountPage";
 
 
 function RequireAdmin({ children }: { children: ReactElement }) {
-  const token = localStorage.getItem("token");
-  const raw = localStorage.getItem("loggedInKunde");
+    const token = localStorage.getItem("token");
+    const raw = localStorage.getItem("loggedInKunde");
 
-  if (!token) return <Navigate to="/login" replace />;
+    if (!token) return <Navigate to="/login" replace />;
 
-  try {
-    const k = raw ? JSON.parse(raw) : null;
-    if (!k || k.role !== "ADMIN") return <Navigate to="/" replace />;
-  } catch {
-    return <Navigate to="/login" replace />;
-  }
+    try {
+        const k = raw ? JSON.parse(raw) : null;
+        if (!k || k.role !== "ADMIN") return <Navigate to="/" replace />;
+    } catch {
+        return <Navigate to="/login" replace />;
+    }
 
-  return children;
+    return children;
 }
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
 }
 
 const router = createBrowserRouter([
-  {
-    element: (
-      <>
-        <ScrollToTop />
-        <Outlet />
-      </>
-    ),
-    children: [
-      {
-        element: <PublicLayout />,
-        children: [
-          { path: "/", element: <HomePage /> },
-          { path: "/leistungen", element: <ServicesPage /> },
-          { path: "/angebote", element: <OffersPage /> },
-          { path: "/kontakt", element: <KontaktPage /> },
-          { path: "/ueber-uns", element: <AboutUsPage /> },
-          { path: "/termin", element: <AppointmentPage /> },
-        ],
-      },
-      { path: "/impressum", element: <ImpressumPage /> },
-      { path: "/datenschutz", element: <PrivacyPolicyPage /> },
-      { path: "/agbs", element: <TermsPage /> },
-
-      {
-        element: <AuthLayout />,
-        children: [
-          { path: "/login", element: <LoginPage /> },
-          { path: "/registrieren", element: <RegisterPage /> },
-          { path: "/passwort-vergessen", element: <ForgotPasswordPage /> },
-        ],
-      },
-      {
-        element: <AccountLayout />,
-        children: [
-          { path: "/my-account", element: <MyAccountPage /> },
-        ],
-      },
-      {
+    {
         element: (
-          <RequireAdmin>
-            <AdminLayout />
-          </RequireAdmin>
+            <>
+                <ScrollToTop />
+                <Outlet />
+            </>
         ),
         children: [
-          { path: "/admin", element: <DashboardPage /> },
-          { path: "/admin/termine", element: <AppointmentsPage /> },
-          { path: "/admin/angebote", element: <AdminOffersPage /> },
-          { path: "/admin/leistungen", element: <AdminServicesPage /> },
-          { path: "/admin/kunden", element: <CustomersPage /> },
-          { path: "/admin/einstellungen", element: <SettingsPage /> },
+            {
+                element: <PublicLayout />,
+                children: [
+                    { path: "/", element: <HomePage /> },
+                    { path: "/leistungen", element: <ServicesPage /> },
+                    { path: "/angebote", element: <OffersPage /> },
+                    { path: "/kontakt", element: <KontaktPage /> },
+                    { path: "/ueber-uns", element: <AboutUsPage /> },
+                    { path: "/termin", element: <AppointmentPage /> },
+                ],
+            },
+            { path: "/impressum", element: <ImpressumPage /> },
+            { path: "/datenschutz", element: <PrivacyPolicyPage /> },
+            { path: "/agbs", element: <TermsPage /> },
+
+            {
+                element: <AuthLayout />,
+                children: [
+                    { path: "/login", element: <LoginPage /> },
+                    { path: "/registrieren", element: <RegisterPage /> },
+                    { path: "/passwort-vergessen", element: <ForgotPasswordPage /> },
+                ],
+            },
+            {
+                element: <AccountLayout />,
+                children: [
+                    { path: "/my-account", element: <MyAccountPage /> },
+                ],
+            },
+            {
+                element: (
+                    <RequireAdmin>
+                        <AdminThemeProvider>
+                            <AdminLayout />
+                        </AdminThemeProvider>
+                    </RequireAdmin>
+                ),
+                children: [
+                    { path: "/admin", element: <DashboardPage /> },
+                    { path: "/admin/termine", element: <AppointmentsPage /> },
+                    { path: "/admin/angebote", element: <AdminOffersPage /> },
+                    { path: "/admin/leistungen", element: <AdminServicesPage /> },
+                    { path: "/admin/kunden", element: <CustomersPage /> },
+                    { path: "/admin/einstellungen", element: <SettingsPage /> },
+                ],
+            },
         ],
-      },
-    ],
-  },
+    },
 ]);
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <CssBaseline />
-          <RouterProvider router={router} />
-        </LocalizationProvider>
-      </ThemeProvider>
+        <ThemeProvider theme={theme}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <CssBaseline />
+                <RouterProvider router={router} />
+            </LocalizationProvider>
+        </ThemeProvider>
     </StrictMode>
 );

@@ -15,6 +15,11 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNavigate } from "react-router-dom";
 
+/**
+* NAME : Dominik Ranegger (KI)
+* DATE : 10.06
+* */
+
 const OWNER_PHOTO: string | null = null;
 
 //const OWNER_PHOTO = devrimFoto; // import devrimFoto from "../pics/devrim.jpg"

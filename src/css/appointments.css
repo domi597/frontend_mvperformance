@@ -1,129 +1,321 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0b0f14;
-    color: #fff;
-}
+/* ==========================================================================
+   BASE STYLES & DARK MODE (Nahtloser Übergang zum App-Layout)
+   ========================================================================== */
 
 .main.full {
-    max-width: 1200px;
-    margin: auto;
-    padding: 40px;
+    padding: 1.5rem 2.5rem;
+    min-height: 100vh;
+    background: transparent; /* Verhindert die unschöne Farbkante zur Navbar */
+    color: #ffffff;
+    font-family: inherit;
 }
 
-/* Tabs */
+/* Filter Tabs */
 .tabs {
     display: flex;
-    gap: 10px;
-    margin: 20px 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .tab {
-    background: transparent;
-    border: 1px solid #333;
-    color: #aaa;
-    padding: 8px 16px;
-    border-radius: 10px;
+    background: #1a1a1a;
+    color: #aaaaaa;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tab:hover {
+    border-color: #444444;
+    color: #ffffff;
 }
 
 .tab.active {
-    border-color: #fff;
-    color: #fff;
+    background: #e63232;
+    border-color: #e63232;
+    color: #ffffff;
 }
 
-/* Table */
+/* Termin Tabelle */
 .table {
     width: 100%;
     border-collapse: collapse;
-    background: #11161d;
-    border-radius: 10px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
     overflow: hidden;
-}
-
-.table th,
-.table td {
-    padding: 14px;
-    text-align: left;
+    margin-bottom: 1.5rem;
 }
 
 .table th {
-    color: #777;
-    font-size: 12px;
+    background: #222222;
+    color: #aaaaaa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.76rem;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    letter-spacing: 0.05em;
 }
 
-.table tr {
-    border-top: 1px solid #1f2630;
+.table td {
+    padding: 1.1rem 1.25rem;
+    border-top: 1px solid #252525;
+    color: #ffffff;
+    font-size: 0.92rem;
+    vertical-align: middle;
 }
 
 .table tbody tr:hover {
-    background: #151b23;
+    background: rgba(255, 255, 255, 0.015);
 }
 
-/* Buttons */
-.btn {
-    background: transparent;
-    border: 1px solid #444;
-    color: #fff;
-    padding: 6px 10px;
-    margin-right: 6px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #1c222b;
-}
-
-.btn.danger {
-    border-color: #ff4d4f;
-}
-
-/* Badges */
+/* Status Badges */
 .badge {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
 }
 
 .badge.blue {
-    background: #1f3a5f;
-    color: #4ea1ff;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .badge.yellow {
-    background: #3a2f12;
-    color: #f5c542;
+    background: rgba(234, 179, 8, 0.15);
+    color: #fde047;
+    border: 1px solid rgba(234, 179, 8, 0.3);
 }
 
 .badge.green {
-    background: #123a22;
-    color: #4cd964;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .badge.red {
-    background: #3a1212;
-    color: #ff4d4f;
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge.gray {
+    background: rgba(156, 163, 175, 0.12);
+    color: #9ca3af;
+    border: 1px solid rgba(156, 163, 175, 0.25);
+}
+
+/* Aktions-Buttons */
+.btn {
+    background: #252525;
+    color: #dddddd;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-right: 0.4rem;
+}
+
+.btn:hover {
+    background: #333333;
+    color: #ffffff;
+    border-color: #4a4a4a;
+}
+
+.btn.danger {
+    background: rgba(230, 50, 50, 0.1);
+    color: #e63232;
+    border: 1px solid rgba(230, 50, 50, 0.25);
+}
+
+.btn.danger:hover {
+    background: rgba(230, 50, 50, 0.2);
+    border-color: #e63232;
+    color: #ffffff;
+}
+
+.btn.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.btn.success:hover {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #22c55e;
+    color: #ffffff;
 }
 
 /* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
-    gap: 10px;
+    gap: 6px;
+    margin-top: 1.5rem;
 }
 
 .page {
-    background: transparent;
-    border: 1px solid #333;
-    color: #aaa;
-    padding: 6px 12px;
-    border-radius: 8px;
+    background: #1a1a1a;
+    color: #aaaaaa;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.page:hover {
+    border-color: #444444;
+    color: #ffffff;
 }
 
 .page.active {
-    border-color: #fff;
-    color: #fff;
+    background: #e63232;
+    border-color: #e63232;
+    color: #ffffff;
+}
+
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES
+   ========================================================================== */
+
+.light-mode .main.full {
+    background: transparent; /* Bleibt auch hier transparent für saubere Übergänge */
+    color: #111111;
+}
+
+.light-mode .tab {
+    background: #ffffff;
+    color: #555555;
+    border-color: #cccccc;
+}
+
+.light-mode .tab:hover {
+    border-color: #999999;
+    color: #111111;
+}
+
+.light-mode .tab.active {
+    background: #e63232;
+    border-color: #e63232;
+    color: #ffffff;
+}
+
+.light-mode .table {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .table th {
+    background: #f0f0f0;
+    color: #666666;
+}
+
+.light-mode .table td {
+    border-top-color: #eaeaea;
+    color: #222222;
+}
+
+.light-mode .table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+.light-mode .badge.blue {
+    background: rgba(29, 78, 216, 0.08);
+    color: #1d4ed8;
+    border-color: rgba(29, 78, 216, 0.2);
+}
+
+.light-mode .badge.yellow {
+    background: rgba(161, 98, 7, 0.08);
+    color: #a16207;
+    border-color: rgba(161, 98, 7, 0.2);
+}
+
+.light-mode .badge.green {
+    background: rgba(21, 128, 61, 0.08);
+    color: #15803d;
+    border-color: rgba(21, 128, 61, 0.2);
+}
+
+.light-mode .badge.red {
+    background: rgba(185, 28, 28, 0.08);
+    color: #b91c1c;
+    border-color: rgba(185, 28, 28, 0.2);
+}
+
+.light-mode .badge.gray {
+    background: rgba(75, 85, 99, 0.08);
+    color: #4b5563;
+    border-color: rgba(75, 85, 99, 0.2);
+}
+
+.light-mode .btn {
+    background: #eaeaea;
+    color: #333333;
+    border-color: #cccccc;
+}
+
+.light-mode .btn:hover {
+    background: #dcdcdc;
+    color: #000000;
+    border-color: #999999;
+}
+
+.light-mode .btn.danger {
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.light-mode .btn.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.light-mode .btn.success {
+    background: rgba(34, 197, 94, 0.08);
+    color: #15803d;
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.light-mode .btn.success:hover {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.light-mode .page {
+    background: #ffffff;
+    color: #555555;
+    border-color: #cccccc;
+}
+
+.light-mode .page:hover {
+    border-color: #999999;
+    color: #111111;
+}
+
+.light-mode .page.active {
+    background: #e63232;
+    border-color: #e63232;
+    color: #ffffff;
 }

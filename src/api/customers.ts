@@ -21,3 +21,12 @@ export const updateMe = (id: number, data: Partial<ICustomer>): Promise<ICustome
 /** Deletes the customer account by id. */
 export const deleteMe = (id: number): Promise<void> =>
     api.delete(`/api/users/${id}`).then(() => undefined);
+
+export const getAllCustomers = (): Promise<ICustomer[]> =>
+    api.get<ICustomer[]>("/api/users").then((res) => res.data);
+
+export const updateCustomer = (id: number, data: Partial<ICustomer>): Promise<ICustomer> =>
+    api.put<ICustomer>(`/api/users/${id}`, data).then((res) => res.data);
+
+export const deleteCustomer = (id: number): Promise<void> =>
+    api.delete(`/api/users/${id}`).then(() => undefined);

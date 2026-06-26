@@ -7,9 +7,12 @@ import {
     getAppointments,
     updateAppointmentStatus
 } from "../../api/appointmentApi";
+import {getOffers, IOffer} from "../../api/offers.ts";
 
 export default function DashboardPage() {
     const [termine, setTermine] = useState<IAppointment[]>([]);
+    const [offers, setOffers] = useState<IOffer[]>([])
+
     const navigate = useNavigate();
 
     const heute = new Date().toLocaleDateString("sv-SE");
@@ -18,14 +21,17 @@ export default function DashboardPage() {
         const load = async () => {
             try {
                 const res = await getAppointments(undefined, 0, 100);
+                const offerData = await getOffers();
 
                 const data: IAppointment[] = Array.isArray(res)
                     ? res
                     : res?.content ?? [];
 
+                setOffers(offerData);
                 setTermine(data);
             } catch (err) {
                 console.error(err);
+                setOffers([]);
                 setTermine([]);
             }
         };
@@ -43,7 +49,6 @@ export default function DashboardPage() {
         [termine, heute]
     );
 
-    const bewertungenCounter = 612;
 
     const topTermine = useMemo(
         () =>
@@ -138,15 +143,8 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="card">
-                    <p>BEWERTUNGEN</p>
-                    <h2>{bewertungenCounter}</h2>
-                    <span className="yellow">★ 4.9</span>
-                </div>
-
-                <div className="card">
                     <p>ANGEBOTE AKTIV</p>
-                    <h2>4</h2>
-                    <span className="red">1 läuft ab</span>
+                    <h2>{offers.length}</h2>
                 </div>
             </div>
 
@@ -220,6 +218,38 @@ export default function DashboardPage() {
                 </table>
 
                 
+            </div>
+
+            <div className="dashboard-offers-section">
+                <div className="dashboard-offers-header">
+                    <h2>Aktuelle Angebote</h2>
+                    <button onClick={() => navigate("/admin/angebote")}>
+                        Verwalten →
+                    </button>
+                </div>
+
+                <div className="dashboard-offers-grid">
+                    {offers.map(offer => (
+                        <div className="dashboard-offer-card" key={offer.id}>
+                            <h3>{offer.title}</h3>
+
+                            <p className="dashboard-offer-price">
+                                € {offer.price},-
+                            </p>
+
+                            <p className="dashboard-offer-services">
+                                {offer.services.map(service => service.title).join(" • ")}
+                            </p>
+                        </div>
+                    ))}
+
+                    <button
+                        className="dashboard-new-offer"
+                        onClick={() => navigate("/admin/angebote")}
+                    >
+                        + Neues Angebot
+                    </button>
+                </div>
             </div>
         </div>
     );

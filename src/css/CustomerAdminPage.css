@@ -1,0 +1,102 @@
+/* Basis-Variablen für das Design */
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --border-color: #333;
+    --input-bg: #121212;
+    --btn-bg: #2a2a2a;
+}
+
+/* Light Mode Definitionen */
+.light-mode {
+    --bg-color: #f4f4f9;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #dddddd;
+    --input-bg: #f9f9f9;
+    --btn-bg: #e0e0e0;
+}
+
+.admin-customers-page {
+    padding: 2rem;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+}
+
+.admin-header h1 { color: var(--text-color); }
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--card-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    max-width: 400px;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    margin-left: 10px;
+    width: 100%;
+}
+
+.table-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.customers-table th {
+    background: var(--btn-bg);
+    padding: 1rem;
+    color: #888;
+}
+
+.customers-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.table-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--btn-bg);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.delete-small-btn {
+    background: #d9534f !important;
+    color: white !important;
+    border: none;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.customer-form, .delete-box {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+input {
+    width: 100%; padding: 0.7rem;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 6px;
+}

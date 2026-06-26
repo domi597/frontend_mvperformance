@@ -1,26 +1,33 @@
+/* ==========================================================================
+   BASE STYLES & DARK MODE (Perfekt bündig an das Layout angepasst)
+   ========================================================================= */
+
 .admin-services-page {
     min-height: 100vh;
-    background: #0b0b0b;
+    background: transparent; /* Nutzt den Hintergrund des Hauptlayouts */
     color: white;
     font-family: Arial, sans-serif;
-    padding: 28px 42px;
+    padding: 1.25rem 1.5rem; /* Exakt das gleiche harmonische Spacing */
+    box-sizing: border-box;
 }
 
 .admin-main {
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: 1200px;        /* Erhöht für ein großzügigeres Tabellen-Layout */
+    margin: 0;                /* Radikal auf 0 gesetzt für den nahtlosen Linksbündig-Übergang */
+    width: 100%;
 }
 
 .admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
+    margin-top: 0;          /* Verhindert doppelte Abstände nach oben */
+    margin-bottom: 1.5rem;  /* Perfekt abgestimmter Abstand nach unten */
 }
 
 .admin-header h1 {
     font-size: 24px;
-    font-weight: 500;
+    font-weight: bold;      /* Exakt so fett wie beim Dashboard und den restlichen Seiten */
     margin: 0;
 }
 
@@ -32,11 +39,16 @@
     padding: 11px 22px;
     font-size: 17px;
     cursor: pointer;
+    transition: background 0.15s;
+}
+
+.new-service-btn:hover {
+    background: #272727;
 }
 
 .search-box {
     width: 300px;
-    height: 58px;
+    height: 44px;           /* Kompakter & eleganter angepasst */
     background: #1b1b1b;
     border: 1px solid #333;
     border-radius: 10px;
@@ -49,7 +61,7 @@
 
 .search-box span {
     color: #777;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .search-box input {
@@ -58,9 +70,9 @@
     border: 1px solid #444;
     border-radius: 8px;
     color: white;
-    height: 42px;
+    height: 32px;
     padding: 0 14px;
-    font-size: 17px;
+    font-size: 15px;
     outline: none;
 }
 
@@ -88,10 +100,15 @@
 }
 
 .services-table td {
-    padding: 15px 20px;
+    padding: 18px 20px;
     border-top: 1px solid #242424;
     color: #e5e5e5;
     font-size: 16px;
+    vertical-align: middle;
+}
+
+.services-table tbody tr {
+    height: 72px;
 }
 
 .services-table td:nth-child(1),
@@ -115,18 +132,43 @@
     font-size: 15px;
     cursor: pointer;
     margin-right: 7px;
+    margin-bottom: 0;       /* Auf 0 beruhigt für bessere vertikale Zentrierung */
+    transition: background 0.15s;
+}
+
+.table-btn:hover {
+    background: #272727;
 }
 
 .delete-small-btn {
     color: #ff5555;
 }
 
+/* Modals & Forms */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
 .service-form {
     background: #1a1a1a;
     border: 1px solid #363636;
     border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 28px;
+    padding: 30px;
+    width: 90%;
+    max-width: 540px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .service-form h2 {
@@ -180,13 +222,22 @@
     padding: 10px 22px;
     font-size: 15px;
     cursor: pointer;
+    transition: background 0.15s;
+}
+
+.form-actions button:hover,
+.delete-actions button:hover {
+    background: #272727;
 }
 
 .delete-box {
-    background: rgba(255, 60, 60, 0.04);
+    background: #1a1a1a;
     border: 1px solid #742828;
     border-radius: 14px;
-    padding: 24px;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .delete-box h2 {
@@ -200,6 +251,7 @@
     color: #888;
     font-size: 16px;
     margin: 0;
+    line-height: 1.5;
 }
 
 .delete-actions {
@@ -207,10 +259,6 @@
     justify-content: flex-end;
     gap: 12px;
     margin-top: 24px;
-}
-
-button:hover {
-    background: #272727;
 }
 
 .file-input {
@@ -236,4 +284,109 @@ button:hover {
 .file-upload:hover {
     background: #333;
     border-color: #777;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES (Aktiviert durch .light-mode im Admin-Wrapper)
+   ========================================================================== */
+
+.light-mode .admin-services-page {
+    background: transparent; /* Nahtloser Übergang auch im Light Mode */
+    color: #111111;
+}
+
+.light-mode .admin-header h1 {
+    color: #111111;
+}
+
+.light-mode .new-service-btn {
+    color: #111111;
+    border-color: #cccccc;
+}
+
+.light-mode .new-service-btn:hover {
+    background: #eaeaea;
+}
+
+.light-mode .search-box {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .search-box input {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .table-card {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .services-table th {
+    background: #f0f0f0;
+    color: #666666;
+}
+
+.light-mode .services-table td {
+    border-top-color: #eaeaea;
+    color: #222222;
+}
+
+.light-mode .table-btn {
+    color: #111111;
+    border-color: #cccccc;
+}
+
+.light-mode .table-btn:hover {
+    background: #eaeaea;
+}
+
+.light-mode .service-form {
+    background: #ffffff;
+    border-color: #e0e0e0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .service-form h2 {
+    color: #111111;
+    border-bottom-color: #eaeaea;
+}
+
+.light-mode .service-form input {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .form-actions button,
+.light-mode .delete-actions button {
+    color: #111111;
+    border-color: #cccccc;
+}
+
+.light-mode .form-actions button:hover,
+.light-mode .delete-actions button:hover {
+    background: #eaeaea;
+}
+
+.light-mode .delete-box {
+    background: #ffffff;
+    border-color: #ffcccc;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .delete-box p {
+    color: #555555;
+}
+
+.light-mode .file-upload {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #111111 !important;
+}
+
+.light-mode .file-upload:hover {
+    background: #eaeaea;
 }
