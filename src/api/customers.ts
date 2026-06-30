@@ -7,7 +7,7 @@ import type { ICustomer } from "../interface/ICustomer";
 
 /** Fetches the current customer's profile from the backend. */
 export const getMe = (): Promise<ICustomer> => {
-    const raw = localStorage.getItem("loggedInKunde");
+    const raw = sessionStorage.getItem("loggedInKunde");
     const kunde = raw ? (JSON.parse(raw) as ICustomer) : null;
     if (!kunde?.id) return Promise.reject(new Error("Nicht eingeloggt"));
     return api.get<ICustomer>(`/api/users/${kunde.id}`).then((res) => res.data);

@@ -42,8 +42,8 @@ import MyAccountPage from "./pages/MyAccountPage";
 
 
 function RequireAdmin({ children }: { children: ReactElement }) {
-    const token = localStorage.getItem("token");
-    const raw = localStorage.getItem("loggedInKunde");
+    const token = sessionStorage.getItem("token");
+    const raw = sessionStorage.getItem("loggedInKunde");
 
     if (!token) return <Navigate to="/login" replace />;
 

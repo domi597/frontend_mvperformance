@@ -1,8 +1,6 @@
 /**
  * Central Axios instance for all backend requests.
  * Attaches the JWT token to every non-public-auth request and redirects to login on 401.
- * @author N
- * @since 27.03.2026
  */
 
 import axios from "axios";
@@ -17,7 +15,7 @@ api.interceptors.request.use((config) => {
     const isPublicAuthEndpoint = url.includes("/api/auth/login") || url.includes("/api/auth/register");
 
     if (!isPublicAuthEndpoint) {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -33,8 +31,8 @@ api.interceptors.response.use(
         const isPublicAuthEndpoint = url.includes("/api/auth/login") || url.includes("/api/auth/register");
 
         if (err.response?.status === 401 && !isPublicAuthEndpoint) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("loggedInKunde");
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("loggedInKunde");
             window.location.href = "/login";
         }
 

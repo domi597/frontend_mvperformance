@@ -1,6 +1,5 @@
 /**
- * Service for login, logout and reading auth state from localStorage.
- * @author N
+ * Service for login, logout and reading auth state from sessionStorage (cleared when the tab is closed).
  */
 
 import type { ICustomer } from "../interface/ICustomer";
@@ -24,30 +23,30 @@ const KUNDE_KEY = "loggedInKunde";
 
 
 const AuthService = {
-    /** Logs in, stores JWT and user data in localStorage. */
+    /** Logs in, stores JWT and user data in sessionStorage. */
     async login(data: LoginRequest): Promise<LoginResponse> {
         const res = await loginApi(data);
 
-        localStorage.setItem(TOKEN_KEY, res.token);
-        localStorage.setItem(KUNDE_KEY, JSON.stringify(res.user));
+        sessionStorage.setItem(TOKEN_KEY, res.token);
+        sessionStorage.setItem(KUNDE_KEY, JSON.stringify(res.user));
 
         return { ...res, kunde: res.user };
     },
 
-    /** Removes token and user data from localStorage. */
+    /** Removes token and user data from sessionStorage. */
     logout(): void {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(KUNDE_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(KUNDE_KEY);
     },
 
     /** Returns the stored JWT token or null. */
     getToken(): string | null {
-        return localStorage.getItem(TOKEN_KEY);
+        return sessionStorage.getItem(TOKEN_KEY);
     },
 
     /** Returns the logged-in customer or null. */
     getKunde(): ICustomer | null {
-        const raw = localStorage.getItem(KUNDE_KEY);
+        const raw = sessionStorage.getItem(KUNDE_KEY);
         if (!raw) return null;
         try {
             return JSON.parse(raw) as ICustomer;

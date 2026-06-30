@@ -55,7 +55,15 @@ export default function AccountLayout() {
                         <Typography
                             component={NavLink}
                             to="/"
-                            sx={{ fontWeight: 800, fontSize: 18, color: "text.primary", textDecoration: "none", mr: 3 }}
+                            sx={{
+                                fontWeight: 800,
+                                fontSize: 18,
+                                color: "text.primary",
+                                textDecoration: "none",
+                                mr: 3,
+                                transition: "opacity 0.15s ease-in-out",
+                                "&:hover": { opacity: 0.7 },
+                            }}
                         >
                             <Box component="span" sx={{ color: "primary.main" }}>KFZ</Box>
                             -Technik GDG

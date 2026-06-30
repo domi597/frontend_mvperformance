@@ -49,7 +49,7 @@ export default function ServicesPage() {
                                 <span className="offer-price">{value.price} €</span>
                                 <span className="offer-duration">⏱ {value.duration} min</span>
                             </div>
-                            <Link to={"/termin"} className="cta-btn">Termin anfragen →</Link>
+                            <Link to={"/termin"} className="cta-btn">Termin anfragen</Link>
                         </div>
                     ))}
                 </div>

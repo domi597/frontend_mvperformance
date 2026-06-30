@@ -19,11 +19,9 @@ import {
     Settings,
 } from "lucide-react";
 import { useNewAppointmentsCount } from "../../hooks/useNewAppointmentsCount.ts";
-import { KeyboardReturnSharp } from "@mui/icons-material";
 
 const systemItems = [
     { label: "Einstellungen", to: "/admin/einstellungen", icon: <Settings size={18} /> },
-    { label: "Zurück", to: "/", icon: <KeyboardReturnSharp sx={{ fontSize: 18 }} /> },
 ];
 
 function NavSection({ items }: { items: { label: string; to: string; icon: React.ReactNode; end?: boolean; badge?: boolean }[] }) {

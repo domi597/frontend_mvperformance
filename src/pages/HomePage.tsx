@@ -12,6 +12,8 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { getServices, IService } from "../api/services";
+import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
+import NearMeRoundedIcon from "@mui/icons-material/NearMeRounded";
 
 
 /**
@@ -99,15 +101,41 @@ export default function HomePage() {
 
             <Container maxWidth="lg">
                 <Box sx={{ pb: 6 }}>
-                    <Typography variant="overline" sx={{ color: "primary.main", fontWeight: 700, letterSpacing: 1.5 }}>
-                        WAS WIR ANBIETEN
-                    </Typography>
-                    <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
-                        Unsere Leistungen
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                        Professionelle KFZ-Arbeiten — schnell, transparent und zu fairen Preisen.
-                    </Typography>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mb: 3 }}>
+                        <Box>
+                            <Typography variant="overline" sx={{ color: "primary.main", fontWeight: 700, letterSpacing: 1.5 }}>
+                                WAS WIR ANBIETEN
+                            </Typography>
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
+                                Unsere Leistungen
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Professionelle KFZ-Arbeiten — schnell, transparent und zu fairen Preisen.
+                            </Typography>
+                        </Box>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate("/leistungen")}
+                            sx={{
+                                flexShrink: 0,
+                                display: { xs: "none", sm: "inline-flex" },
+                                color: "#d32f2f",
+                                borderColor: "rgba(211, 47, 47, 0.5)",
+                                textTransform: "none",
+                                fontWeight: 600,
+                                fontSize: "0.95rem",
+                                borderRadius: "8px",
+                                padding: "6px 20px",
+                                transition: "all 0.2s ease-in-out",
+                                "&:hover": {
+                                    borderColor: "#d32f2f",
+                                    backgroundColor: "rgba(211, 47, 47, 0.08)", 
+                                },
+                            }}
+                        >
+                            Alle Leistungen ansehen
+                        </Button>
+                    </Stack>
 
                     {servicesLoading ? (
                         <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -196,11 +224,6 @@ export default function HomePage() {
                         </Grid>
                     )}
 
-                    <Box sx={{ mt: 2.5, textAlign: "right" }}>
-                        <Button variant="text" onClick={() => navigate("/leistungen")}>
-                            Alle Leistungen ansehen →
-                        </Button>
-                    </Box>
                 </Box>
 
                 <Card
@@ -231,9 +254,11 @@ export default function HomePage() {
                 </Card>
 
                 <Box sx={{ pb: 6 }}>
-                    <Typography variant="h5" fontWeight={700} sx={{ mb: 2.5 }}>
-                        So finden Sie uns
-                    </Typography>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-end" sx={{ mb: 2.5 }}>
+                        <Typography variant="h5" fontWeight={700}>
+                            So finden Sie uns
+                        </Typography>
+                    </Stack>
                     <Card variant="outlined" sx={{ overflow: "hidden", borderColor: "divider" }}>
                         <MapContainer
                             center={WERKSTATT_POS}
@@ -256,18 +281,55 @@ export default function HomePage() {
                             </Marker>
                         </MapContainer>
                     </Card>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Grazer Straße 136, 8430 Leibnitz
-                        </Typography>
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        flexWrap="wrap"
+                        spacing={1.5}
+                        sx={{
+                            mt: 2,
+                            p: 2,
+                            borderRadius: 2,
+                            bgcolor: "background.paper",
+                            border: "1px solid",
+                            borderColor: "divider",
+                        }}
+                    >
+                        <Stack direction="row" alignItems="center" spacing={1.5}>
+                            <Box
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: "50%",
+                                    bgcolor: "action.hover",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <LocationOnRoundedIcon color="primary" />
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle2" fontWeight={700}>
+                                    KFZ-Technik GDG
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Grazer Straße 136, 8430 Leibnitz
+                                </Typography>
+                            </Box>
+                        </Stack>
                         <Button
-                            variant="text"
+                            variant="outlined"
                             size="small"
+                            startIcon={<NearMeRoundedIcon />}
                             href="https://www.google.com/maps/search/?api=1&query=Grazer+Stra%C3%9Fe+136+Leibnitz"
                             target="_blank"
                             rel="noopener noreferrer"
+                            sx={{ flexShrink: 0 }}
                         >
-                            In Google Maps öffnen →
+                            Route planen
                         </Button>
                     </Stack>
                 </Box>

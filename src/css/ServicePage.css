@@ -109,14 +109,17 @@
     color: #fff;
     font-size: 13px;
     font-weight: 700;
-    padding: 10px;
+    padding: 11px;
     border-radius: 8px;
     text-decoration: none;
     letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(255, 60, 0, 0.25);
+    transition: background 0.18s ease, box-shadow 0.18s ease;
 }
 
 .cta-btn:hover {
     background: #e03500;
+    box-shadow: 0 4px 12px rgba(255, 60, 0, 0.35);
 }
 
 .breadcrumb {

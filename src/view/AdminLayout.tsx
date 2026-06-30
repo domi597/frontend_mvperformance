@@ -59,6 +59,8 @@ export default function AdminLayout() {
                         sx={{
                             cursor: "pointer",
                             color: "text.primary",
+                            transition: "opacity 0.15s ease-in-out",
+                            "&:hover": { opacity: 0.7 },
                             ".light-mode &": { color: "#111111" }
                         }}
                     >

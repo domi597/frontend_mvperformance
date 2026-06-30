@@ -1,6 +1,5 @@
 /**
  * Service for registering new customers.
- * @author N
  */
 
 import type { RegisterRequest, RegisterResponse } from "../types/RegisterTypes";
@@ -26,8 +25,8 @@ const RegisterService = {
 
         const res = await registerApi(backendPayload as never);
 
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("loggedInKunde", JSON.stringify(res.user));
+        sessionStorage.setItem("token", res.token);
+        sessionStorage.setItem("loggedInKunde", JSON.stringify(res.user));
 
         return { kunde: res.user };
     },

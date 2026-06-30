@@ -160,7 +160,7 @@ export default function OffersPage() {
                                     fullWidth
                                     sx={{ fontWeight: 700, letterSpacing: 0.5, mt: "auto" }}
                                 >
-                                    Termin anfragen →
+                                    Termin anfragen
                                 </Button>
                             </CardContent>
                         </Card>

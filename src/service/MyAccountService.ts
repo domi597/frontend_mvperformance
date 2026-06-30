@@ -1,6 +1,5 @@
 /**
  * Service for the account page — profile and vehicle operations.
- * @author N
  */
 
 import { getMe, updateMe, deleteMe } from "../api/customers";
@@ -38,10 +37,10 @@ export const MyAccountService = {
         return { street: value.trim() || null, city: value2.trim() || null };
     },
 
-    /** Saves a profile patch to the backend and updates localStorage. */
+    /** Saves a profile patch to the backend and updates sessionStorage. */
     async updateProfile(customerId: number, patch: Partial<ICustomer>): Promise<ICustomer> {
         const updated = await updateMe(customerId, patch);
-        localStorage.setItem("loggedInKunde", JSON.stringify(updated));
+        sessionStorage.setItem("loggedInKunde", JSON.stringify(updated));
         return updated;
     },
 
@@ -68,10 +67,10 @@ export const MyAccountService = {
         return deleteVehicle(vehicleId);
     },
 
-    /** Deletes the account and clears auth data from localStorage. */
+    /** Deletes the account and clears auth data from sessionStorage. */
     async removeAccount(customerId: number): Promise<void> {
         await deleteMe(customerId);
-        localStorage.removeItem("loggedInKunde");
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("loggedInKunde");
+        sessionStorage.removeItem("token");
     },
 };
