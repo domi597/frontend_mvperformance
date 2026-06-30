@@ -1,7 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { ICustomer } from "../../interface/ICustomer.ts";
-import { getAllCustomers, updateCustomer, deleteCustomer } from "../../api/customers.ts";
+import { getAllCustomers, updateCustomer, deleteCustomer, updateCustomerPassword } from "../../api/customers.ts";
 import "../../css/CustomerAdminPage.css"
+
+/** Extracts the backend's human-readable error message from an Axios error, with a fallback. */
+function extractErrorMessage(err: unknown, fallback: string): string {
+    const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+    return message ?? fallback;
+}
 
 export default function CustomersPage() {
     const [customers, setCustomers] = useState<ICustomer[]>([]);
@@ -9,10 +15,13 @@ export default function CustomersPage() {
     const [loading, setLoading] = useState(true);
     const [editingCustomer, setEditingCustomer] = useState<ICustomer | null>(null);
     const [editForm, setEditForm] = useState<Partial<ICustomer>>({});
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordError, setPasswordError] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const loadCustomers = useCallback(() => {
-        setLoading(true);
         getAllCustomers()
             .then((data) => {
                 setCustomers(data);
@@ -28,15 +37,40 @@ export default function CustomersPage() {
         loadCustomers();
     }, [loadCustomers]);
 
-    const handleSaveEdit = (e: React.FormEvent) => {
+    const handleSaveEdit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingCustomer?.id) return;
-        updateCustomer(editingCustomer.id, editForm)
-            .then(() => {
-                setEditingCustomer(null);
-                loadCustomers();
-            })
-            .catch((err) => alert(err.message));
+
+        // Passwort-Validierung VOR dem Speichern, damit bei einem Tippfehler
+        // gar nichts (auch nicht Name/E-Mail) gespeichert wird und der Admin
+        // direkt korrigieren kann.
+        if (newPassword.trim().length > 0) {
+            if (newPassword.trim().length < 6) {
+                setPasswordError("Das Passwort muss mindestens 6 Zeichen lang sein.");
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                setPasswordError("Die beiden Passwörter stimmen nicht überein.");
+                return;
+            }
+        }
+        setPasswordError(null);
+
+        try {
+            await updateCustomer(editingCustomer.id, editForm);
+
+            // Passwort nur ändern, wenn der Admin tatsächlich etwas eingetragen hat
+            if (newPassword.trim().length > 0) {
+                await updateCustomerPassword(editingCustomer.id, newPassword.trim());
+            }
+
+            setEditingCustomer(null);
+            setNewPassword("");
+            setConfirmPassword("");
+            loadCustomers();
+        } catch (err) {
+            alert(extractErrorMessage(err, "Speichern fehlgeschlagen. Bitte erneut versuchen."));
+        }
     };
 
     const handleDeleteConfirm = () => {
@@ -44,13 +78,16 @@ export default function CustomersPage() {
         deleteCustomer(deletingId)
             .then(() => {
                 setDeletingId(null);
+                setDeleteError(null);
                 loadCustomers();
             })
-            .catch((err) => alert(err.message));
+            .catch((err) => {
+                setDeleteError(extractErrorMessage(err, "Löschen fehlgeschlagen. Bitte erneut versuchen."));
+            });
     };
 
     const filteredCustomers = customers.filter((c) => {
-        const fullName = `${c.vorname || ""} ${c.nachname || ""}`.toLowerCase();
+        const fullName = `${c.firstName || ""} ${c.lastName || ""}`.toLowerCase();
         const email = (c.email || "").toLowerCase();
         const query = search.toLowerCase();
         return fullName.includes(query) || email.includes(query);
@@ -84,12 +121,33 @@ export default function CustomersPage() {
                             {filteredCustomers.map((customer) => (
                                 <tr key={customer.id}>
                                     <td>{customer.id}</td>
-                                    <td><strong>{customer.vorname} {customer.nachname}</strong></td>
+                                    <td><strong>{customer.firstName} {customer.lastName}</strong></td>
                                     <td>{customer.email}</td>
-                                    <td>{customer.telefon || "-"}</td>
+                                    <td>{customer.phone || "-"}</td>
                                     <td>
-                                        <button className="table-btn" onClick={() => { setEditingCustomer(customer); setEditForm({ vorname: customer.vorname, nachname: customer.nachname, email: customer.email, telefon: customer.telefon }); }}>Bearbeiten</button>
-                                        <button className="table-btn delete-small-btn" onClick={() => setDeletingId(customer.id)}>Löschen</button>
+                                        <button
+                                            className="table-btn"
+                                            onClick={() => {
+                                                setEditingCustomer(customer);
+                                                setEditForm({
+                                                    firstName: customer.firstName,
+                                                    lastName: customer.lastName,
+                                                    email: customer.email,
+                                                    phone: customer.phone,
+                                                });
+                                                setNewPassword("");
+                                                setConfirmPassword("");
+                                                setPasswordError(null);
+                                            }}
+                                        >
+                                            Bearbeiten
+                                        </button>
+                                        <button
+                                            className="table-btn delete-small-btn"
+                                            onClick={() => { setDeletingId(customer.id); setDeleteError(null); }}
+                                        >
+                                            Löschen
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -103,13 +161,67 @@ export default function CustomersPage() {
                     <form className="customer-form" onSubmit={handleSaveEdit}>
                         <h2>Kunde bearbeiten</h2>
                         <div className="form-row">
-                            <div><label>Vorname</label><input type="text" value={editForm.vorname || ""} onChange={(e) => setEditForm({ ...editForm, vorname: e.target.value })} required /></div>
-                            <div><label>Nachname</label><input type="text" value={editForm.nachname || ""} onChange={(e) => setEditForm({ ...editForm, nachname: e.target.value })} required /></div>
+                            <div>
+                                <label>Vorname</label>
+                                <input type="text" value={editForm.firstName || ""} onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })} required />
+                            </div>
+                            <div>
+                                <label>Nachname</label>
+                                <input type="text" value={editForm.lastName || ""} onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })} required />
+                            </div>
                         </div>
-                        <label>E-Mail</label><input type="email" value={editForm.email || ""} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} required />
-                        <label>Telefon</label><input type="text" value={editForm.telefon || ""} onChange={(e) => setEditForm({ ...editForm, telefon: e.target.value })} />
+                        <label>E-Mail</label>
+                        <input type="email" value={editForm.email || ""} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} required />
+                        <label>Telefon</label>
+                        <input type="text" value={editForm.phone || ""} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+
+                        <div className="password-field-header">
+                            <label>Neues Passwort</label>
+                            {newPassword.length > 0 && (
+                                <span className={`char-counter ${newPassword.length < 6 ? "char-counter-low" : "char-counter-ok"}`}>
+                                    {newPassword.length} Zeichen
+                                </span>
+                            )}
+                        </div>
+                        <input
+                            type="password"
+                            placeholder="Leer lassen, um das Passwort nicht zu ändern"
+                            value={newPassword}
+                            onChange={(e) => { setNewPassword(e.target.value); setPasswordError(null); }}
+                            minLength={6}
+                        />
+
+                        {newPassword.length > 0 && (
+                            <>
+                                <label>Passwort bestätigen</label>
+                                <input
+                                    type="password"
+                                    placeholder="Passwort wiederholen"
+                                    value={confirmPassword}
+                                    onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(null); }}
+                                    minLength={6}
+                                />
+                            </>
+                        )}
+
+                        {passwordError ? (
+                            <div className="warning-box warning-box-error">
+                                <span className="warning-icon">⛔</span>
+                                <p>{passwordError}</p>
+                            </div>
+                        ) : (
+                            <div className="warning-box">
+                                <span className="warning-icon">⚠️</span>
+                                <p>
+                                    Dieses Feld setzt ein <strong>komplett neues</strong> Passwort für den Kunden.
+                                    Das aktuelle Passwort ist aus Sicherheitsgründen nicht einsehbar und kann nicht angezeigt werden.
+                                    Nur ausfüllen, wenn wirklich ein Reset gewünscht ist.
+                                </p>
+                            </div>
+                        )}
+
                         <div className="form-actions">
-                            <button type="button" onClick={() => setEditingCustomer(null)}>Abbrechen</button>
+                            <button type="button" onClick={() => { setEditingCustomer(null); setNewPassword(""); setConfirmPassword(""); setPasswordError(null); }}>Abbrechen</button>
                             <button type="submit">Speichern</button>
                         </div>
                     </form>
@@ -120,8 +232,16 @@ export default function CustomersPage() {
                     <div className="delete-box">
                         <h2>Konto löschen?</h2>
                         <p>Soll dieser Kunde wirklich gelöscht werden?</p>
+
+                        {deleteError && (
+                            <div className="warning-box warning-box-error">
+                                <span className="warning-icon">⛔</span>
+                                <p>{deleteError}</p>
+                            </div>
+                        )}
+
                         <div className="delete-actions">
-                            <button onClick={() => setDeletingId(null)}>Abbrechen</button>
+                            <button onClick={() => { setDeletingId(null); setDeleteError(null); }}>Abbrechen</button>
                             <button onClick={handleDeleteConfirm} className="delete-small-btn">Ja, Löschen</button>
                         </div>
                     </div>

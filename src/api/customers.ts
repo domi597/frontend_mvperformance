@@ -1,6 +1,5 @@
 /**
  * API calls for the logged-in customer's own profile.
- * @author N
  */
 
 import api from "./api";
@@ -30,3 +29,7 @@ export const updateCustomer = (id: number, data: Partial<ICustomer>): Promise<IC
 
 export const deleteCustomer = (id: number): Promise<void> =>
     api.delete(`/api/users/${id}`).then(() => undefined);
+
+/** Admin sets a new password for a customer. The old password is never read. */
+export const updateCustomerPassword = (id: number, password: string): Promise<void> =>
+    api.put(`/api/users/${id}/password`, { password }).then(() => undefined);

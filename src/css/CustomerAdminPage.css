@@ -1,102 +1,442 @@
-/* Basis-Variablen für das Design */
-:root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-color: #e0e0e0;
-    --border-color: #333;
-    --input-bg: #121212;
-    --btn-bg: #2a2a2a;
-}
-
-/* Light Mode Definitionen */
-.light-mode {
-    --bg-color: #f4f4f9;
-    --card-bg: #ffffff;
-    --text-color: #333333;
-    --border-color: #dddddd;
-    --input-bg: #f9f9f9;
-    --btn-bg: #e0e0e0;
-}
+/* ==========================================================================
+   BASE STYLES & DARK MODE (passend zum restlichen Admin-Layout)
+   ========================================================================== */
 
 .admin-customers-page {
-    padding: 2rem;
-    background-color: var(--bg-color);
-    color: var(--text-color);
     min-height: 100vh;
-}
-
-.admin-header h1 { color: var(--text-color); }
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background: var(--card-bg);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    max-width: 400px;
-}
-
-.search-box input {
     background: transparent;
-    border: none;
-    color: var(--text-color);
-    margin-left: 10px;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding: 1.25rem 1.5rem;
+    box-sizing: border-box;
+}
+
+.admin-main {
+    max-width: 1200px;
+    margin: 0;
     width: 100%;
 }
 
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.admin-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.search-box {
+    width: 300px;
+    height: 44px;
+    background: #1b1b1b;
+    border: 1px solid #333;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 15px;
+    margin-bottom: 24px;
+}
+
+.search-box span {
+    color: #777;
+    font-size: 18px;
+}
+
+.search-box input {
+    flex: 1;
+    background: #292929;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: white;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 15px;
+    outline: none;
+}
+
 .table-card {
-    background: var(--card-bg);
+    border: 1px solid #333;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
+    overflow: hidden;
+    background: #151515;
+    margin-bottom: 24px;
+}
+
+.loading-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: #777;
+    font-size: 15px;
+}
+
+.customers-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .customers-table th {
-    background: var(--btn-bg);
-    padding: 1rem;
+    background: #202020;
     color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 14px;
+    text-align: left;
+    padding: 14px 20px;
 }
 
 .customers-table td {
-    padding: 1rem;
-    border-top: 1px solid var(--border-color);
+    padding: 18px 20px;
+    border-top: 1px solid #242424;
+    color: #e5e5e5;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.customers-table tbody tr {
+    height: 72px;
+}
+
+.customers-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.customers-table td:nth-child(1) {
+    color: #888;
 }
 
 .table-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--btn-bg);
-    color: var(--text-color);
+    background: transparent;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: 15px;
     cursor: pointer;
+    margin-right: 7px;
+    margin-bottom: 0;
+    transition: background 0.15s;
+}
+
+.table-btn:hover {
+    background: #272727;
 }
 
 .delete-small-btn {
-    background: #d9534f !important;
-    color: white !important;
-    border: none;
+    color: #ff5555;
 }
 
+/* Modals & Forms */
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
-.customer-form, .delete-box {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
+.customer-form {
+    background: #1a1a1a;
+    border: 1px solid #363636;
+    border-radius: 14px;
+    padding: 30px;
+    width: 90%;
+    max-width: 540px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-input {
-    width: 100%; padding: 0.7rem;
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    border-radius: 6px;
+.customer-form h2 {
+    font-size: 21px;
+    font-weight: 500;
+    margin: 0 0 20px 0;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.customer-form label {
+    display: block;
+    color: #858585;
+    font-size: 14px;
+    margin-bottom: 8px;
+    margin-top: 14px;
+}
+
+.customer-form input {
+    width: 100%;
+    height: 44px;
+    background: #2b2b2b;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.password-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 14px;
+}
+
+.password-field-header label {
+    margin-top: 0;
+}
+
+.char-counter {
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.char-counter-low {
+    color: #fde047;
+}
+
+.char-counter-ok {
+    color: #4ade80;
+}
+
+.warning-box {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: rgba(234, 179, 8, 0.08);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 10px;
+}
+
+.warning-icon {
+    font-size: 16px;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.warning-box p {
+    color: #fde047;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.warning-box strong {
+    color: #fff7cc;
+}
+
+.light-mode .warning-box {
+    background: rgba(161, 98, 7, 0.08);
+    border-color: rgba(161, 98, 7, 0.25);
+}
+
+.light-mode .warning-box p {
+    color: #a16207;
+}
+
+.light-mode .warning-box strong {
+    color: #7c5306;
+}
+
+.warning-box-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.warning-box-error p {
+    color: #fca5a5;
+}
+
+.light-mode .warning-box-error {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.light-mode .warning-box-error p {
+    color: #b91c1c;
+}
+
+.form-hint {
+    color: #777;
+    font-size: 12.5px;
+    margin: 6px 0 0 0;
+    line-height: 1.4;
+}
+
+.light-mode .form-hint {
+    color: #888;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.form-actions button,
+.delete-actions button {
+    background: transparent;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.form-actions button:hover,
+.delete-actions button:hover {
+    background: #272727;
+}
+
+.delete-box {
+    background: #1a1a1a;
+    border: 1px solid #742828;
+    border-radius: 14px;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.delete-box h2 {
+    color: #ff5555;
+    font-size: 19px;
+    font-weight: 500;
+    margin: 0 0 12px 0;
+}
+
+.delete-box p {
+    color: #888;
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.delete-box .warning-box {
+    margin-top: 16px;
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES (aktiviert durch .light-mode im Admin-Wrapper)
+   ========================================================================== */
+
+.light-mode .admin-customers-page {
+    background: transparent;
+    color: #111111;
+}
+
+.light-mode .admin-header h1 {
+    color: #111111;
+}
+
+.light-mode .search-box {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .search-box input {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .table-card {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .customers-table th {
+    background: #f0f0f0;
+    color: #666666;
+}
+
+.light-mode .customers-table td {
+    border-top-color: #eaeaea;
+    color: #222222;
+}
+
+.light-mode .customers-table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+.light-mode .table-btn {
+    color: #111111;
+    border-color: #cccccc;
+}
+
+.light-mode .table-btn:hover {
+    background: #eaeaea;
+}
+
+.light-mode .customer-form {
+    background: #ffffff;
+    border-color: #e0e0e0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .customer-form h2 {
+    color: #111111;
+    border-bottom-color: #eaeaea;
+}
+
+.light-mode .customer-form label {
+    color: #666666;
+}
+
+.light-mode .customer-form input {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .form-actions button,
+.light-mode .delete-actions button {
+    color: #111111;
+    border-color: #cccccc;
+}
+
+.light-mode .form-actions button:hover,
+.light-mode .delete-actions button:hover {
+    background: #eaeaea;
+}
+
+.light-mode .delete-box {
+    background: #ffffff;
+    border-color: #ffcccc;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .delete-box p {
+    color: #555555;
 }
