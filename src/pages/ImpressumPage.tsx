@@ -1,19 +1,4 @@
-/**
- * @description Legal imprint page as required by Austrian law (§ 5 ECG).
- * Rendered outside `PublicLayout` so it is reachable directly from the registration and login flows.
- * @author N
- * @since 10.04.2026
- */
-
-import {
-  Box,
-  Container,
-  Divider,
-  IconButton,
-  Link,
-  Stack,
-  Typography,
-} from "@mui/material";
+import {Box, Container, Divider, IconButton, Link, Stack, Typography,} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 

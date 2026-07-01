@@ -129,7 +129,7 @@ export default function HomePage() {
                                 transition: "all 0.2s ease-in-out",
                                 "&:hover": {
                                     borderColor: "#d32f2f",
-                                    backgroundColor: "rgba(211, 47, 47, 0.08)", 
+                                    backgroundColor: "rgba(211, 47, 47, 0.08)",
                                 },
                             }}
                         >
@@ -213,7 +213,7 @@ export default function HomePage() {
                                                 variant="contained"
                                                 fullWidth
                                                 size="small"
-                                                onClick={() => navigate("/termin")}
+                                                onClick={() => navigate("/termin", { state: { serviceId: s.id } })}
                                             >
                                                 Termin anfragen
                                             </Button>

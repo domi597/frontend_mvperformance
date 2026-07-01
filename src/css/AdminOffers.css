@@ -49,6 +49,121 @@
     gap: 1.25rem;
 }
 
+.offers-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 4rem 1rem;
+    text-align: center;
+    color: #777;
+}
+
+.offers-empty svg {
+    width: 40px;
+    height: 40px;
+    color: #444;
+}
+
+.offers-empty p {
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+.light-mode .offers-empty {
+    color: #777;
+}
+
+.light-mode .offers-empty svg {
+    color: #bbbbbb;
+}
+.skeleton-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.skeleton-block {
+    background: linear-gradient(90deg, #232323 25%, #2c2c2c 37%, #232323 63%);
+    background-size: 400% 100%;
+    border-radius: 6px;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+}
+
+.skeleton-title {
+    width: 55%;
+    height: 20px;
+    margin-top: 0.25rem;
+}
+
+.skeleton-tags {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.skeleton-tag {
+    width: 70px;
+    height: 22px;
+    border-radius: 5px;
+}
+
+.skeleton-price {
+    width: 90px;
+    height: 26px;
+    margin-top: 0.25rem;
+}
+
+.skeleton-status {
+    width: 70px;
+    height: 22px;
+    border-radius: 20px;
+}
+
+.skeleton-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+    border-top: 1px solid #222;
+}
+
+.skeleton-btn {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+.light-mode .skeleton-card {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .skeleton-block {
+    background: linear-gradient(90deg, #eaeaea 25%, #f4f4f4 37%, #eaeaea 63%);
+    background-size: 400% 100%;
+}
+
+.light-mode .skeleton-actions {
+    border-top-color: #eaeaea;
+}
+
 .offer-card {
     background: #1a1a1a;
     border: 1px solid #2a2a2a;
@@ -63,6 +178,16 @@
 .offer-card:hover {
     border-color: #3a3a3a;
     transform: translateY(-2px);
+}
+
+.offer-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    background: #252525;
+    border-radius: 10px;
+    padding: 8px;
+    box-sizing: border-box;
 }
 
 .offer-card h3 {
@@ -134,39 +259,56 @@
     display: flex;
     gap: 0.6rem;
     margin-top: auto;
-    padding-top: 0.75rem;
+    padding-top: 0.9rem;
     border-top: 1px solid #222;
 }
 
 .edit-btn,
 .delete-btn {
     flex: 1;
-    padding: 0.5rem 0;
-    border-radius: 7px;
-    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.6rem 0;
+    border-radius: 8px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    border: none;
-    transition: background 0.15s, color 0.15s;
+    border: 1px solid transparent;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+}
+
+.edit-btn svg,
+.delete-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
 }
 
 .edit-btn {
-    background: #252525;
-    color: #dddddd;
+    background: #232323;
+    color: #ddd;
+    border-color: #333;
 }
 
 .edit-btn:hover {
-    background: #2e2e2e;
+    background: #2a2a2a;
+    border-color: #444;
     color: #ffffff;
+    transform: translateY(-1px);
 }
 
 .delete-btn {
-    background: rgba(230, 50, 50, 0.1);
+    background: rgba(230, 50, 50, 0.08);
     color: #e63232;
+    border-color: rgba(230, 50, 50, 0.25);
 }
 
 .delete-btn:hover {
-    background: rgba(230, 50, 50, 0.2);
+    background: rgba(230, 50, 50, 0.16);
+    border-color: #e63232;
+    transform: translateY(-1px);
 }
 
 /* Edit / Create Form Container */
@@ -231,6 +373,44 @@
 .edit-offer-form textarea {
     resize: vertical;
     min-height: 90px;
+}
+
+/* Icon upload */
+.file-input {
+    display: none;
+}
+
+.file-upload {
+    display: inline-block;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    color: #ccc;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.55rem 0.9rem;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: normal;
+    transition: border-color 0.15s, color 0.15s;
+    width: fit-content;
+}
+
+.file-upload:hover {
+    border-color: #e63232;
+    color: #fff;
+}
+
+.icon-preview {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    padding: 6px;
+    margin: 0.5rem 0 0.25rem;
+    box-sizing: border-box;
 }
 
 .price-status-row {
@@ -397,7 +577,6 @@
 }
 
 .delete-icon {
-    font-size: 2rem;
     background: rgba(230, 50, 50, 0.1);
     border-radius: 50%;
     width: 56px;
@@ -406,6 +585,12 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 0.25rem;
+}
+
+.delete-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #e63232;
 }
 
 .delete-modal h2 {
@@ -420,6 +605,13 @@
     color: #888;
     line-height: 1.55;
     margin: 0;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 0.5rem;
 }
 
 .modal-actions button {
@@ -477,6 +669,10 @@
     color: #111111;
 }
 
+.light-mode .offer-icon {
+    background: #eaeaea;
+}
+
 .light-mode .service-tag {
     background: #eaeaea;
     color: #444444;
@@ -505,7 +701,29 @@
     border-top-color: #eaeaea;
 }
 
-.light-mode .edit-btn,
+.light-mode .edit-btn {
+    background: #eaeaea;
+    border-color: #cccccc;
+    color: #333333;
+}
+
+.light-mode .edit-btn:hover {
+    background: #dcdcdc;
+    border-color: #bbbbbb;
+    color: #000000;
+}
+
+.light-mode .delete-btn {
+    background: rgba(230, 50, 50, 0.08);
+    border-color: rgba(230, 50, 50, 0.25);
+    color: #c92828;
+}
+
+.light-mode .delete-btn:hover {
+    background: rgba(230, 50, 50, 0.16);
+    border-color: #e63232;
+}
+
 .light-mode .cancel-btn,
 .light-mode .modal-actions button {
     background: #eaeaea;
@@ -513,7 +731,6 @@
     color: #333333;
 }
 
-.light-mode .edit-btn:hover,
 .light-mode .cancel-btn:hover,
 .light-mode .modal-actions button:hover {
     background: #dcdcdc;
@@ -529,6 +746,22 @@
     background: #fdfdfd;
     border-color: #cccccc;
     color: #111111;
+}
+
+.light-mode .file-upload {
+    background: #fdfdfd;
+    border-color: #cccccc;
+    color: #444444;
+}
+
+.light-mode .file-upload:hover {
+    border-color: #e63232;
+    color: #111111;
+}
+
+.light-mode .icon-preview {
+    background: #fdfdfd;
+    border-color: #cccccc;
 }
 
 .light-mode .status-container {
@@ -575,4 +808,43 @@
 
 .light-mode .confirm-delete-btn:hover {
     background: rgba(230, 50, 50, 0.2) !important;
+}
+
+/* Saving / deleting states */
+.btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    animation: btn-spin 0.7s linear infinite;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+.save-btn:disabled,
+.cancel-btn:disabled,
+.status-btn:disabled,
+.service-btn:disabled,
+.confirm-delete-btn:disabled,
+.modal-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.edit-offer-form input:disabled,
+.edit-offer-form textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.light-mode .btn-spinner {
+    border-color: rgba(0, 0, 0, 0.15);
+    border-top-color: #ffffff;
 }

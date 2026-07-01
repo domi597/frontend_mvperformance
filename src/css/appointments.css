@@ -1,11 +1,7 @@
-/* ==========================================================================
-   BASE STYLES & DARK MODE (Nahtloser Übergang zum App-Layout)
-   ========================================================================== */
-
 .main.full {
     padding: 1.5rem 2.5rem;
     min-height: 100vh;
-    background: transparent; /* Verhindert die unschöne Farbkante zur Navbar */
+    background: transparent;
     color: #ffffff;
     font-family: inherit;
 }
@@ -195,13 +191,80 @@
     color: #ffffff;
 }
 
+/* Skeleton loading rows */
+.skeleton-row td {
+    padding: 1.1rem 1.25rem;
+    border-top: 1px solid #252525;
+}
+
+.skeleton-block {
+    background: linear-gradient(90deg, #232323 25%, #2c2c2c 37%, #232323 63%);
+    background-size: 400% 100%;
+    border-radius: 6px;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+.skeleton-cell {
+    height: 16px;
+    width: 70%;
+}
+
+.skeleton-badge {
+    width: 80px;
+    height: 22px;
+    border-radius: 20px;
+}
+
+.skeleton-actions-cell {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.skeleton-actions-cell .skeleton-block {
+    width: 96px;
+    height: 30px;
+    border-radius: 6px;
+}
+
+/* Empty state */
+.empty-row td {
+    padding: 0;
+    border-top: 1px solid #252525;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 3rem 1rem;
+    color: #777;
+    text-align: center;
+}
+
+.empty-state svg {
+    width: 36px;
+    height: 36px;
+    color: #444;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.92rem;
+}
 
 /* ==========================================================================
    LIGHT MODE OVERRIDES
    ========================================================================== */
 
 .light-mode .main.full {
-    background: transparent; /* Bleibt auch hier transparent für saubere Übergänge */
+    background: transparent;
     color: #111111;
 }
 
@@ -318,4 +381,22 @@
     background: #e63232;
     border-color: #e63232;
     color: #ffffff;
+}
+
+.light-mode .skeleton-row td,
+.light-mode .empty-row td {
+    border-top-color: #eaeaea;
+}
+
+.light-mode .skeleton-block {
+    background: linear-gradient(90deg, #eaeaea 25%, #f4f4f4 37%, #eaeaea 63%);
+    background-size: 400% 100%;
+}
+
+.light-mode .empty-state {
+    color: #666666;
+}
+
+.light-mode .empty-state svg {
+    color: #bbbbbb;
 }

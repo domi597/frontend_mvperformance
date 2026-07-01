@@ -1,46 +1,6 @@
-/**
- * Account page — shows and edits the logged-in customer's profile and vehicles.
- * Designed in collaboration with AI (Claude by Anthropic).
- * @author N
- * @since 09.06.2026
- */
-
 import { useEffect, useState } from "react";
-import {
-    Alert,
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    CircularProgress,
-    Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Grid,
-    IconButton,
-    Paper,
-    Snackbar,
-    Stack,
-    TextField,
-    Typography,
-} from "@mui/material";
-import {
-    BadgeOutlined,
-    DirectionsCarOutlined,
-    Edit,
-    DeleteOutline,
-    AddOutlined,
-    LockOutlined,
-    PersonOutlined,
-    PhoneOutlined,
-    HomeOutlined,
-    EmailOutlined,
-    DarkModeOutlined,
-    LightModeOutlined,
-} from "@mui/icons-material";
+import {Alert, Avatar, Box, Button, Chip, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Paper, Snackbar, Stack, TextField, Typography,} from "@mui/material";
+import {BadgeOutlined, DirectionsCarOutlined, Edit, DeleteOutline, AddOutlined, LockOutlined, PersonOutlined, PhoneOutlined, HomeOutlined, EmailOutlined, DarkModeOutlined, LightModeOutlined,} from "@mui/icons-material";
 import Switch from "@mui/material/Switch";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";

@@ -1,31 +1,9 @@
-/**
- * @description Multi-step appointment booking form for workshop customers.
- *              Services and timeslots are loaded from the backend API.
- * @author N
- * @since 14.04.2026
- */
-
 import { useEffect, useState } from "react";
-import {
-    Alert,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    CircularProgress,
-    Container,
-    Divider,
-    Grid,
-    Snackbar,
-    Stack,
-    Step,
-    StepLabel,
-    Stepper,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Link as RouterLink, useLocation } from "react-router-dom";
+import {Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Divider, Grid, Snackbar, Stack, Step, StepLabel, Stepper, TextField, Typography,} from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import AuthService from "../service/AuthService";
 import { createAppointment } from "../api/appointmentApi";
 import { getServices, IService } from "../api/services";
@@ -53,6 +31,11 @@ interface FormData {
 export default function AppointmentPage() {
     const customer   = AuthService.getKunde();
     const isLoggedIn = AuthService.isLoggedIn();
+    const location    = useLocation();
+
+    /** Service id passed in when arriving via a "Termin anfragen" button on a specific service (e.g. from the homepage or services list). */
+    const preselectedServiceId = (location.state as { serviceId?: number } | null)?.serviceId;
+    const [autoSelectApplied, setAutoSelectApplied] = useState(false);
 
     const [activeStep, setActiveStep]             = useState(0);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -81,6 +64,23 @@ export default function AppointmentPage() {
         fetchData();
 
     }, []);
+
+    /**
+     * Once the service list has loaded, pre-selects the service the user
+     * came from (if any) and jumps straight to the "Termin wählen" step,
+     * skipping the manual service-selection step.
+     */
+    useEffect(() => {
+        if (autoSelectApplied || preselectedServiceId == null || services.length === 0) return;
+
+        const match = services.find((s) => s.id === preselectedServiceId);
+        if (match) {
+            setSelectedServices([match.title]);
+            setActiveStep(1);
+        }
+        setAutoSelectApplied(true);
+    }, [autoSelectApplied, preselectedServiceId, services]);
+
 
     const fetchTimeslots = async (date : string) => {
         const timeslots : ITimeslot[] = await getTimeslots(date);
@@ -146,6 +146,29 @@ export default function AppointmentPage() {
     };
 
     /**
+     * The full service objects (incl. price/duration) belonging to the
+     * currently selected service titles.
+     */
+    const selectedServiceObjects = services.filter((s) => selectedServices.includes(s.title));
+
+    const totalPrice    = selectedServiceObjects.reduce((sum, s) => sum + (s.price ?? 0), 0);
+    const totalDuration = selectedServiceObjects.reduce((sum, s) => sum + (s.duration ?? 0), 0);
+
+    /** Formats a Euro amount, e.g. 89 -> "89,00 €". */
+    const formatPrice = (value: number) =>
+        value.toLocaleString("de-AT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+
+    /** Formats a duration in minutes as "1 Std. 30 Min." / "45 Min.". */
+    const formatDuration = (minutes: number) => {
+        if (!minutes || minutes <= 0) return "–";
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        if (h === 0) return `${m} Min.`;
+        if (m === 0) return `${h} Std.`;
+        return `${h} Std. ${m} Min.`;
+    };
+
+    /**
      * Submits the appointment request to the backend.
      * Builds the `preferredDate` string from the selected date and time,
      * then calls the API. On success the success screen is shown; on failure
@@ -170,7 +193,7 @@ export default function AppointmentPage() {
                 time:         selectedTime,
                 preferredDate,
                 note:         form.note,
-                price:        0,
+                price:        totalPrice,
                 createdAt:    new Date().toISOString(),
             } as any);
 
@@ -240,6 +263,27 @@ export default function AppointmentPage() {
                                             {s.subtitle}
                                         </Typography>
                                     )}
+
+                                    {(typeof s.price === "number" || (typeof s.duration === "number" && s.duration > 0)) && (
+                                        <>
+                                            <Divider sx={{ my: 1.5 }} />
+                                            <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                                {typeof s.duration === "number" && s.duration > 0 ? (
+                                                    <Stack direction="row" spacing={0.5} alignItems="center" color="text.secondary">
+                                                        <AccessTimeIcon sx={{ fontSize: 16 }} />
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            ca. {formatDuration(s.duration)}
+                                                        </Typography>
+                                                    </Stack>
+                                                ) : <span />}
+                                                {typeof s.price === "number" && (
+                                                    <Typography variant="subtitle1" fontWeight={800} color="primary.main">
+                                                        {formatPrice(s.price)}
+                                                    </Typography>
+                                                )}
+                                            </Stack>
+                                        </>
+                                    )}
                                 </CardContent>
                             </Card>
                         </Grid>
@@ -262,14 +306,14 @@ export default function AppointmentPage() {
                     label="Datum"
                     value={form.date ? dayjs(form.date) : null}
                     onChange={(newValue) =>
-                        {
-                            setForm((prev) => ({
-                                ...prev,
-                                date: newValue ? newValue.format("YYYY-MM-DD") : "",
-                            }));
+                    {
+                        setForm((prev) => ({
+                            ...prev,
+                            date: newValue ? newValue.format("YYYY-MM-DD") : "",
+                        }));
 
-                            fetchTimeslots(newValue!.format("YYYY-MM-DD"));
-                        }
+                        fetchTimeslots(newValue!.format("YYYY-MM-DD"));
+                    }
                     }
                     format="DD.MM.YYYY"
                     disablePast
@@ -425,6 +469,55 @@ export default function AppointmentPage() {
                     </CardContent>
                 </Card>
 
+                <Card
+                    variant="outlined"
+                    sx={{
+                        borderColor: "primary.main",
+                        background: "linear-gradient(135deg, rgba(198,40,40,0.10), rgba(198,40,40,0.02))",
+                    }}
+                >
+                    <CardContent>
+                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5, textTransform: "uppercase", letterSpacing: 1 }}>
+                            Preis &amp; Dauer
+                        </Typography>
+
+                        <Stack spacing={1.25} sx={{ mb: selectedServiceObjects.length > 1 ? 2 : 0 }}>
+                            {selectedServiceObjects.map((s) => (
+                                <Stack key={s.id ?? s.title} direction="row" justifyContent="space-between" alignItems="baseline">
+                                    <Typography variant="body2">{s.title}</Typography>
+                                    <Stack direction="row" spacing={2}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {formatDuration(s.duration ?? 0)}
+                                        </Typography>
+                                        <Typography variant="body2" fontWeight={600} sx={{ minWidth: 72, textAlign: "right" }}>
+                                            {formatPrice(s.price ?? 0)}
+                                        </Typography>
+                                    </Stack>
+                                </Stack>
+                            ))}
+                        </Stack>
+
+                        {selectedServiceObjects.length > 1 && <Divider sx={{ mb: 1.5 }} />}
+
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <AccessTimeIcon fontSize="small" color="primary" />
+                                <Typography variant="body1" fontWeight={700}>
+                                    Geschätzte Gesamtdauer: {formatDuration(totalDuration)}
+                                </Typography>
+                            </Stack>
+                            <Typography variant="h6" fontWeight={800} color="primary.main">
+                                {formatPrice(totalPrice)}
+                            </Typography>
+                        </Stack>
+
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+                            Preis- und Zeitangaben sind Richtwerte. Je nach Fahrzeugzustand und Umfang der Arbeiten kann die tatsächliche
+                            Dauer kürzer oder länger ausfallen; der finale Preis wird nach der Begutachtung bestätigt.
+                        </Typography>
+                    </CardContent>
+                </Card>
+
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5, textTransform: "uppercase", letterSpacing: 1 }}>
@@ -489,6 +582,42 @@ export default function AppointmentPage() {
         </Box>
     );
 
+    if (!isLoggedIn) {
+        return (
+            <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 }, textAlign: "center" }}>
+                <LockOutlinedIcon sx={{ fontSize: 64, color: "primary.main", mb: 2 }} />
+                <Typography variant="h5" fontWeight={700} sx={{ mb: 1 }}>
+                    Anmeldung erforderlich
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                    Um einen Termin anzufragen, melden Sie sich bitte mit Ihrem Konto an oder registrieren
+                    Sie sich kostenlos. So können wir Ihre Anfrage eindeutig zuordnen und Sie über den Status
+                    informieren.
+                </Typography>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
+                    <Button
+                        variant="contained"
+                        size="large"
+                        component={RouterLink}
+                        to="/login"
+                        state={{ from: location.pathname }}
+                    >
+                        Anmelden
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        size="large"
+                        component={RouterLink}
+                        to="/registrieren"
+                        state={{ from: location.pathname }}
+                    >
+                        Registrieren
+                    </Button>
+                </Stack>
+            </Container>
+        );
+    }
+
     if (submitted) {
         return (
             <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 }, textAlign: "center" }}>
@@ -503,7 +632,7 @@ export default function AppointmentPage() {
                     <br />
                     Sie erhalten in Kürze eine Bestätigung per E-Mail.
                 </Typography>
-                <Button variant="contained" href="/">Zurück zur Startseite</Button>
+                <Button variant="contained" component={RouterLink} to="/">Zurück zur Startseite</Button>
             </Container>
         );
     }

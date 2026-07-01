@@ -32,6 +32,9 @@ export const getAppointments = (
         },
     }).then((r) => r.data);
 
+export const getCalendarAppointments = (): Promise<IAppointment[]> =>
+    api.get<IAppointment[]>("/api/appointments/calendar").then((r) => r.data);
+
 export const createAppointment = (
     body: Omit<IAppointment, "id" | "status">
 ): Promise<IAppointment> =>

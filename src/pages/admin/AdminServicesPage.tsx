@@ -3,7 +3,7 @@ import { createService, deleteService, getServices, IService, updateService } fr
 import "../../css/AdminServicePage.css";
 
 interface ServiceFormProps {
-    onSubmit: (e: React.FormEvent) => void;
+    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
     onCancelClick: () => void;
     heading: string;
     title: string;
@@ -15,6 +15,7 @@ interface ServiceFormProps {
     duration: number | "";
     setDuration: (v: number | "") => void;
     onIconChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    isSaving: boolean;
 }
 
 const ServiceForm = ({
@@ -30,6 +31,7 @@ const ServiceForm = ({
                          duration,
                          setDuration,
                          onIconChange,
+                         isSaving,
                      }: ServiceFormProps) => (
     <form className="service-form" onSubmit={onSubmit}>
         <h2>{heading}</h2>
@@ -43,6 +45,7 @@ const ServiceForm = ({
                     type="text"
                     value={title}
                     required
+                    disabled={isSaving}
                     onChange={e => setTitle(e.target.value)}
                 />
             </div>
@@ -55,18 +58,19 @@ const ServiceForm = ({
                     className="file-input"
                     type="file"
                     accept="image/*"
+                    disabled={isSaving}
                     onChange={onIconChange}
                 />
             </div>
         </div>
 
-        <label htmlFor="description">Untertitel</label>
+        <label htmlFor="description">Beschreibung</label>
         <input
             id="description"
             placeholder="Kurze Beschreibung"
             type="text"
             value={description}
-            required
+            disabled={isSaving}
             onChange={e => setDescription(e.target.value)}
         />
 
@@ -75,9 +79,10 @@ const ServiceForm = ({
             id="price"
             placeholder="100"
             type="number"
-            value={price}
+            value={price === 0 ? "" : price}
             required
-            onChange={e => setPrice(Number(e.target.value))}
+            disabled={isSaving}
+            onChange={e => setPrice(e.target.value === "" ? 0 : Number(e.target.value))}
         />
 
         <label htmlFor="duration">Dauer (Minuten) *</label>
@@ -86,21 +91,49 @@ const ServiceForm = ({
             placeholder="60"
             type="number"
             value={duration}
+            disabled={isSaving}
             onChange={e => setDuration(e.target.value === "" ? "" : Number(e.target.value))}
         />
 
         <div className="form-actions">
-            <button type="button" onClick={onCancelClick}>Abbrechen</button>
-            <button type="submit">Speichern</button>
+            <button type="button" disabled={isSaving} onClick={onCancelClick}>
+                Abbrechen
+            </button>
+            <button type="submit" disabled={isSaving}>
+                {isSaving && <span className="btn-spinner" />}
+                {isSaving ? "Speichert..." : "Speichern"}
+            </button>
         </div>
     </form>
 );
+
+function ServiceRowSkeleton() {
+    return (
+        <tr className="skeleton-row">
+            <td><div className="skeleton-block skeleton-cell skeleton-id" /></td>
+            <td><div className="skeleton-block skeleton-cell skeleton-icon" /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "70%" }} /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "80%" }} /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "50%" }} /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "50%" }} /></td>
+            <td>
+                <div className="skeleton-actions-cell">
+                    <div className="skeleton-block" />
+                    <div className="skeleton-block" />
+                </div>
+            </td>
+        </tr>
+    );
+}
 
 export default function AdminServicesPage() {
     const [services, setServices] = useState<IService[]>([]);
     const [selectedServiceForEditing, setSelectedServiceForEditing] = useState<IService>();
     const [unfiltered, setUnfiltered] = useState<IService[]>([]);
     const [selectedForDeleting, setSelectedForDeleting] = useState<IService>();
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [title, setTitle] = useState("");
     const [icon, setIcon] = useState("");
@@ -116,8 +149,9 @@ export default function AdminServicesPage() {
         setServices(serviceData);
     };
 
-    const handleEditSubmit = async (e: React.FormEvent) => {
+    const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isSaving) return;
 
         if (duration === "" || duration === 0) {
             alert("Bitte geben Sie eine gültige Dauer an.");
@@ -126,53 +160,71 @@ export default function AdminServicesPage() {
 
         if (!selectedServiceForEditing || selectedServiceForEditing.id === undefined) return;
 
-        const updatedService: Omit<IService, "id"> = {
-            icon,
-            title,
-            subtitle: description,
-            price,
-            duration: Number(duration),
-        };
+        setIsSaving(true);
+        try {
+            const updatedService: Omit<IService, "id"> = {
+                icon,
+                title,
+                subtitle: description,
+                price,
+                duration: Number(duration),
+            };
 
-        await updateService(selectedServiceForEditing.id, updatedService);
-        await reloadServices();
+            await updateService(selectedServiceForEditing.id, updatedService);
+            await reloadServices();
 
-        setSelectedServiceForEditing(undefined);
-        setIcon("");
-        setTitle("");
-        setDescription("");
-        setPrice(0);
-        setDuration(0);
+            setSelectedServiceForEditing(undefined);
+            setIcon("");
+            setTitle("");
+            setDescription("");
+            setPrice(0);
+            setDuration(0);
+        } catch (err) {
+            console.log("AdminServicesPage.tsx : " + err);
+            alert("Speichern fehlgeschlagen. Bitte versuche es erneut.");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
-    const handleAddSubmit = async (e: React.FormEvent) => {
+    const handleAddSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (isSaving) return;
 
         if (duration === "" || duration === 0) {
             alert("Bitte geben Sie eine gültige Dauer an.");
             return;
         }
 
-        const newService: Omit<IService, "id"> = {
-            icon,
-            title,
-            subtitle: description,
-            price,
-            duration: Number(duration),
-        };
+        setIsSaving(true);
+        try {
+            const newService: Omit<IService, "id"> = {
+                icon,
+                title,
+                subtitle: description,
+                price,
+                duration: Number(duration),
+            };
 
-        await createService(newService);
-        await reloadServices();
+            await createService(newService);
+            await reloadServices();
 
-        setNewServiceClicked(false);
-        setIcon("");
-        setTitle("");
-        setDescription("");
-        setPrice(0);
-        setDuration(0);
+            setNewServiceClicked(false);
+            setIcon("");
+            setTitle("");
+            setDescription("");
+            setPrice(0);
+            setDuration(0);
+        } catch (err) {
+            console.log("AdminServicesPage.tsx : " + err);
+            alert("Speichern fehlgeschlagen. Bitte versuche es erneut.");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const onCancel = () => {
+        if (isSaving) return;
         setSelectedServiceForEditing(undefined);
         setIcon("");
         setTitle("");
@@ -182,6 +234,7 @@ export default function AdminServicesPage() {
     };
 
     const onAddCancel = () => {
+        if (isSaving) return;
         setNewServiceClicked(false);
         setIcon("");
         setTitle("");
@@ -213,12 +266,19 @@ export default function AdminServicesPage() {
     };
 
     const wantsToDelete = async () => {
-        if (!selectedForDeleting?.id) return;
+        if (!selectedForDeleting?.id || isDeleting) return;
 
-        await deleteService(selectedForDeleting.id);
-        await reloadServices();
-
-        setSelectedForDeleting(undefined);
+        setIsDeleting(true);
+        try {
+            await deleteService(selectedForDeleting.id);
+            await reloadServices();
+            setSelectedForDeleting(undefined);
+        } catch (err) {
+            console.log("AdminServicesPage.tsx : " + err);
+            alert("Löschen fehlgeschlagen. Bitte versuche es erneut.");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,9 +291,14 @@ export default function AdminServicesPage() {
 
     useEffect(() => {
         const load = async () => {
-            const serviceData = await getServices();
-            setUnfiltered(serviceData);
-            setServices(serviceData);
+            setIsLoading(true);
+            try {
+                const serviceData = await getServices();
+                setUnfiltered(serviceData);
+                setServices(serviceData);
+            } finally {
+                setIsLoading(false);
+            }
         };
         load();
     }, []);
@@ -248,6 +313,7 @@ export default function AdminServicesPage() {
         duration,
         setDuration,
         onIconChange: handleIconChange,
+        isSaving,
     };
 
     return (
@@ -277,47 +343,68 @@ export default function AdminServicesPage() {
                             <th>Id</th>
                             <th>Icon</th>
                             <th>Titel</th>
-                            <th>Untertitel</th>
+                            <th>Beschreibung</th>
                             <th>Preis</th>
                             <th>Dauer</th>
                             <th>Aktionen</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {services.map(value => (
-                            <tr key={value.id}>
-                                <td>{value.id}</td>
-                                <td>
-                                    <img src={`data:image/png;base64,${value.icon}`} alt="icon"/>
-                                </td>
-                                <td>{value.title}</td>
-                                <td>{value.subtitle}</td>
-                                <td>{value.price} €</td>
-                                <td>{value.duration} min</td>
-                                <td>
-                                    <button
-                                        className="table-btn"
-                                        onClick={() => {
-                                            setSelectedServiceForEditing(value);
-                                            setNewServiceClicked(false);
-                                            setTitle(value.title);
-                                            setIcon(value.icon);
-                                            setDescription(value.subtitle ?? "");
-                                            setPrice(value.price);
-                                            setDuration(value.duration ?? 0);
-                                        }}
-                                    >
-                                        Bearbeiten
-                                    </button>
-                                    <button
-                                        className="table-btn delete-small-btn"
-                                        onClick={() => setSelectedForDeleting(value)}
-                                    >
-                                        Löschen
-                                    </button>
+                        {isLoading ? (
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <ServiceRowSkeleton key={i} />
+                            ))
+                        ) : services.length === 0 ? (
+                            <tr className="empty-row">
+                                <td colSpan={7}>
+                                    <div className="empty-state">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z" />
+                                            <path d="M12 12v9" />
+                                            <path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6" />
+                                            <path d="M12 7V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2" />
+                                            <path d="M12 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                                        </svg>
+                                        <p>Es sind noch keine Leistungen vorhanden.</p>
+                                    </div>
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            services.map(value => (
+                                <tr key={value.id}>
+                                    <td>{value.id}</td>
+                                    <td>
+                                        <img src={`data:image/png;base64,${value.icon}`} alt="icon"/>
+                                    </td>
+                                    <td>{value.title}</td>
+                                    <td>{value.subtitle}</td>
+                                    <td>{value.price} €</td>
+                                    <td>{value.duration} min</td>
+                                    <td>
+                                        <button
+                                            className="table-btn"
+                                            onClick={() => {
+                                                setSelectedServiceForEditing(value);
+                                                setNewServiceClicked(false);
+                                                setTitle(value.title);
+                                                setIcon(value.icon);
+                                                setDescription(value.subtitle ?? "");
+                                                setPrice(value.price);
+                                                setDuration(value.duration ?? 0);
+                                            }}
+                                        >
+                                            Bearbeiten
+                                        </button>
+                                        <button
+                                            className="table-btn delete-small-btn"
+                                            onClick={() => setSelectedForDeleting(value)}
+                                        >
+                                            Löschen
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                         </tbody>
                     </table>
                 </div>
@@ -348,8 +435,13 @@ export default function AdminServicesPage() {
                                     Diese Aktion kann nicht rückgängig gemacht werden.
                                 </p>
                                 <div className="delete-actions">
-                                    <button onClick={() => setSelectedForDeleting(undefined)}>Abbrechen</button>
-                                    <button onClick={wantsToDelete}>Löschen</button>
+                                    <button disabled={isDeleting} onClick={() => setSelectedForDeleting(undefined)}>
+                                        Abbrechen
+                                    </button>
+                                    <button disabled={isDeleting} onClick={wantsToDelete}>
+                                        {isDeleting && <span className="btn-spinner" />}
+                                        {isDeleting ? "Löscht..." : "Löschen"}
+                                    </button>
                                 </div>
                             </div>
                         )}

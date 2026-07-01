@@ -1,23 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
-import {
-    Box,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
-    Divider,
-    Badge,
-} from "@mui/material";
-import {
-    LayoutDashboard,
-    CalendarDays,
-    Tag,
-    Wrench,
-    Users,
-    Settings,
-} from "lucide-react";
+import {Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Divider, Badge,} from "@mui/material";
+import {LayoutDashboard, CalendarDays, Calendar, Tag, Wrench, Users, Settings,} from "lucide-react";
 import { useNewAppointmentsCount } from "../../hooks/useNewAppointmentsCount.ts";
 
 const systemItems = [
@@ -95,6 +78,7 @@ export default function AdminNavbar() {
     const navItems = [
         { label: "Dashboard",  to: "/admin",            icon: <LayoutDashboard size={18} />, end: true       },
         { label: "Termine",    to: "/admin/termine",    icon: <CalendarDays size={18} />,    badge: newCount > 0 },
+        { label: "Kalender",   to: "/admin/kalender",   icon: <Calendar size={18} />         },
         { label: "Angebote",   to: "/admin/angebote",   icon: <Tag size={18} />              },
         { label: "Leistungen", to: "/admin/leistungen", icon: <Wrench size={18} />           },
         { label: "Kunden",     to: "/admin/kunden",     icon: <Users size={18} />            },

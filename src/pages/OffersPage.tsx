@@ -1,24 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { getOffersByActive, IOffer } from "../api/offers.ts";
-import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Container,
-    Divider,
-    Skeleton,
-    Stack,
-    Typography,
-} from "@mui/material";
+import {Box, Button, Card, CardContent, Chip, Container, Divider, Skeleton, Stack, Typography,} from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 function OfferCardSkeleton() {
     return (
         <Card variant="outlined" sx={{ bgcolor: "background.paper", borderColor: "divider" }}>
             <CardContent sx={{ p: 3 }}>
+                <Skeleton variant="rounded" width={48} height={48} sx={{ borderRadius: 2, mb: 2 }} />
                 <Skeleton variant="text" width="55%" height={28} sx={{ mb: 1 }} />
                 <Skeleton variant="text" width="80%" height={16} />
                 <Skeleton variant="text" width="60%" height={16} sx={{ mb: 2 }} />
@@ -93,9 +83,11 @@ export default function OffersPage() {
                 {loading ? (
                     Array.from({ length: 3 }).map((_, i) => <OfferCardSkeleton key={i} />)
                 ) : offers.length === 0 ? (
-                    <Typography color="text.secondary">
-                        Derzeit sind keine Angebote verfügbar.
-                    </Typography>
+                    <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 6 }}>
+                        <Typography color="text.secondary">
+                            Derzeit sind keine Angebote verfügbar.
+                        </Typography>
+                    </Box>
                 ) : (
                     offers.map(offer => (
                         <Card
@@ -114,6 +106,27 @@ export default function OffersPage() {
                             }}
                         >
                             <CardContent sx={{ p: 3, display: "flex", flexDirection: "column", flex: 1 }}>
+                                {offer.icon && (
+                                    <Box
+                                        sx={{
+                                            width: 48,
+                                            height: 48,
+                                            borderRadius: 2,
+                                            bgcolor: "action.hover",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            mb: 2,
+                                        }}
+                                    >
+                                        <img
+                                            src={`data:image/png;base64,${offer.icon}`}
+                                            alt="icon"
+                                            style={{ width: 28, height: 28, objectFit: "contain" }}
+                                        />
+                                    </Box>
+                                )}
+
                                 <Typography variant="h6" fontWeight={700} gutterBottom>
                                     {offer.title}
                                 </Typography>
@@ -155,6 +168,7 @@ export default function OffersPage() {
                                 <Button
                                     component={RouterLink}
                                     to="/termin"
+                                    state={{ offerId: offer.id }}
                                     variant="contained"
                                     color="error"
                                     fullWidth

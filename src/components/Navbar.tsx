@@ -1,19 +1,5 @@
-/**
- * Shows "Hallo [first name]" with a dropdown when logged in, otherwise an "Anmelden" button.
- */
-
 import { useState } from "react";
-import {
-    AppBar,
-    Toolbar,
-    Typography,
-    Button,
-    Box,
-    Container,
-    Menu,
-    MenuItem,
-    Divider,
-} from "@mui/material";
+import {AppBar, Toolbar, Typography, Button, Box, Container, Menu, MenuItem, Divider,} from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
 import AuthService from "../service/AuthService";
 

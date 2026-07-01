@@ -1,26 +1,6 @@
-/**
- * Registration page — two-section form for personal data and an optional vehicle.
- * Designed in collaboration with AI (Claude by Anthropic).
- * @author N
- * @since 07.04.2026
- */
-
 import { useState } from "react";
-import {
-    Alert,
-    Box,
-    Button,
-    Checkbox,
-    CircularProgress,
-    Divider,
-    FormControlLabel,
-    FormHelperText,
-    Link,
-    Stack,
-    TextField,
-    Typography,
-} from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import {Alert, Box, Button, Checkbox, CircularProgress, Divider, FormControlLabel, FormHelperText, Link, Stack, TextField, Typography,} from "@mui/material";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
 import { isValidAustrianPlate } from "../utils/validation";
@@ -31,6 +11,8 @@ const required = (val: string) => val.trim().length > 0;
 /** Registration form — validates on first submit and redirects home on success. */
 export default function RegisterPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = (location.state as { from?: string } | null)?.from;
 
     const [form, setForm] = useState<RegisterRequest>({
         vorname:    "",
@@ -99,7 +81,7 @@ export default function RegisterPage() {
                 `Willkommen, ${form.vorname}! Ihr Konto wurde erfolgreich erstellt.`
             );
 
-            navigate("/");
+            navigate(from ?? "/");
         } catch (err: unknown) {
             const message = (err as { response?: { data?: { error?: string } } })
                 ?.response?.data?.error;

@@ -1,0 +1,789 @@
+/* ==========================================================================
+   CALENDAR PAGE
+   ========================================================================= */
+.calendar-page {
+    color: #fff;
+}
+
+/* ---------------- Toolbar ---------------- */
+.calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cal-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.cal-icon-btn:hover {
+    background: #1c222b;
+    border-color: #444;
+}
+
+.cal-today-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.15s;
+}
+
+.cal-today-btn:hover {
+    background: #1c222b;
+    border-color: #444;
+}
+
+.calendar-title {
+    margin: 0 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.01em;
+}
+
+.calendar-view-toggle {
+    display: flex;
+    background: #11161d;
+    border: 1px solid #2a2f38;
+    border-radius: 9px;
+    overflow: hidden;
+    padding: 2px;
+}
+
+.calendar-view-toggle button {
+    background: transparent;
+    border: none;
+    color: #888;
+    padding: 7px 16px;
+    font-size: 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.calendar-view-toggle button:hover {
+    color: #ddd;
+}
+
+.calendar-view-toggle button.active {
+    background: #ff4d4f;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ---------------- Legend ---------------- */
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #0f141b;
+    border: 1px solid #1f2630;
+    border-radius: 9px;
+}
+
+.calendar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: #999;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-dot.blue { background: #4ea1ff; }
+.legend-dot.yellow { background: #f5c542; }
+.legend-dot.green { background: #4cd964; }
+.legend-dot.red { background: #ff4d4f; }
+.legend-dot.gray { background: #9aa0a6; }
+
+/* ---------------- Month View ---------------- */
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #11161d;
+    border: 1px solid #1f2630;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.month-weekday {
+    padding: 11px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #777;
+    text-align: left;
+    border-bottom: 1px solid #1f2630;
+    background: #0f141b;
+    letter-spacing: 0.02em;
+}
+
+.month-cell {
+    min-height: 112px;
+    padding: 10px;
+    border-right: 1px solid #1a1f27;
+    border-bottom: 1px solid #1a1f27;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: background 0.15s, box-shadow 0.15s;
+    position: relative;
+}
+
+.month-grid .month-cell:nth-child(7n) {
+    border-right: none;
+}
+
+.month-cell.is-weekend {
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.month-cell.has-items {
+    cursor: pointer;
+}
+
+.month-cell.has-items:hover {
+    background: #161c25;
+    box-shadow: inset 0 0 0 1px #2a2f38;
+    z-index: 1;
+}
+
+.month-cell-date {
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+}
+
+.month-cell.is-today {
+    background: rgba(255, 77, 79, 0.05);
+}
+
+.month-cell.is-today .month-cell-date {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ff4d4f;
+    color: #fff;
+    font-weight: 700;
+}
+
+.month-cell.other-month {
+    background: #0d1117;
+}
+
+.month-cell.other-month .month-cell-date {
+    color: #3d3d3d;
+}
+
+.month-cell-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cal-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    transition: background 0.15s;
+}
+
+.cal-chip:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.cal-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cal-chip-dot.blue { background: #4ea1ff; }
+.cal-chip-dot.yellow { background: #f5c542; }
+.cal-chip-dot.green { background: #4cd964; }
+.cal-chip-dot.red { background: #ff4d4f; }
+.cal-chip-dot.gray { background: #9aa0a6; }
+
+.cal-chip-time {
+    font-weight: 700;
+    color: #ddd;
+    flex-shrink: 0;
+}
+
+.cal-chip-name {
+    color: #aaa;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cal-more {
+    font-size: 11px;
+    color: #6a6a6a;
+    padding: 0 4px;
+}
+
+/* ---------------- Week / Day Grid (shared) ---------------- */
+.week-view,
+.day-view {
+    background: #11161d;
+    border: 1px solid #1f2630;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.week-header,
+.day-view-header {
+    display: grid;
+    grid-template-columns: 56px repeat(7, 1fr);
+    border-bottom: 1px solid #1f2630;
+    background: #0f141b;
+}
+
+.day-view-header {
+    grid-template-columns: 56px 1fr;
+}
+
+.week-time-col {
+    border-right: 1px solid #1f2630;
+}
+
+.week-day-header {
+    padding: 11px 6px;
+    text-align: center;
+    border-right: 1px solid #1a1f27;
+}
+
+.week-header .week-day-header:last-child,
+.day-view-header .week-day-header:last-child {
+    border-right: none;
+}
+
+.day-single-header {
+    padding: 11px 14px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.week-day-name {
+    display: block;
+    font-size: 11px;
+    color: #777;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.week-day-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.day-single-header .week-day-num {
+    margin-top: 0;
+}
+
+.week-day-header.is-today .week-day-num,
+.day-single-header.is-today .week-day-num {
+    background: #ff4d4f;
+    color: #fff;
+}
+
+.week-body,
+.day-view-body {
+    display: grid;
+    grid-template-columns: 56px repeat(7, 1fr);
+    position: relative;
+}
+
+.day-view-body {
+    grid-template-columns: 56px 1fr;
+}
+
+.week-hour-label {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-right: 10px;
+    padding-top: 2px;
+    font-size: 11px;
+    color: #666;
+    border-right: 1px solid #1f2630;
+    border-top: 1px solid #171b22;
+    box-sizing: border-box;
+}
+
+.week-day-col,
+.day-single-col {
+    position: relative;
+    border-right: 1px solid #1a1f27;
+    box-sizing: border-box;
+}
+
+.week-body > .week-day-col:last-child,
+.day-view-body > .day-single-col:last-child {
+    border-right: none;
+}
+
+.week-hour-line {
+    border-top: 1px solid #171b22;
+    box-sizing: border-box;
+}
+
+.week-appointment {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    border-radius: 7px;
+    padding: 4px 7px;
+    font-size: 11px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    cursor: default;
+    border-left: 2.5px solid transparent;
+    transition: transform 0.1s;
+}
+
+.week-appointment:hover {
+    transform: translateX(1px);
+}
+
+.week-appt-time {
+    font-weight: 700;
+}
+
+.week-appt-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.week-appointment.blue { background: rgba(78, 161, 255, 0.14); color: #4ea1ff; border-left-color: #4ea1ff; }
+.week-appointment.yellow { background: rgba(245, 197, 66, 0.14); color: #f5c542; border-left-color: #f5c542; }
+.week-appointment.green { background: rgba(76, 217, 100, 0.14); color: #4cd964; border-left-color: #4cd964; }
+.week-appointment.red { background: rgba(255, 77, 79, 0.14); color: #ff4d4f; border-left-color: #ff4d4f; }
+.week-appointment.gray { background: rgba(154, 160, 166, 0.14); color: #9aa0a6; border-left-color: #9aa0a6; }
+
+/* ---------------- Live "now" line ---------------- */
+.now-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1.5px solid #ff4d4f;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.now-dot {
+    position: absolute;
+    left: -3px;
+    top: -3.5px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff4d4f;
+    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.25);
+}
+
+/* ---------------- Day View: detail appointment cards ---------------- */
+.day-single-col {
+    padding: 0 10px;
+}
+
+.day-appointment {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 9px;
+    padding: 8px 12px;
+    border-left: 3px solid transparent;
+    z-index: 2;
+}
+
+.day-appt-time {
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 42px;
+}
+
+.day-appt-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.day-appt-name {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #eee;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.day-appt-sub {
+    margin: 2px 0 0;
+    font-size: 11.5px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.day-appointment.blue { background: rgba(78, 161, 255, 0.1); border-left-color: #4ea1ff; }
+.day-appointment.yellow { background: rgba(245, 197, 66, 0.1); border-left-color: #f5c542; }
+.day-appointment.green { background: rgba(76, 217, 100, 0.1); border-left-color: #4cd964; }
+.day-appointment.red { background: rgba(255, 77, 79, 0.1); border-left-color: #ff4d4f; }
+.day-appointment.gray { background: rgba(154, 160, 166, 0.1); border-left-color: #9aa0a6; }
+
+.day-empty-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #555;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* ---------------- Status Badges (eigenständig, inkl. "gray" für abgeschlossen) ---------------- */
+.calendar-page .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.calendar-page .badge.blue { background: #1f3a5f; color: #4ea1ff; }
+.calendar-page .badge.yellow { background: #3a2f12; color: #f5c542; }
+.calendar-page .badge.green { background: #123a22; color: #4cd964; }
+.calendar-page .badge.red { background: #3a1212; color: #ff4d4f; }
+.calendar-page .badge.gray { background: #23262c; color: #9aa0a6; }
+
+.light-mode .calendar-page .badge.blue { background: #e6f0ff; color: #0066cc; }
+.light-mode .calendar-page .badge.yellow { background: #fffbe6; color: #b28200; }
+.light-mode .calendar-page .badge.green { background: #e6fcf5; color: #0ca678; }
+.light-mode .calendar-page .badge.red { background: #ffeef0; color: #ff4d4f; }
+.light-mode .calendar-page .badge.gray { background: #eceff1; color: #607080; }
+
+/* ---------------- Skeleton ---------------- */
+.skeleton-block {
+    background: linear-gradient(90deg, #1a1f27 25%, #232935 37%, #1a1f27 63%);
+    background-size: 400% 100%;
+    border-radius: 6px;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+.skeleton-line {
+    height: 14px;
+    width: 60%;
+}
+
+/* ---------------- Day Detail Modal (Monatsansicht) ---------------- */
+.calendar-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.calendar-modal {
+    background: #1a1a1a;
+    border: 1px solid #363636;
+    border-radius: 14px;
+    padding: 26px;
+    width: 90%;
+    max-width: 460px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.calendar-modal h3 {
+    margin: 0 0 16px 0;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.calendar-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calendar-modal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #262626;
+}
+
+.calendar-modal-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.cmi-name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cmi-sub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #888;
+}
+
+.calendar-modal-close {
+    margin-top: 20px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid #666;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.calendar-modal-close:hover {
+    background: #272727;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES
+   ========================================================================= */
+.light-mode .calendar-page {
+    color: #111111;
+}
+
+.light-mode .cal-icon-btn,
+.light-mode .cal-today-btn {
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .cal-icon-btn:hover,
+.light-mode .cal-today-btn:hover {
+    background: #eaeaea;
+}
+
+.light-mode .calendar-view-toggle {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .calendar-view-toggle button {
+    color: #666666;
+}
+
+.light-mode .calendar-view-toggle button:hover {
+    color: #111111;
+}
+
+.light-mode .calendar-view-toggle button.active {
+    background: #ff4d4f;
+    color: #ffffff;
+}
+
+.light-mode .calendar-legend {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .calendar-legend-item {
+    color: #666666;
+}
+
+.light-mode .month-grid,
+.light-mode .week-view,
+.light-mode .day-view {
+    background: #ffffff;
+    border-color: #e0e0e0;
+}
+
+.light-mode .month-weekday {
+    background: #fcfcfc;
+    color: #666666;
+    border-bottom-color: #eaeaea;
+}
+
+.light-mode .month-cell {
+    border-color: #eaeaea;
+}
+
+.light-mode .month-cell.is-weekend {
+    background: rgba(0, 0, 0, 0.015);
+}
+
+.light-mode .month-cell.has-items:hover {
+    background: #f7f7f7;
+    box-shadow: inset 0 0 0 1px #e0e0e0;
+}
+
+.light-mode .month-cell-date {
+    color: #666666;
+}
+
+.light-mode .month-cell.other-month {
+    background: #fafafa;
+}
+
+.light-mode .month-cell.other-month .month-cell-date {
+    color: #cccccc;
+}
+
+.light-mode .cal-chip {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.light-mode .cal-chip:hover {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+.light-mode .cal-chip-time {
+    color: #333333;
+}
+
+.light-mode .cal-chip-name {
+    color: #666666;
+}
+
+.light-mode .week-header,
+.light-mode .day-view-header,
+.light-mode .week-day-header,
+.light-mode .week-time-col,
+.light-mode .week-day-col,
+.light-mode .day-single-col,
+.light-mode .week-hour-label,
+.light-mode .week-hour-line {
+    border-color: #eaeaea;
+}
+
+.light-mode .week-header,
+.light-mode .day-view-header {
+    background: #fcfcfc;
+}
+
+.light-mode .week-day-name {
+    color: #666666;
+}
+
+.light-mode .week-hour-label {
+    color: #999999;
+}
+
+.light-mode .day-appt-name {
+    color: #111111;
+}
+
+.light-mode .day-appt-sub {
+    color: #666666;
+}
+
+.light-mode .day-empty-hint {
+    color: #aaaaaa;
+}
+
+.light-mode .skeleton-block {
+    background: linear-gradient(90deg, #eaeaea 25%, #f4f4f4 37%, #eaeaea 63%);
+    background-size: 400% 100%;
+}
+
+.light-mode .calendar-modal {
+    background: #ffffff;
+    border-color: #e0e0e0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .calendar-modal h3 {
+    color: #111111;
+}
+
+.light-mode .calendar-modal-item {
+    border-bottom-color: #eaeaea;
+}
+
+.light-mode .cmi-name {
+    color: #111111;
+}
+
+.light-mode .cmi-sub {
+    color: #666666;
+}
+
+.light-mode .calendar-modal-close {
+    border-color: #cccccc;
+    color: #111111;
+}
+
+.light-mode .calendar-modal-close:hover {
+    background: #eaeaea;
+}

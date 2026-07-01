@@ -3,7 +3,6 @@ import { ICustomer } from "../../interface/ICustomer.ts";
 import { getAllCustomers, updateCustomer, deleteCustomer, updateCustomerPassword } from "../../api/customers.ts";
 import "../../css/CustomerAdminPage.css"
 
-/** Extracts the backend's human-readable error message from an Axios error, with a fallback. */
 function extractErrorMessage(err: unknown, fallback: string): string {
     const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
     return message ?? fallback;

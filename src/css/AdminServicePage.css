@@ -1,19 +1,15 @@
-/* ==========================================================================
-   BASE STYLES & DARK MODE (Perfekt bündig an das Layout angepasst)
-   ========================================================================= */
-
 .admin-services-page {
     min-height: 100vh;
-    background: transparent; /* Nutzt den Hintergrund des Hauptlayouts */
+    background: transparent;
     color: white;
     font-family: Arial, sans-serif;
-    padding: 1.25rem 1.5rem; /* Exakt das gleiche harmonische Spacing */
+    padding: 1.25rem 1.5rem;
     box-sizing: border-box;
 }
 
 .admin-main {
-    max-width: 1200px;        /* Erhöht für ein großzügigeres Tabellen-Layout */
-    margin: 0;                /* Radikal auf 0 gesetzt für den nahtlosen Linksbündig-Übergang */
+    max-width: 1200px;
+    margin: 0;
     width: 100%;
 }
 
@@ -21,13 +17,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 0;          /* Verhindert doppelte Abstände nach oben */
-    margin-bottom: 1.5rem;  /* Perfekt abgestimmter Abstand nach unten */
+    margin-top: 0;
+    margin-bottom: 1.5rem;
 }
 
 .admin-header h1 {
     font-size: 24px;
-    font-weight: bold;      /* Exakt so fett wie beim Dashboard und den restlichen Seiten */
+    font-weight: bold;
     margin: 0;
 }
 
@@ -48,7 +44,7 @@
 
 .search-box {
     width: 300px;
-    height: 44px;           /* Kompakter & eleganter angepasst */
+    height: 44px;
     background: #1b1b1b;
     border: 1px solid #333;
     border-radius: 10px;
@@ -132,7 +128,7 @@
     font-size: 15px;
     cursor: pointer;
     margin-right: 7px;
-    margin-bottom: 0;       /* Auf 0 beruhigt für bessere vertikale Zentrierung */
+    margin-bottom: 0;
     transition: background 0.15s;
 }
 
@@ -144,7 +140,76 @@
     color: #ff5555;
 }
 
-/* Modals & Forms */
+.skeleton-row td {
+    padding: 18px 20px;
+    border-top: 1px solid #242424;
+}
+
+.skeleton-block {
+    background: linear-gradient(90deg, #232323 25%, #2c2c2c 37%, #232323 63%);
+    background-size: 400% 100%;
+    border-radius: 6px;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+.skeleton-cell {
+    height: 16px;
+    width: 60%;
+}
+
+.skeleton-cell.skeleton-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+}
+
+.skeleton-cell.skeleton-id {
+    width: 24px;
+}
+
+.skeleton-actions-cell {
+    display: flex;
+    gap: 7px;
+}
+
+.skeleton-actions-cell .skeleton-block {
+    width: 88px;
+    height: 34px;
+    border-radius: 10px;
+}
+
+.empty-row td {
+    padding: 0;
+    border-top: 1px solid #242424;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 3rem 1rem;
+    color: #777;
+    text-align: center;
+}
+
+.empty-state svg {
+    width: 36px;
+    height: 36px;
+    color: #444;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 15px;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -286,12 +351,8 @@
     border-color: #777;
 }
 
-/* ==========================================================================
-   LIGHT MODE OVERRIDES (Aktiviert durch .light-mode im Admin-Wrapper)
-   ========================================================================== */
-
 .light-mode .admin-services-page {
-    background: transparent; /* Nahtloser Übergang auch im Light Mode */
+    background: transparent;
     color: #111111;
 }
 
@@ -343,6 +404,24 @@
     background: #eaeaea;
 }
 
+.light-mode .skeleton-row td,
+.light-mode .empty-row td {
+    border-top-color: #eaeaea;
+}
+
+.light-mode .skeleton-block {
+    background: linear-gradient(90deg, #eaeaea 25%, #f4f4f4 37%, #eaeaea 63%);
+    background-size: 400% 100%;
+}
+
+.light-mode .empty-state {
+    color: #666666;
+}
+
+.light-mode .empty-state svg {
+    color: #bbbbbb;
+}
+
 .light-mode .service-form {
     background: #ffffff;
     border-color: #e0e0e0;
@@ -389,4 +468,37 @@
 
 .light-mode .file-upload:hover {
     background: #eaeaea;
+}
+
+.btn-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    animation: btn-spin 0.7s linear infinite;
+}
+
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+.form-actions button:disabled,
+.delete-actions button:disabled,
+.table-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.service-form input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.light-mode .btn-spinner {
+    border-color: rgba(0, 0, 0, 0.15);
+    border-top-color: #ffffff;
 }

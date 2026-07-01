@@ -7,6 +7,7 @@ const SIDEBAR_WIDTH = 220;
 const pageTitles: Record<string, string> = {
     "/admin":                 "Dashboard",
     "/admin/termine":         "Termine",
+    "/admin/kalender":        "Kalender",
     "/admin/angebote":        "Angebote",
     "/admin/leistungen":      "Leistungen",
     "/admin/kunden":          "Kunden",

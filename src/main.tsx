@@ -1,13 +1,10 @@
-import { StrictMode, type ReactElement } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import {
     createBrowserRouter,
     Outlet,
     RouterProvider,
-    Navigate,
-    useLocation,
 } from "react-router-dom";
-import { useEffect } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -24,7 +21,7 @@ import OffersPage from "./pages/OffersPage";
 import KontaktPage from "./pages/ContactPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import AppointmentPage from "./pages/AppointmentPage";
-import ImpressumPage from "./pages/ImpressumPage.tsx";
+import ImpressumPage from "./pages/ImpressumPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 import LoginPage from "./pages/LoginPage";
@@ -33,6 +30,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 import DashboardPage from "./pages/admin/DashboardPage";
 import AppointmentsPage from "./pages/admin/AppointmentsPage";
+import AdminCalendarPage from "./pages/admin/AdminCalendarPage.tsx";
 import AdminOffersPage from "./pages/admin/AdminOffersPage";
 import AdminServicesPage from "./pages/admin/AdminServicesPage";
 import CustomersPage from "./pages/admin/CustomersPage";
@@ -40,30 +38,8 @@ import SettingsPage from "./pages/admin/SettingsPage";
 import { TermsPage } from "./pages/TermsPage";
 import MyAccountPage from "./pages/MyAccountPage";
 
-
-function RequireAdmin({ children }: { children: ReactElement }) {
-    const token = sessionStorage.getItem("token");
-    const raw = sessionStorage.getItem("loggedInKunde");
-
-    if (!token) return <Navigate to="/login" replace />;
-
-    try {
-        const k = raw ? JSON.parse(raw) : null;
-        if (!k || k.role !== "ADMIN") return <Navigate to="/" replace />;
-    } catch {
-        return <Navigate to="/login" replace />;
-    }
-
-    return children;
-}
-
-function ScrollToTop() {
-    const { pathname } = useLocation();
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [pathname]);
-    return null;
-}
+import { RequireAdmin } from "./utils/RequireAdmin.tsx";
+import { ScrollToTop } from "./utils/ScrollToTop.tsx";
 
 const router = createBrowserRouter([
     {
@@ -112,6 +88,7 @@ const router = createBrowserRouter([
                 children: [
                     { path: "/admin", element: <DashboardPage /> },
                     { path: "/admin/termine", element: <AppointmentsPage /> },
+                    { path: "/admin/kalender", element: <AdminCalendarPage /> },
                     { path: "/admin/angebote", element: <AdminOffersPage /> },
                     { path: "/admin/leistungen", element: <AdminServicesPage /> },
                     { path: "/admin/kunden", element: <CustomersPage /> },

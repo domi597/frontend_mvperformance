@@ -4,8 +4,9 @@ import {IService} from "./services.ts";
 
 export interface IOffer {
     id: number;
+    icon?: string;
     title: string;
-    description: string;
+    description?: string;
     price: number;
     duration?: number;
     active: boolean;

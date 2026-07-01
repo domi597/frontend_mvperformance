@@ -3,15 +3,50 @@ import { IAppointment } from "../../interface/IAppointment";
 import { AppointmentStatus } from "../../types/AppointmentStatus";
 import "../../css/dashboard.css";
 import { useNavigate } from "react-router-dom";
-import {
-    getAppointments,
-    updateAppointmentStatus
-} from "../../api/appointmentApi";
+import {getAppointments, updateAppointmentStatus} from "../../api/appointmentApi";
 import {getOffers, IOffer} from "../../api/offers.ts";
+
+function StatCardSkeleton() {
+    return (
+        <div className="card">
+            <div className="skeleton-block skeleton-line" style={{ width: "60%", height: "12px" }} />
+            <div className="skeleton-block skeleton-line" style={{ width: "40%", height: "24px", marginTop: "10px" }} />
+        </div>
+    );
+}
+
+function AppointmentRowSkeleton() {
+    return (
+        <tr className="skeleton-row">
+            <td><div className="skeleton-block skeleton-line" style={{ width: "70%" }} /></td>
+            <td><div className="skeleton-block skeleton-line" style={{ width: "60%" }} /></td>
+            <td><div className="skeleton-block skeleton-line" style={{ width: "80%" }} /></td>
+            <td><div className="skeleton-block skeleton-line" style={{ width: "70%" }} /></td>
+            <td><div className="skeleton-block skeleton-line" style={{ width: "50px" }} /></td>
+            <td>
+                <div className="skeleton-actions-cell">
+                    <div className="skeleton-block skeleton-btn" />
+                    <div className="skeleton-block skeleton-btn" />
+                </div>
+            </td>
+        </tr>
+    );
+}
+
+function OfferCardSkeleton() {
+    return (
+        <div className="dashboard-offer-card">
+            <div className="skeleton-block skeleton-line" style={{ width: "70%", height: "16px" }} />
+            <div className="skeleton-block skeleton-line" style={{ width: "50%", height: "24px", marginTop: "14px" }} />
+            <div className="skeleton-block skeleton-line" style={{ width: "90%", height: "13px", marginTop: "8px" }} />
+        </div>
+    );
+}
 
 export default function DashboardPage() {
     const [termine, setTermine] = useState<IAppointment[]>([]);
     const [offers, setOffers] = useState<IOffer[]>([])
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -19,6 +54,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const load = async () => {
+            setIsLoading(true);
             try {
                 const res = await getAppointments(undefined, 0, 100);
                 const offerData = await getOffers();
@@ -33,6 +69,8 @@ export default function DashboardPage() {
                 console.error(err);
                 setOffers([]);
                 setTermine([]);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -132,20 +170,26 @@ export default function DashboardPage() {
         <div className="main full">
 
             <div className="stats">
-                <div className="card">
-                    <p>NEUE ANFRAGEN</p>
-                    <h2>{anfragenCounter}</h2>
-                </div>
+                {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => <StatCardSkeleton key={i} />)
+                ) : (
+                    <>
+                        <div className="card">
+                            <p>NEUE ANFRAGEN</p>
+                            <h2>{anfragenCounter}</h2>
+                        </div>
 
-                <div className="card">
-                    <p>TERMINE HEUTE</p>
-                    <h2>{termineHeute}</h2>
-                </div>
+                        <div className="card">
+                            <p>TERMINE HEUTE</p>
+                            <h2>{termineHeute}</h2>
+                        </div>
 
-                <div className="card">
-                    <p>ANGEBOTE AKTIV</p>
-                    <h2>{offers.length}</h2>
-                </div>
+                        <div className="card">
+                            <p>ANGEBOTE AKTIV</p>
+                            <h2>{offers.length}</h2>
+                        </div>
+                    </>
+                )}
             </div>
 
             <div className="section">
@@ -169,55 +213,69 @@ export default function DashboardPage() {
                     </thead>
 
                     <tbody>
-                    {topTermine.map((t) => (
-                        <tr key={t.id}>
-                            <td>{t.customerName}</td>
-                            <td>{t.serviceType}</td>
-                            <td>{t.brand} {t.model} ({t.year})</td>
-                            <td>{t.date} · {t.time}</td>
+                    {isLoading ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                            <AppointmentRowSkeleton key={i} />
+                        ))
+                    ) : topTermine.length === 0 ? (
+                        <tr className="empty-row">
+                            <td colSpan={6}>
+                                <div className="empty-state">
+                                    <p>Es sind keine offenen Terminanfragen vorhanden.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : (
+                        topTermine.map((t) => (
+                            <tr key={t.id}>
+                                <td>{t.customerName}</td>
+                                <td>{t.serviceType}</td>
+                                <td>{t.brand} {t.model} ({t.year})</td>
+                                <td>{t.date} · {t.time}</td>
 
-                            <td>
+                                <td>
                                 <span className={`badge ${statusColor(t.status)}`}>
                                     {t.status}
                                 </span>
-                            </td>
+                                </td>
 
-                            <td>
-                                <>
-                                    {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
-                                        <button
-                                            className="btn"
-                                            onClick={() => onAccept(t.id)}
-                                        >
-                                            Bestätigen
-                                        </button>
-                                    )}
+                                <td>
+                                    <>
+                                        {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
+                                            <button
+                                                className="btn"
+                                                onClick={() => onAccept(t.id)}
+                                            >
+                                                Bestätigen
+                                            </button>
+                                        )}
 
-                                    {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
-                                        <button
-                                            className="btn danger"
-                                            onClick={() => onDecline(t.id)}
-                                        >
-                                            Ablehnen
-                                        </button>
-                                    )}
+                                        {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
+                                            <button
+                                                className="btn danger"
+                                                onClick={() => onDecline(t.id)}
+                                            >
+                                                Ablehnen
+                                            </button>
+                                        )}
 
-                                    {t.status === "BESTÄTIGT" && (
-                                        <button
-                                            className="btn success"
-                                            onClick={() => onComplete(t.id)}
-                                        >
-                                            Abschließen
-                                        </button>
-                                    )}
-                                </>
-                            </td>
-                        </tr>
-                    ))}
+                                        {t.status === "BESTÄTIGT" && (
+                                            <button
+                                                className="btn success"
+                                                onClick={() => onComplete(t.id)}
+                                            >
+                                                Abschließen
+                                            </button>
+                                        )}
+                                    </>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                     </tbody>
                 </table>
 
-                
+
             </div>
 
             <div className="dashboard-offers-section">
@@ -229,26 +287,32 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="dashboard-offers-grid">
-                    {offers.map(offer => (
-                        <div className="dashboard-offer-card" key={offer.id}>
-                            <h3>{offer.title}</h3>
+                    {isLoading ? (
+                        Array.from({ length: 3 }).map((_, i) => <OfferCardSkeleton key={i} />)
+                    ) : (
+                        offers.map(offer => (
+                            <div className="dashboard-offer-card" key={offer.id}>
+                                <h3>{offer.title}</h3>
 
-                            <p className="dashboard-offer-price">
-                                € {offer.price},-
-                            </p>
+                                <p className="dashboard-offer-price">
+                                    € {offer.price},-
+                                </p>
 
-                            <p className="dashboard-offer-services">
-                                {offer.services.map(service => service.title).join(" • ")}
-                            </p>
-                        </div>
-                    ))}
+                                <p className="dashboard-offer-services">
+                                    {offer.services.map(service => service.title).join(" • ")}
+                                </p>
+                            </div>
+                        ))
+                    )}
 
-                    <button
-                        className="dashboard-new-offer"
-                        onClick={() => navigate("/admin/angebote")}
-                    >
-                        + Neues Angebot
-                    </button>
+                    {!isLoading && (
+                        <button
+                            className="dashboard-new-offer"
+                            onClick={() => navigate("/admin/angebote")}
+                        >
+                            + Neues Angebot
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

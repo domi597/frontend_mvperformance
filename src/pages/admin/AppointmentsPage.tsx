@@ -1,24 +1,41 @@
 import { useEffect, useState } from "react";
 import "../../css/appointments.css";
 import { IAppointment } from "../../interface/IAppointment";
-import {
-    getAppointments,
-    updateAppointmentStatus
-} from "../../api/appointmentApi";
+import {getAppointments, updateAppointmentStatus} from "../../api/appointmentApi";
 import { AppointmentStatus } from "../../types/AppointmentStatus";
 
 type FilterType = "ALLE" | "HEUTE" | AppointmentStatus;
+
+function AppointmentRowSkeleton() {
+    return (
+        <tr className="skeleton-row">
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "60%" }} /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "50%" }} /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "55%" }} /></td>
+            <td><div className="skeleton-block skeleton-cell" style={{ width: "70%" }} /></td>
+            <td><div className="skeleton-block skeleton-badge" /></td>
+            <td>
+                <div className="skeleton-actions-cell">
+                    <div className="skeleton-block" />
+                    <div className="skeleton-block" />
+                </div>
+            </td>
+        </tr>
+    );
+}
 
 function AppointmentsPage() {
     const [termine, setTermine] = useState<IAppointment[]>([]);
     const [filter, setFilter] = useState<FilterType>("ALLE");
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const itemsPerPage = 5;
 
     useEffect(() => {
         const load = async () => {
+            setIsLoading(true);
             try {
                 const backendPage = page - 1;
                 const status =
@@ -34,6 +51,8 @@ function AppointmentsPage() {
                 console.error(err);
                 setTermine([]);
                 setTotalPages(1);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -91,6 +110,12 @@ function AppointmentsPage() {
         ABGESCHLOSSEN: "gray",
     };
 
+    const emptyLabel = filter === "HEUTE"
+        ? "Heute stehen keine Termine an."
+        : filter === "ALLE"
+            ? "Es sind noch keine Termine vorhanden."
+            : `Keine Termine mit Status „${labelMap[filter]}".`;
+
     return (
         <div className="main full">
             <h1>Termine</h1>
@@ -123,40 +148,61 @@ function AppointmentsPage() {
                 </thead>
 
                 <tbody>
-                {termine.map((t) => (
-                    <tr key={t.id}>
-                        <td>{t.customerName}</td>
-                        <td>{t.serviceType}</td>
-                        <td>{t.brand} {t.model}</td>
-                        <td>{t.date} · {t.time}</td>
-
-                        <td>
-                            <span className={`badge ${statusClassMap[t.status]}`}>
-                                {labelMap[t.status]}
-                            </span>
-                        </td>
-
-                        <td>
-                            <>
-                                {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
-                                    <button className="btn" onClick={() => onAccept(t.id)}>
-                                        Bestätigen
-                                    </button>
-                                )}
-                                {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
-                                    <button className="btn danger" onClick={() => onDecline(t.id)}>
-                                        Ablehnen
-                                    </button>
-                                )}
-                                {t.status === "BESTÄTIGT" && (
-                                    <button className="btn success" onClick={() => onComplete(t.id)}>
-                                        Abschließen
-                                    </button>
-                                )}
-                            </>
+                {isLoading ? (
+                    Array.from({ length: itemsPerPage }).map((_, i) => (
+                        <AppointmentRowSkeleton key={i} />
+                    ))
+                ) : termine.length === 0 ? (
+                    <tr className="empty-row">
+                        <td colSpan={6}>
+                            <div className="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                                    <path d="M16 2v4" />
+                                    <path d="M8 2v4" />
+                                    <path d="M3 10h18" />
+                                    <path d="m9.5 16 2 2 3-3" />
+                                </svg>
+                                <p>{emptyLabel}</p>
+                            </div>
                         </td>
                     </tr>
-                ))}
+                ) : (
+                    termine.map((t) => (
+                        <tr key={t.id}>
+                            <td>{t.customerName}</td>
+                            <td>{t.serviceType}</td>
+                            <td>{t.brand} {t.model}</td>
+                            <td>{t.date} · {t.time}</td>
+
+                            <td>
+                                <span className={`badge ${statusClassMap[t.status]}`}>
+                                    {labelMap[t.status]}
+                                </span>
+                            </td>
+
+                            <td>
+                                <>
+                                    {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
+                                        <button className="btn" onClick={() => onAccept(t.id)}>
+                                            Bestätigen
+                                        </button>
+                                    )}
+                                    {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
+                                        <button className="btn danger" onClick={() => onDecline(t.id)}>
+                                            Ablehnen
+                                        </button>
+                                    )}
+                                    {t.status === "BESTÄTIGT" && (
+                                        <button className="btn success" onClick={() => onComplete(t.id)}>
+                                            Abschließen
+                                        </button>
+                                    )}
+                                </>
+                            </td>
+                        </tr>
+                    ))
+                )}
                 </tbody>
             </table>
 
