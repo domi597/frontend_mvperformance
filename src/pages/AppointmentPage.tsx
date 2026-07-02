@@ -7,6 +7,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import AuthService from "../service/AuthService";
 import { createAppointment } from "../api/appointmentApi";
 import { getServices, IService } from "../api/services";
+import { getOfferById, IOffer } from "../api/offers";
 import { getTimeslots, ITimeslot } from "../api/timeslotApi";
 import { isValidAustrianPlate } from "../utils/validation";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -36,6 +37,11 @@ export default function AppointmentPage() {
     /** Service id passed in when arriving via a "Termin anfragen" button on a specific service (e.g. from the homepage or services list). */
     const preselectedServiceId = (location.state as { serviceId?: number } | null)?.serviceId;
     const [autoSelectApplied, setAutoSelectApplied] = useState(false);
+
+    /** Offer id passed in when arriving via a "Termin anfragen" button on the offers page. */
+    const preselectedOfferId = (location.state as { offerId?: number } | null)?.offerId;
+    const [autoOfferApplied, setAutoOfferApplied] = useState(false);
+    const [selectedOffer, setSelectedOffer] = useState<IOffer | null>(null);
 
     const [activeStep, setActiveStep]             = useState(0);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -68,10 +74,11 @@ export default function AppointmentPage() {
     /**
      * Once the service list has loaded, pre-selects the service the user
      * came from (if any) and jumps straight to the "Termin wählen" step,
-     * skipping the manual service-selection step.
+     * skipping the manual service-selection step. Wird übersprungen, wenn
+     * bereits ein Angebot vorausgewählt wurde.
      */
     useEffect(() => {
-        if (autoSelectApplied || preselectedServiceId == null || services.length === 0) return;
+        if (autoSelectApplied || preselectedOfferId != null || preselectedServiceId == null || services.length === 0) return;
 
         const match = services.find((s) => s.id === preselectedServiceId);
         if (match) {
@@ -79,13 +86,36 @@ export default function AppointmentPage() {
             setActiveStep(1);
         }
         setAutoSelectApplied(true);
-    }, [autoSelectApplied, preselectedServiceId, services]);
+    }, [autoSelectApplied, preselectedOfferId, preselectedServiceId, services]);
+
+    /**
+     * Wenn die Terminanfrage über ein Angebot ("Termin anfragen" auf der
+     * Angebote-Seite) ausgelöst wurde, werden die im Angebot enthaltenen
+     * Leistungen und der Angebotspreis direkt übernommen und der Nutzer
+     * springt sofort zum Schritt "Termin wählen" (Datum/Uhrzeit).
+     */
+    useEffect(() => {
+        if (autoOfferApplied || preselectedOfferId == null) return;
+
+        getOfferById(preselectedOfferId)
+            .then((offer) => {
+                setSelectedOffer(offer);
+                setSelectedServices(offer.services.map((s) => s.title));
+                setActiveStep(1);
+            })
+            .catch(() => {
+                setDataError("Angebot konnte nicht geladen werden. Bitte Seite neu laden.");
+            })
+            .finally(() => {
+                setAutoOfferApplied(true);
+            });
+    }, [autoOfferApplied, preselectedOfferId]);
 
 
-    const fetchTimeslots = async (date : string) => {
-        const timeslots : ITimeslot[] = await getTimeslots(date);
+    const fetchTimeslots = async (date: string, duration: number) => {
+        const slots: ITimeslot[] = await getTimeslots(date, duration || 30);
 
-        setTimeslots(timeslots);
+        setTimeslots(slots);
     }
 
     const [form, setForm] = useState<FormData>({
@@ -137,9 +167,12 @@ export default function AppointmentPage() {
 
     /**
      * Toggles a service in the multi-select. Services can be added or
-     * removed from the selection by clicking their card again.
+     * removed from the selection by clicking their card again. Eine manuelle
+     * Anpassung verlässt den Fixpreis eines vorausgewählten Angebots, da die
+     * Auswahl dann nicht mehr dem Angebot entspricht.
      */
     const toggleService = (title: string) => {
+        setSelectedOffer(null);
         setSelectedServices((prev) =>
             prev.includes(title) ? prev.filter((s) => s !== title) : [...prev, title]
         );
@@ -151,8 +184,20 @@ export default function AppointmentPage() {
      */
     const selectedServiceObjects = services.filter((s) => selectedServices.includes(s.title));
 
-    const totalPrice    = selectedServiceObjects.reduce((sum, s) => sum + (s.price ?? 0), 0);
-    const totalDuration = selectedServiceObjects.reduce((sum, s) => sum + (s.duration ?? 0), 0);
+    /** IDs der ausgewählten Leistungen – bevorzugt aus dem Angebot, sonst aus der freien Auswahl. */
+    const selectedServiceIds: number[] = selectedOffer
+        ? selectedOffer.services.map((s) => s.id).filter((id): id is number => id != null)
+        : selectedServiceObjects.map((s) => s.id).filter((id): id is number => id != null);
+
+    /** Angebotspreis, falls über ein Angebot gebucht wird, sonst Summe der Einzelleistungen. */
+    const totalPrice = selectedOffer
+        ? selectedOffer.price
+        : selectedServiceObjects.reduce((sum, s) => sum + (s.price ?? 0), 0);
+
+    /** Angebotsdauer, falls über ein Angebot gebucht wird, sonst Summe der Einzelleistungen. */
+    const totalDuration = selectedOffer && selectedOffer.duration
+        ? selectedOffer.duration
+        : selectedServiceObjects.reduce((sum, s) => sum + (s.duration ?? 0), 0);
 
     /** Formats a Euro amount, e.g. 89 -> "89,00 €". */
     const formatPrice = (value: number) =>
@@ -166,6 +211,18 @@ export default function AppointmentPage() {
         if (h === 0) return `${m} Min.`;
         if (m === 0) return `${h} Std.`;
         return `${h} Std. ${m} Min.`;
+    };
+
+    /** Formatiert einen Zeitslot als belegten Bereich, z.B. "13:30 – 14:10". */
+    const formatSlotRange = (start: string, durationMinutes: number) => {
+        if (!durationMinutes || durationMinutes <= 0) return start;
+        const [h, m] = start.split(":").map(Number);
+        const startTotal = h * 60 + m;
+        const endTotal = startTotal + durationMinutes;
+        const endH = Math.floor(endTotal / 60) % 24;
+        const endM = endTotal % 60;
+        const endStr = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+        return `${start} – ${endStr}`;
     };
 
     /**
@@ -185,6 +242,8 @@ export default function AppointmentPage() {
                 customerId:   customer?.id ?? null,
                 customerName: `${form.firstName} ${form.lastName}`,
                 serviceType:  selectedServices.join(", "),
+                offerId:      selectedOffer?.id ?? null,
+                serviceIds:   selectedServiceIds,
                 brand:        form.brand,
                 model:        form.model,
                 year:         form.buildYear ? parseInt(form.buildYear) : null,
@@ -193,7 +252,8 @@ export default function AppointmentPage() {
                 time:         selectedTime,
                 preferredDate,
                 note:         form.note,
-                price:        totalPrice,
+                price:          totalPrice,
+                durationMinutes: totalDuration || 30,
                 createdAt:    new Date().toISOString(),
             } as any);
 
@@ -205,6 +265,12 @@ export default function AppointmentPage() {
                 err?.response?.data ??
                 "Fehler beim Senden der Terminanfrage. Bitte versuchen Sie es erneut.";
             setErrorMsg(typeof msg === "string" ? msg : JSON.stringify(msg));
+            // Der gewählte Slot könnte inzwischen von jemand anderem gebucht worden sein (409 Conflict) –
+            // in dem Fall die Zeitslots für das gewählte Datum neu laden, damit die Liste aktuell bleibt.
+            if (err?.response?.status === 409 && form.date) {
+                fetchTimeslots(form.date, totalDuration || 30).catch(() => undefined);
+                setSelectedTime("");
+            }
         } finally {
             setLoading(false);
         }
@@ -299,7 +365,10 @@ export default function AppointmentPage() {
                 Wählen Sie Datum &amp; Uhrzeit
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Wählen Sie einen freien Termin aus.
+                Wählen Sie einen freien Termin aus. Sie können das Datum auch direkt eingeben.
+                {totalDuration > 0 && (
+                    <> Geschätzte Dauer: <strong>{formatDuration(totalDuration)}</strong>.</>
+                )}
             </Typography>
             <Stack spacing={3}>
                 <DatePicker
@@ -307,12 +376,19 @@ export default function AppointmentPage() {
                     value={form.date ? dayjs(form.date) : null}
                     onChange={(newValue) =>
                     {
+                        const newDate = newValue ? newValue.format("YYYY-MM-DD") : "";
+
                         setForm((prev) => ({
                             ...prev,
-                            date: newValue ? newValue.format("YYYY-MM-DD") : "",
+                            date: newDate,
                         }));
+                        setSelectedTime("");
 
-                        fetchTimeslots(newValue!.format("YYYY-MM-DD"));
+                        if (newDate) {
+                            fetchTimeslots(newDate, totalDuration || 30);
+                        } else {
+                            setTimeslots([]);
+                        }
                     }
                     }
                     format="DD.MM.YYYY"
@@ -347,7 +423,7 @@ export default function AppointmentPage() {
                                     return (
                                         <Chip
                                             key={slot.id}
-                                            label={timeShort}
+                                            label={formatSlotRange(timeShort, totalDuration)}
                                             onClick={() => !disable && setSelectedTime(timeShort)}
                                             variant={selectedTime === timeShort ? "filled" : "outlined"}
                                             color={selectedTime === timeShort ? "primary" : "default"}
@@ -481,23 +557,40 @@ export default function AppointmentPage() {
                             Preis &amp; Dauer
                         </Typography>
 
-                        <Stack spacing={1.25} sx={{ mb: selectedServiceObjects.length > 1 ? 2 : 0 }}>
-                            {selectedServiceObjects.map((s) => (
-                                <Stack key={s.id ?? s.title} direction="row" justifyContent="space-between" alignItems="baseline">
-                                    <Typography variant="body2">{s.title}</Typography>
-                                    <Stack direction="row" spacing={2}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {formatDuration(s.duration ?? 0)}
-                                        </Typography>
-                                        <Typography variant="body2" fontWeight={600} sx={{ minWidth: 72, textAlign: "right" }}>
-                                            {formatPrice(s.price ?? 0)}
-                                        </Typography>
+                        {selectedOffer && (
+                            <Chip
+                                label={`Paket: ${selectedOffer.title}`}
+                                color="primary"
+                                size="small"
+                                sx={{ mb: 1.5 }}
+                            />
+                        )}
+
+                        <Stack spacing={1.25} sx={{ mb: selectedServiceObjects.length > 1 && !selectedOffer ? 2 : 1 }}>
+                            {selectedOffer ? (
+                                selectedOffer.services.map((s) => (
+                                    <Typography key={s.id ?? s.title} variant="body2">
+                                        • {s.title}
+                                    </Typography>
+                                ))
+                            ) : (
+                                selectedServiceObjects.map((s) => (
+                                    <Stack key={s.id ?? s.title} direction="row" justifyContent="space-between" alignItems="baseline">
+                                        <Typography variant="body2">{s.title}</Typography>
+                                        <Stack direction="row" spacing={2}>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {formatDuration(s.duration ?? 0)}
+                                            </Typography>
+                                            <Typography variant="body2" fontWeight={600} sx={{ minWidth: 72, textAlign: "right" }}>
+                                                {formatPrice(s.price ?? 0)}
+                                            </Typography>
+                                        </Stack>
                                     </Stack>
-                                </Stack>
-                            ))}
+                                ))
+                            )}
                         </Stack>
 
-                        {selectedServiceObjects.length > 1 && <Divider sx={{ mb: 1.5 }} />}
+                        {(selectedServiceObjects.length > 1 || selectedOffer) && <Divider sx={{ mb: 1.5 }} />}
 
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <Stack direction="row" spacing={1} alignItems="center">

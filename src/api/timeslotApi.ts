@@ -10,15 +10,11 @@ export interface ITimeslot {
     time: string; // "HH:mm:ss"
 }
 
-export const getTimeslots = (date: string): Promise<ITimeslot[]> =>
+export const getTimeslots = (date: string, duration?: number): Promise<ITimeslot[]> =>
     api.post<ITimeslot[]>("/api/timeslots", null, {
-        params: { date }
+        params: { date, ...(duration ? { duration } : {}) }
     }).then((r) => r.data);
 
-/*export const addTimeslot = (time: string): Promise<ITimeslot> =>
-    api.post<ITimeslot>("/api/timeslots", null, {
-        params: { time },
-    }).then((r) => r.data);*/
 
 export const deleteTimeslot = (id: number): Promise<void> =>
     api.delete(`/api/timeslots/${id}`).then(() => undefined);
