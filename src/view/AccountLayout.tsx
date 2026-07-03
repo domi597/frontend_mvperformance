@@ -1,21 +1,8 @@
 import { Outlet, Link as RouterLink, useNavigate } from "react-router-dom";
-import {
-    AppBar,
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    Container,
-    Divider,
-    Menu,
-    MenuItem,
-    Stack,
-    Toolbar,
-    Typography,
-} from "@mui/material";
+import {AppBar, Avatar, Box, Button, Chip, Container, Divider, Menu, MenuItem, Stack, Toolbar, Typography,} from "@mui/material";
 import {
     AccountCircleOutlined,
-    DirectionsCarOutlined,
+    CalendarMonthOutlined,
     HomeOutlined,
     LogoutOutlined,
     NavigateNextOutlined,
@@ -27,7 +14,7 @@ import Footer from "../components/Footer";
 
 const ACCOUNT_NAV = [
     { to: "/my-account", label: "Übersicht", icon: <AccountCircleOutlined fontSize="small" /> },
-    { to: "/termin", label: "Termin anfragen", icon: <DirectionsCarOutlined fontSize="small" /> },
+    { to: "/my-account/termine", label: "Meine Termine", icon: <CalendarMonthOutlined fontSize="small" /> },
 ];
 
 export default function AccountLayout() {

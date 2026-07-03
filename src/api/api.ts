@@ -29,8 +29,11 @@ api.interceptors.response.use(
     (err) => {
         const url = err.config?.url ?? "";
         const isPublicAuthEndpoint = url.includes("/api/auth/login") || url.includes("/api/auth/register");
+        // Wrong-current-password on the account page must never trigger an auto-logout —
+        // the user needs to see the error message, not get silently redirected to /login.
+        const isSelfPasswordChange = url.includes("/password/self");
 
-        if (err.response?.status === 401 && !isPublicAuthEndpoint) {
+        if (err.response?.status === 401 && !isPublicAuthEndpoint && !isSelfPasswordChange) {
             sessionStorage.removeItem("token");
             sessionStorage.removeItem("loggedInKunde");
             window.location.href = "/login";

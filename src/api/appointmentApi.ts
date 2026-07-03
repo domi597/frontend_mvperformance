@@ -35,6 +35,14 @@ export const getAppointments = (
 export const getCalendarAppointments = (): Promise<IAppointment[]> =>
     api.get<IAppointment[]>("/api/appointments/calendar").then((r) => r.data);
 
+/** Liefert alle Termine (vergangen + zukünftig) des eingeloggten Kunden. Abgelehnte werden vom Backend ausgeblendet. */
+export const getMyAppointments = (): Promise<IAppointment[]> =>
+    api.get<IAppointment[]>("/api/appointments/my").then((r) => r.data);
+
+/** Storniert einen eigenen Termin (Kunden-Selbstbedienung). */
+export const cancelAppointment = (id: number): Promise<IAppointment> =>
+    api.patch<IAppointment>(`/api/appointments/${id}/cancel`).then((r) => r.data);
+
 export const createAppointment = (
     body: Omit<IAppointment, "id" | "status">
 ): Promise<IAppointment> =>

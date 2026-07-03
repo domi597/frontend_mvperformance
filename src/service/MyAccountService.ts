@@ -2,7 +2,7 @@
  * Service for the account page — profile and vehicle operations.
  */
 
-import { getMe, updateMe, deleteMe } from "../api/customers";
+import { getMe, updateMe, deleteMe, changeMyPassword } from "../api/customers";
 import { getVehiclesByUser, createVehicle, updateVehicle, deleteVehicle } from "../api/vehicleApi";
 import type { ICustomer } from "../interface/ICustomer";
 import type { IVehicle } from "../interface/IVehicle";
@@ -72,5 +72,15 @@ export const MyAccountService = {
         await deleteMe(customerId);
         sessionStorage.removeItem("loggedInKunde");
         sessionStorage.removeItem("token");
+    },
+
+    /** Changes the logged-in customer's own password (current password required). */
+    changePassword(
+        customerId: number,
+        oldPassword: string,
+        newPassword: string,
+        newPasswordConfirm: string,
+    ): Promise<void> {
+        return changeMyPassword(customerId, oldPassword, newPassword, newPasswordConfirm);
     },
 };

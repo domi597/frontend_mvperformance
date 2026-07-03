@@ -82,6 +82,15 @@ export default function MyAccountPage() {
 
     const [deleteVehicleTarget, setDeleteVehicleTarget] = useState<IVehicle | null>(null);
     const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
+    const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+    const [deleteAccountSaving, setDeleteAccountSaving] = useState(false);
+
+    const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [passwordSaving, setPasswordSaving] = useState(false);
 
     useEffect(() => {
         if (!AuthService.isLoggedIn()) {
@@ -187,15 +196,62 @@ export default function MyAccountPage() {
         }
     };
 
+    /** Resets and opens the password change dialog. */
+    const openPasswordDialog = () => {
+        setOldPassword("");
+        setNewPassword("");
+        setNewPasswordConfirm("");
+        setPasswordError(null);
+        setPasswordDialogOpen(true);
+    };
+
+    /** Closes the password dialog and clears its fields. */
+    const closePasswordDialog = () => {
+        setPasswordDialogOpen(false);
+        setOldPassword("");
+        setNewPassword("");
+        setNewPasswordConfirm("");
+        setPasswordError(null);
+    };
+
+    /** Validates and submits the password change. */
+    const savePassword = async () => {
+        if (!customer) return;
+        if (newPassword.length < 6) {
+            setPasswordError("Das neue Passwort muss mindestens 6 Zeichen lang sein.");
+            return;
+        }
+        if (newPassword !== newPasswordConfirm) {
+            setPasswordError("Die neuen Passwörter stimmen nicht überein.");
+            return;
+        }
+        setPasswordSaving(true);
+        setPasswordError(null);
+        try {
+            await MyAccountService.changePassword(customer.id, oldPassword, newPassword, newPasswordConfirm);
+            closePasswordDialog();
+            setSuccessMsg("Passwort erfolgreich geändert.");
+        } catch (err) {
+            const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+            setPasswordError(message ?? "Passwort konnte nicht geändert werden.");
+        } finally {
+            setPasswordSaving(false);
+        }
+    };
+
     /** Deletes the account, clears localStorage and redirects to home. */
     const confirmDeleteAccount = async () => {
         if (!customer) return;
+        setDeleteAccountSaving(true);
+        setDeleteAccountError(null);
         try {
             await MyAccountService.removeAccount(customer.id);
             navigate("/");
-        } catch {
-            setError("Konto konnte nicht gelöscht werden.");
-            setDeleteAccountOpen(false);
+        } catch (err) {
+            const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+            setDeleteAccountError(message ?? "Konto konnte nicht gelöscht werden.");
+        } finally {
+            setDeleteAccountSaving(false);
         }
     };
 
@@ -234,7 +290,7 @@ export default function MyAccountPage() {
                             <Box sx={{ flex: 1 }}>
                                 <Typography variant="body2" fontWeight={500}>Passwort</Typography>
                             </Box>
-                            <Button variant="outlined" size="small" sx={{ borderRadius: 2, fontSize: 12 }}>
+                            <Button variant="outlined" size="small" sx={{ borderRadius: 2, fontSize: 12 }} onClick={openPasswordDialog}>
                                 Ändern
                             </Button>
                         </Stack>
@@ -262,7 +318,7 @@ export default function MyAccountPage() {
                                 <Typography variant="body2" fontWeight={500}>Konto löschen</Typography>
                                 <Typography variant="caption" color="text.secondary">Unwiderruflich</Typography>
                             </Box>
-                            <Button variant="outlined" size="small" color="error" sx={{ borderRadius: 2, fontSize: 12 }} onClick={() => setDeleteAccountOpen(true)}>
+                            <Button variant="outlined" size="small" color="error" sx={{ borderRadius: 2, fontSize: 12 }} onClick={() => { setDeleteAccountError(null); setDeleteAccountOpen(true); }}>
                                 Löschen
                             </Button>
                         </Stack>
@@ -413,16 +469,70 @@ export default function MyAccountPage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={deleteAccountOpen} onClose={() => setDeleteAccountOpen(false)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+            <Dialog open={passwordDialogOpen} onClose={passwordSaving ? undefined : closePasswordDialog} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
+                <DialogTitle fontWeight={700}>Passwort ändern</DialogTitle>
+                <DialogContent>
+                    <Stack spacing={2} sx={{ mt: 0.5 }}>
+                        <TextField
+                            label="Aktuelles Passwort"
+                            type="password"
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                            size="small"
+                            fullWidth
+                            autoFocus
+                            autoComplete="current-password"
+                        />
+                        <TextField
+                            label="Neues Passwort"
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            size="small"
+                            fullWidth
+                            autoComplete="new-password"
+                            helperText="Mindestens 6 Zeichen"
+                        />
+                        <TextField
+                            label="Neues Passwort wiederholen"
+                            type="password"
+                            value={newPasswordConfirm}
+                            onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                            size="small"
+                            fullWidth
+                            autoComplete="new-password"
+                            error={newPasswordConfirm.length > 0 && newPassword !== newPasswordConfirm}
+                            helperText={newPasswordConfirm.length > 0 && newPassword !== newPasswordConfirm ? "Stimmt nicht überein" : ""}
+                        />
+                    </Stack>
+                    {passwordError && <Alert severity="error" sx={{ mt: 2 }} onClose={() => setPasswordError(null)}>{passwordError}</Alert>}
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2.5 }}>
+                    <Button onClick={closePasswordDialog} disabled={passwordSaving}>Abbrechen</Button>
+                    <Button
+                        variant="contained"
+                        onClick={savePassword}
+                        disabled={passwordSaving || !oldPassword || !newPassword || !newPasswordConfirm}
+                        sx={{ borderRadius: 2 }}
+                    >
+                        {passwordSaving ? <CircularProgress size={16} color="inherit" /> : "Speichern"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={deleteAccountOpen} onClose={() => { if (!deleteAccountSaving) setDeleteAccountOpen(false); }} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
                 <DialogTitle fontWeight={700}>Konto löschen</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Dein Konto und alle zugehörigen Daten werden <strong>unwiderruflich</strong> gelöscht. Bist du sicher?
                     </DialogContentText>
+                    {deleteAccountError && <Alert severity="error" sx={{ mt: 2 }} onClose={() => setDeleteAccountError(null)}>{deleteAccountError}</Alert>}
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2.5 }}>
-                    <Button onClick={() => setDeleteAccountOpen(false)}>Abbrechen</Button>
-                    <Button variant="contained" color="error" onClick={confirmDeleteAccount} sx={{ borderRadius: 2 }}>Konto löschen</Button>
+                    <Button onClick={() => setDeleteAccountOpen(false)} disabled={deleteAccountSaving}>Abbrechen</Button>
+                    <Button variant="contained" color="error" onClick={confirmDeleteAccount} disabled={deleteAccountSaving} sx={{ borderRadius: 2 }}>
+                        {deleteAccountSaving ? <CircularProgress size={16} color="inherit" /> : "Konto löschen"}
+                    </Button>
                 </DialogActions>
             </Dialog>
 

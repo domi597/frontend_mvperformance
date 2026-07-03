@@ -33,3 +33,12 @@ export const deleteCustomer = (id: number): Promise<void> =>
 /** Admin sets a new password for a customer. The old password is never read. */
 export const updateCustomerPassword = (id: number, password: string): Promise<void> =>
     api.put(`/api/users/${id}/password`, { password }).then(() => undefined);
+
+/** Self-service password change: requires the current password for verification. */
+export const changeMyPassword = (
+    id: number,
+    oldPassword: string,
+    newPassword: string,
+    newPasswordConfirm: string,
+): Promise<void> =>
+    api.put(`/api/users/${id}/password/self`, { oldPassword, newPassword, newPasswordConfirm }).then(() => undefined);

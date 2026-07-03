@@ -37,6 +37,7 @@ import CustomersPage from "./pages/admin/CustomersPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import { TermsPage } from "./pages/TermsPage";
 import MyAccountPage from "./pages/MyAccountPage";
+import MyAppointmentsPage from "./pages/MyAppointmentsPage";
 
 import { RequireAdmin } from "./utils/RequireAdmin.tsx";
 import { ScrollToTop } from "./utils/ScrollToTop.tsx";
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
                 element: <AccountLayout />,
                 children: [
                     { path: "/my-account", element: <MyAccountPage /> },
+                    { path: "/my-account/termine", element: <MyAppointmentsPage /> },
                 ],
             },
             {

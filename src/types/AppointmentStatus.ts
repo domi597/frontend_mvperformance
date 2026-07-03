@@ -3,4 +3,5 @@ export type AppointmentStatus =
     | "BESTÄTIGT"
     | "AUSSTEHEND"
     | "ABGELEHNT"
-    | "ABGESCHLOSSEN";
+    | "ABGESCHLOSSEN"
+    | "STORNIERT";

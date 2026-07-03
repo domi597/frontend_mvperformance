@@ -100,6 +100,7 @@ function AppointmentsPage() {
         BESTÄTIGT: "Bestätigt",
         ABGELEHNT: "Abgelehnt",
         ABGESCHLOSSEN: "Abgeschlossen",
+        STORNIERT: "Storniert",
     };
 
     const statusClassMap: Record<AppointmentStatus, string> = {
@@ -108,6 +109,7 @@ function AppointmentsPage() {
         BESTÄTIGT: "green",
         ABGELEHNT: "red",
         ABGESCHLOSSEN: "gray",
+        STORNIERT: "gray",
     };
 
     const emptyLabel = filter === "HEUTE"
@@ -121,7 +123,7 @@ function AppointmentsPage() {
             <h1>Termine</h1>
 
             <div className="tabs">
-                {["ALLE", "HEUTE", "NEU", "AUSSTEHEND", "BESTÄTIGT", "ABGELEHNT", "ABGESCHLOSSEN"].map((f) => (
+                {["ALLE", "HEUTE", "NEU", "AUSSTEHEND", "BESTÄTIGT", "ABGELEHNT", "ABGESCHLOSSEN", "STORNIERT"].map((f) => (
                     <button
                         key={f}
                         className={filter === f ? "tab active" : "tab"}
@@ -183,12 +185,12 @@ function AppointmentsPage() {
 
                             <td>
                                 <>
-                                    {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && (
+                                    {t.status !== "BESTÄTIGT" && t.status !== "ABGESCHLOSSEN" && t.status !== "STORNIERT" && (
                                         <button className="btn" onClick={() => onAccept(t.id)}>
                                             Bestätigen
                                         </button>
                                     )}
-                                    {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && (
+                                    {t.status !== "ABGELEHNT" && t.status !== "ABGESCHLOSSEN" && t.status !== "STORNIERT" && (
                                         <button className="btn danger" onClick={() => onDecline(t.id)}>
                                             Ablehnen
                                         </button>
