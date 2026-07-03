@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+import { hasPreferenceConsent, onConsentChange } from "../utils/cookieConsent";
 
 export interface GlobalThemeContextType {
     isDark: boolean;
@@ -47,12 +48,32 @@ const lightTheme = createTheme({
 });
 
 export function GlobalThemeProvider({ children }: { children: ReactNode }) {
-    const [isDark, setIsDark] = useState(() => localStorage.getItem("theme") !== "light");
+    // Ohne Zustimmung zur funktionalen Speicherung wird die Präferenz nicht gelesen/persistiert,
+    // sondern gilt nur für die aktuelle Sitzung (im React-State, nicht im localStorage).
+    const [isDark, setIsDark] = useState(() =>
+        hasPreferenceConsent() ? localStorage.getItem("theme") !== "light" : true
+    );
 
     useEffect(() => {
-        localStorage.setItem("theme", isDark ? "dark" : "light");
+        if (hasPreferenceConsent()) {
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        }
         document.body.classList.toggle("light-mode", !isDark);
     }, [isDark]);
+
+    // Reagiert live auf eine spätere Entscheidung im Cookie-Banner: bei Zustimmung wird die
+    // aktuelle Wahl nachträglich gespeichert, bei Widerruf/Ablehnung sofort wieder entfernt.
+    useEffect(
+        () =>
+            onConsentChange((consent) => {
+                if (consent?.status === "all") {
+                    localStorage.setItem("theme", isDark ? "dark" : "light");
+                } else {
+                    localStorage.removeItem("theme");
+                }
+            }),
+        [isDark]
+    );
 
     return (
         <GlobalThemeContext.Provider value={{ isDark, setIsDark }}>

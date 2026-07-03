@@ -9,6 +9,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import { GlobalThemeProvider } from "../src/state/GlobalThemeContext.tsx";
+import { CookieConsentProvider } from "./state/CookieConsentContext.tsx";
+import CookieConsentBanner from "./components/CookieConsentBanner.tsx";
 
 import PublicLayout from "./view/PublicLayout";
 import { AuthLayout } from "./view/AuthLayout";
@@ -48,6 +50,7 @@ const router = createBrowserRouter([
             <>
                 <ScrollToTop />
                 <Outlet />
+                <CookieConsentBanner />
             </>
         ),
         children: [
@@ -103,10 +106,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <GlobalThemeProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <RouterProvider router={router} />
-            </LocalizationProvider>
-        </GlobalThemeProvider>
+        <CookieConsentProvider>
+            <GlobalThemeProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <RouterProvider router={router} />
+                </LocalizationProvider>
+            </GlobalThemeProvider>
+        </CookieConsentProvider>
     </StrictMode>
 );

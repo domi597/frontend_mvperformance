@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+import { hasPreferenceConsent, onConsentChange } from "../utils/cookieConsent";
 
 export interface AccountThemeContextType {
     isDark: boolean;
@@ -51,11 +52,28 @@ const lightTheme = createTheme({
 });
 
 export function AccountThemeProvider({ children }: { children: ReactNode }) {
-    const [isDark, setIsDark] = useState(() => localStorage.getItem("account-theme") !== "light");
+    // Ohne Zustimmung zur funktionalen Speicherung gilt die Präferenz nur für die Sitzung.
+    const [isDark, setIsDark] = useState(() =>
+        hasPreferenceConsent() ? localStorage.getItem("account-theme") !== "light" : true
+    );
 
     useEffect(() => {
-        localStorage.setItem("account-theme", isDark ? "dark" : "light");
+        if (hasPreferenceConsent()) {
+            localStorage.setItem("account-theme", isDark ? "dark" : "light");
+        }
     }, [isDark]);
+
+    useEffect(
+        () =>
+            onConsentChange((consent) => {
+                if (consent?.status === "all") {
+                    localStorage.setItem("account-theme", isDark ? "dark" : "light");
+                } else {
+                    localStorage.removeItem("account-theme");
+                }
+            }),
+        [isDark]
+    );
 
     return (
         <AccountThemeContext.Provider value={{ isDark, setIsDark }}>
