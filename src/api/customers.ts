@@ -5,6 +5,14 @@
 import api from "./api";
 import type { ICustomer } from "../interface/ICustomer";
 
+export interface Page<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    size: number;
+}
+
 /** Fetches the current customer's profile from the backend. */
 export const getMe = (): Promise<ICustomer> => {
     const raw = sessionStorage.getItem("loggedInKunde");
@@ -21,8 +29,11 @@ export const updateMe = (id: number, data: Partial<ICustomer>): Promise<ICustome
 export const deleteMe = (id: number): Promise<void> =>
     api.delete(`/api/users/${id}`).then(() => undefined);
 
-export const getAllCustomers = (): Promise<ICustomer[]> =>
-    api.get<ICustomer[]>("/api/users").then((res) => res.data);
+/** Lädt eine Seite der Kundenliste, optional gefiltert per Suchbegriff (Name/E-Mail). */
+export const getAllCustomers = (page: number, size: number, search?: string): Promise<Page<ICustomer>> =>
+    api
+        .get<Page<ICustomer>>("/api/users", { params: { page, size, search: search || undefined } })
+        .then((res) => res.data);
 
 export const updateCustomer = (id: number, data: Partial<ICustomer>): Promise<ICustomer> =>
     api.put<ICustomer>(`/api/users/${id}`, data).then((res) => res.data);

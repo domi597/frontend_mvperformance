@@ -1,9 +1,3 @@
-/**
- * Auth API calls — login and registration.
- * @author N
- * @since 27.03.2026
- */
-
 import api from "./api";
 import type { LoginRequest, LoginResponse } from "../service/AuthService";
 import type { RegisterRequest } from "../types/RegisterTypes";
@@ -23,6 +17,16 @@ export interface UserDTO {
     themeAccess: boolean;
 }
 
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ResetPasswordRequest {
+    token: string;
+    newPassword: string;
+    newPasswordConfirm: string;
+}
+
 /** Sends login credentials and returns the JWT token with user data. */
 export const loginApi = (data: LoginRequest): Promise<LoginResponse> =>
     api.post<LoginResponse>("/api/auth/login", data).then((res) => res.data);
@@ -33,3 +37,15 @@ export const registerApi = (data: RegisterRequest): Promise<AuthResponse> =>
 
 export const meApi = (): Promise<UserDTO> =>
     api.get<UserDTO>("/api/auth/me").then((res) => res.data);
+
+/** Tauscht ein noch gültiges Token gegen ein frisches mit neuer Ablaufzeit (Session verlängern). */
+export const refreshApi = (): Promise<LoginResponse> =>
+    api.post<LoginResponse>("/api/auth/refresh").then((res) => res.data);
+
+/** Fordert einen Passwort-Reset-Link für die angegebene E-Mail-Adresse an. */
+export const forgotPasswordApi = (data: ForgotPasswordRequest): Promise<void> =>
+    api.post("/api/auth/forgot-password", data).then(() => undefined);
+
+/** Setzt anhand eines gültigen Reset-Tokens ein neues Passwort. */
+export const resetPasswordApi = (data: ResetPasswordRequest): Promise<void> =>
+    api.post("/api/auth/reset-password", data).then(() => undefined);

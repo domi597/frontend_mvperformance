@@ -3,7 +3,8 @@
  */
 
 import type { ICustomer } from "../interface/ICustomer";
-import { loginApi } from "../api/auth";
+import { loginApi, refreshApi } from "../api/auth";
+import { getTokenExpiryMs } from "../utils/jwt";
 
 
 export interface LoginRequest {
@@ -39,9 +40,25 @@ const AuthService = {
         sessionStorage.removeItem(KUNDE_KEY);
     },
 
+    async refresh(): Promise<LoginResponse> {
+        const res = await refreshApi();
+
+        sessionStorage.setItem(TOKEN_KEY, res.token);
+        sessionStorage.setItem(KUNDE_KEY, JSON.stringify(res.user));
+
+        return { ...res, kunde: res.user };
+    },
+
     /** Returns the stored JWT token or null. */
     getToken(): string | null {
         return sessionStorage.getItem(TOKEN_KEY);
+    },
+
+    /** Gibt den Ablaufzeitpunkt (ms seit Epoch) des aktuellen Tokens zurück, oder null. */
+    getTokenExpiryMs(): number | null {
+        const token = this.getToken();
+        if (!token) return null;
+        return getTokenExpiryMs(token);
     },
 
     /** Returns the logged-in customer or null. */

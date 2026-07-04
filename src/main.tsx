@@ -11,6 +11,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { GlobalThemeProvider } from "../src/state/GlobalThemeContext.tsx";
 import { CookieConsentProvider } from "./state/CookieConsentContext.tsx";
 import CookieConsentBanner from "./components/CookieConsentBanner.tsx";
+import SessionExpiryWarning from "./components/SessionExpiryWarning.tsx";
 
 import PublicLayout from "./view/PublicLayout";
 import { AuthLayout } from "./view/AuthLayout";
@@ -43,6 +44,7 @@ import MyAppointmentsPage from "./pages/MyAppointmentsPage";
 
 import { RequireAdmin } from "./utils/RequireAdmin.tsx";
 import { ScrollToTop } from "./utils/ScrollToTop.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -51,6 +53,7 @@ const router = createBrowserRouter([
                 <ScrollToTop />
                 <Outlet />
                 <CookieConsentBanner />
+                <SessionExpiryWarning />
             </>
         ),
         children: [
@@ -75,6 +78,7 @@ const router = createBrowserRouter([
                     { path: "/login", element: <LoginPage /> },
                     { path: "/registrieren", element: <RegisterPage /> },
                     { path: "/passwort-vergessen", element: <ForgotPasswordPage /> },
+                    { path: "/passwort-zuruecksetzen", element: <ResetPasswordPage /> },
                 ],
             },
             {

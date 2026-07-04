@@ -132,6 +132,29 @@
     color: #ff5555;
 }
 
+.pagination-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -8px;
+    margin-bottom: 24px;
+}
+
+.pagination-info {
+    color: #888;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.pagination-controls .table-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 /* Modals & Forms */
 .modal-overlay {
     position: fixed;
@@ -397,6 +420,10 @@
 
 .light-mode .table-btn:hover {
     background: #eaeaea;
+}
+
+.light-mode .pagination-info {
+    color: #666666;
 }
 
 .light-mode .customer-form {

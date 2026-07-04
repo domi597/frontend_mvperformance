@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {Alert, Box, Button, CircularProgress, Divider, IconButton, InputAdornment, Link, Stack, TextField, Typography,} from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
@@ -13,10 +13,17 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading]           = useState(false);
     const [error, setError]               = useState<string | null>(null);
+    const [retryAfter, setRetryAfter]     = useState<number | null>(null);
 
     const emailError    = email.length > 0 && !email.includes("@");
     const passwordError = password.length > 0 && password.length < 6;
     const formValid     = email.length > 0 && password.length >= 6 && !emailError;
+
+    useEffect(() => {
+        if (retryAfter === null || retryAfter <= 0) return;
+        const timeout = setTimeout(() => setRetryAfter((s) => (s !== null ? s - 1 : null)), 1000);
+        return () => clearTimeout(timeout);
+    }, [retryAfter]);
 
     /**
      * Submits the login credentials to the server and redirects on success.
@@ -37,8 +44,15 @@ export default function LoginPage() {
                 navigate(from ?? "/");
             }
         } catch (err: unknown) {
-            const status = (err as { response?: { status?: number } })?.response?.status;
-            if (status === 401) {
+            const response = (err as { response?: { status?: number; headers?: Record<string, string> } })?.response;
+            const status = response?.status;
+
+            if (status === 429) {
+                const retryAfterHeader = response?.headers?.["retry-after"];
+                const seconds = retryAfterHeader ? parseInt(retryAfterHeader, 10) : 60;
+                setRetryAfter(Number.isNaN(seconds) ? 60 : seconds);
+                setError(null);
+            } else if (status === 401) {
                 setError("E-Mail oder Passwort ist falsch.");
             } else if (status === 404) {
                 setError("Kein Konto mit dieser E-Mail gefunden.");
@@ -67,6 +81,13 @@ export default function LoginPage() {
             {error && (
                 <Alert severity="error" onClose={() => setError(null)}>
                     {error}
+                </Alert>
+            )}
+
+            {retryAfter !== null && retryAfter > 0 && (
+                <Alert severity="warning">
+                    Zu viele Fehlversuche. Bitte warte noch <strong>{retryAfter}</strong>{" "}
+                    {retryAfter === 1 ? "Sekunde" : "Sekunden"}, bevor du es erneut versuchst.
                 </Alert>
             )}
 
@@ -127,7 +148,7 @@ export default function LoginPage() {
                 type="button"
                 variant="contained"
                 fullWidth
-                disabled={!formValid || loading}
+                disabled={!formValid || loading || (retryAfter !== null && retryAfter > 0)}
                 onClick={handleLogin}
                 size="large"
                 sx={{ mt: 0.5 }}

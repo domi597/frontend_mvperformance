@@ -3,6 +3,8 @@ import { ICustomer } from "../../interface/ICustomer.ts";
 import { getAllCustomers, updateCustomer, deleteCustomer, updateCustomerPassword } from "../../api/customers.ts";
 import "../../css/CustomerAdminPage.css"
 
+const PAGE_SIZE = 10;
+
 function extractErrorMessage(err: unknown, fallback: string): string {
     const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
     return message ?? fallback;
@@ -11,6 +13,9 @@ function extractErrorMessage(err: unknown, fallback: string): string {
 export default function CustomersPage() {
     const [customers, setCustomers] = useState<ICustomer[]>([]);
     const [search, setSearch] = useState("");
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
     const [editingCustomer, setEditingCustomer] = useState<ICustomer | null>(null);
     const [editForm, setEditForm] = useState<Partial<ICustomer>>({});
@@ -20,17 +25,30 @@ export default function CustomersPage() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    useEffect(() => {
+        const timeout = setTimeout(() => setDebouncedSearch(search), 300);
+        return () => clearTimeout(timeout);
+    }, [search]);
+
+    useEffect(() => {
+        setPage(0);
+    }, [debouncedSearch]);
+
     const loadCustomers = useCallback(() => {
-        getAllCustomers()
-            .then((data) => {
-                setCustomers(data);
+        setLoading(true);
+        getAllCustomers(page, PAGE_SIZE, debouncedSearch)
+            .then((result) => {
+                setCustomers(result.content);
+                setTotalPages(result.totalPages);
+                setTotalElements(result.totalElements);
                 setLoading(false);
             })
             .catch((err) => {
                 console.error(err);
                 setLoading(false);
             });
-    }, []);
+    }, [page, debouncedSearch]);
 
     useEffect(() => {
         loadCustomers();
@@ -40,9 +58,6 @@ export default function CustomersPage() {
         e.preventDefault();
         if (!editingCustomer?.id) return;
 
-        // Passwort-Validierung VOR dem Speichern, damit bei einem Tippfehler
-        // gar nichts (auch nicht Name/E-Mail) gespeichert wird und der Admin
-        // direkt korrigieren kann.
         if (newPassword.trim().length > 0) {
             if (newPassword.trim().length < 6) {
                 setPasswordError("Das Passwort muss mindestens 6 Zeichen lang sein.");
@@ -58,7 +73,6 @@ export default function CustomersPage() {
         try {
             await updateCustomer(editingCustomer.id, editForm);
 
-            // Passwort nur ändern, wenn der Admin tatsächlich etwas eingetragen hat
             if (newPassword.trim().length > 0) {
                 await updateCustomerPassword(editingCustomer.id, newPassword.trim());
             }
@@ -85,12 +99,7 @@ export default function CustomersPage() {
             });
     };
 
-    const filteredCustomers = customers.filter((c) => {
-        const fullName = `${c.firstName || ""} ${c.lastName || ""}`.toLowerCase();
-        const email = (c.email || "").toLowerCase();
-        const query = search.toLowerCase();
-        return fullName.includes(query) || email.includes(query);
-    });
+    const filteredCustomers = customers;
 
     return (
         <div className="admin-customers-page">
@@ -154,6 +163,29 @@ export default function CustomersPage() {
                         </table>
                     )}
                 </div>
+                {!loading && totalElements > 0 && (
+                    <div className="pagination-bar">
+                        <span className="pagination-info">
+                            {totalElements} {totalElements === 1 ? "Kunde" : "Kunden"} · Seite {page + 1} von {Math.max(totalPages, 1)}
+                        </span>
+                        <div className="pagination-controls">
+                            <button
+                                className="table-btn"
+                                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                                disabled={page === 0}
+                            >
+                                Zurück
+                            </button>
+                            <button
+                                className="table-btn"
+                                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                                disabled={page + 1 >= totalPages}
+                            >
+                                Weiter
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
             {editingCustomer && (
                 <div className="modal-overlay">
