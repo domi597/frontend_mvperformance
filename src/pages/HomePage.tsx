@@ -23,7 +23,7 @@ import NearMeRoundedIcon from "@mui/icons-material/NearMeRounded";
  */
 
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,
@@ -35,14 +35,11 @@ const WERKSTATT_POS: [number, number] = [46.794200, 15.538571];
 export default function HomePage() {
     const navigate = useNavigate();
     const { isDark } = useGlobalTheme();
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = useState<string | null>(
+        () => RegisterService.popSuccessMessage() ?? null
+    );
     const [services, setServices] = useState<IService[]>([]);
     const [servicesLoading, setServicesLoading] = useState(true);
-
-    useEffect(() => {
-        const msg = RegisterService.popSuccessMessage();
-        if (msg) setSuccessMsg(msg);
-    }, []);
 
     useEffect(() => {
         getServices()

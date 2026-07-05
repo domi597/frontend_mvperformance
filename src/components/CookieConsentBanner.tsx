@@ -1,6 +1,6 @@
 import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { useCookieConsent } from "../state/CookieConsentContext";
+import { useCookieConsent } from "../hooks/useCookieConsent";
 
 export default function CookieConsentBanner() {
     const { bannerOpen, status, acceptAll, acceptNecessaryOnly } = useCookieConsent();

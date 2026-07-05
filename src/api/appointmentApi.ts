@@ -43,8 +43,28 @@ export const getMyAppointments = (): Promise<IAppointment[]> =>
 export const cancelAppointment = (id: number): Promise<IAppointment> =>
     api.patch<IAppointment>(`/api/appointments/${id}/cancel`).then((r) => r.data);
 
+/** Payload sent when a customer books a new appointment via the public booking form. */
+export interface CreateAppointmentRequest {
+    customerId: number | null;
+    customerName: string;
+    serviceType: string;
+    offerId: number | null;
+    serviceIds: number[];
+    brand: string;
+    model: string;
+    year: number | null;
+    licensePlate: string;
+    date: string;
+    time: string;
+    preferredDate: string;
+    note: string;
+    price: number | null;
+    durationMinutes: number;
+    createdAt: string;
+}
+
 export const createAppointment = (
-    body: Omit<IAppointment, "id" | "status">
+    body: CreateAppointmentRequest
 ): Promise<IAppointment> =>
     api.post<IAppointment>("/api/appointments", body).then((r) => r.data);
 

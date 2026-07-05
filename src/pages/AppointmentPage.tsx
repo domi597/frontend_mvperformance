@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { isAxiosError } from "axios";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import {Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container, Divider, Grid, Snackbar, Stack, Step, StepLabel, Stepper, TextField, Typography,} from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -76,17 +77,19 @@ export default function AppointmentPage() {
      * came from (if any) and jumps straight to the "Termin wählen" step,
      * skipping the manual service-selection step. Wird übersprungen, wenn
      * bereits ein Angebot vorausgewählt wurde.
+     *
+     * Adjusted directly during render (React-recommended pattern for "run once
+     * when data becomes available") instead of in an Effect, guarded by
+     * `autoSelectApplied` so it only ever fires a single time.
      */
-    useEffect(() => {
-        if (autoSelectApplied || preselectedOfferId != null || preselectedServiceId == null || services.length === 0) return;
-
+    if (!autoSelectApplied && preselectedOfferId == null && preselectedServiceId != null && services.length > 0) {
         const match = services.find((s) => s.id === preselectedServiceId);
         if (match) {
             setSelectedServices([match.title]);
             setActiveStep(1);
         }
         setAutoSelectApplied(true);
-    }, [autoSelectApplied, preselectedOfferId, preselectedServiceId, services]);
+    }
 
     /**
      * Wenn die Terminanfrage über ein Angebot ("Termin anfragen" auf der
@@ -255,19 +258,22 @@ export default function AppointmentPage() {
                 price:          totalPrice,
                 durationMinutes: totalDuration || 30,
                 createdAt:    new Date().toISOString(),
-            } as any);
+            });
 
             setSubmitted(true);
             setSnackbar("Ihr Termin wurde erfolgreich angefragt!");
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const responseData = isAxiosError<{ message?: string }>(err)
+                ? err.response?.data
+                : undefined;
             const msg =
-                err?.response?.data?.message ??
-                err?.response?.data ??
+                responseData?.message ??
+                responseData ??
                 "Fehler beim Senden der Terminanfrage. Bitte versuchen Sie es erneut.";
             setErrorMsg(typeof msg === "string" ? msg : JSON.stringify(msg));
             // Der gewählte Slot könnte inzwischen von jemand anderem gebucht worden sein (409 Conflict) –
             // in dem Fall die Zeitslots für das gewählte Datum neu laden, damit die Liste aktuell bleibt.
-            if (err?.response?.status === 409 && form.date) {
+            if (isAxiosError(err) && err.response?.status === 409 && form.date) {
                 fetchTimeslots(form.date, totalDuration || 30).catch(() => undefined);
                 setSelectedTime("");
             }

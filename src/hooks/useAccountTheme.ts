@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AccountThemeContext } from "../state/AccountThemeContext";
+import { AccountThemeContext } from "../state/AccountThemeContextObject";
 
 export function useAccountTheme() {
     const ctx = useContext(AccountThemeContext);

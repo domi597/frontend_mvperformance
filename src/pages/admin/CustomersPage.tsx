@@ -31,12 +31,14 @@ export default function CustomersPage() {
         return () => clearTimeout(timeout);
     }, [search]);
 
-    useEffect(() => {
+    const [prevDebouncedSearch, setPrevDebouncedSearch] = useState(debouncedSearch);
+    
+    if (debouncedSearch !== prevDebouncedSearch) {
+        setPrevDebouncedSearch(debouncedSearch);
         setPage(0);
-    }, [debouncedSearch]);
+    }
 
     const loadCustomers = useCallback(() => {
-        setLoading(true);
         getAllCustomers(page, PAGE_SIZE, debouncedSearch)
             .then((result) => {
                 setCustomers(result.content);
@@ -51,6 +53,10 @@ export default function CustomersPage() {
     }, [page, debouncedSearch]);
 
     useEffect(() => {
+        // Intentional: show the loading spinner immediately for every page/search
+        // change (not just on mount), so a synchronous setState here is by design.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLoading(true);
         loadCustomers();
     }, [loadCustomers]);
 

@@ -1,20 +1,12 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
-    type CookieConsentStatus,
     getStoredConsent,
     onConsentChange,
     storeConsent,
+    type CookieConsentStatus,
 } from "../utils/cookieConsent";
-
-export interface CookieConsentContextType {
-    status: CookieConsentStatus | null;
-    bannerOpen: boolean;
-    acceptAll: () => void;
-    acceptNecessaryOnly: () => void;
-    openSettings: () => void;
-}
-
-const CookieConsentContext = createContext<CookieConsentContextType | undefined>(undefined);
+import { CookieConsentContext } from "./CookieConsentContextObject";
+export type { CookieConsentContextType } from "./CookieConsentContextObject";
 
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<CookieConsentStatus | null>(
@@ -49,12 +41,4 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
             {children}
         </CookieConsentContext.Provider>
     );
-}
-
-export function useCookieConsent(): CookieConsentContextType {
-    const ctx = useContext(CookieConsentContext);
-    if (!ctx) {
-        throw new Error("useCookieConsent muss innerhalb eines CookieConsentProvider verwendet werden.");
-    }
-    return ctx;
 }

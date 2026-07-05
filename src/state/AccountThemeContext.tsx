@@ -1,14 +1,9 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { hasPreferenceConsent, onConsentChange } from "../utils/cookieConsent";
-
-export interface AccountThemeContextType {
-    isDark: boolean;
-    setIsDark: (val: boolean) => void;
-}
-
-export const AccountThemeContext = createContext<AccountThemeContextType | undefined>(undefined);
+import { AccountThemeContext } from "./AccountThemeContextObject";
+export type { AccountThemeContextType } from "./AccountThemeContextObject";
 
 const paletteBase = {
     primary: { main: "#c62828", light: "#e53935", dark: "#8e0000" },

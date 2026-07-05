@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { IAppointment } from "../../interface/IAppointment";
 import { AppointmentStatus } from "../../types/AppointmentStatus";
 import { getCalendarAppointments } from "../../api/appointmentApi";
-import "../../css/calendar.css";
+import "../../css/Calendar.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -59,7 +59,7 @@ function addDays(d: Date, n: number) {
 }
 
 function toDateKey(d: Date) {
-    return d.toLocaleDateString("sv-SE"); 
+    return d.toLocaleDateString("sv-SE");
 }
 
 function nowTopOffset() {

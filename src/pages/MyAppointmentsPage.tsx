@@ -1,21 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-    Alert,
-    Box,
-    Button,
-    Chip,
-    CircularProgress,
-    Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Paper,
-    Snackbar,
-    Stack,
-    Typography,
-} from "@mui/material";
+import {Alert, Box, Button, Chip, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Snackbar, Stack, Typography,} from "@mui/material";
 import {
     CalendarMonthOutlined,
     DirectionsCarOutlined,
@@ -158,7 +142,6 @@ export default function MyAppointmentsPage() {
             navigate("/login");
             return;
         }
-        setLoading(true);
         getMyAppointments()
             .then(setAppointments)
             .catch(() => setError("Termine konnten nicht geladen werden."))

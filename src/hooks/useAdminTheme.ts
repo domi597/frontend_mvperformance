@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AdminThemeContext } from "../state/AdminThemeContextState.tsx";
+import { AdminThemeContext } from "../state/AdminThemeContextObject";
 
 export function useAdminTheme() {
     const ctx = useContext(AdminThemeContext);

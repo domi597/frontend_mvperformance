@@ -65,7 +65,7 @@ export default function MyAccountPage() {
     const { isDark, setIsDark } = useGlobalTheme();
 
     const [customer, setCustomer] = useState<ICustomer | null>(kunde);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -97,7 +97,6 @@ export default function MyAccountPage() {
             navigate("/login");
             return;
         }
-        setLoading(true);
         MyAccountService.fetchCustomer()
             .then((data) => {
                 setCustomer(data);

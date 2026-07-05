@@ -1,14 +1,9 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { hasPreferenceConsent, onConsentChange } from "../utils/cookieConsent";
-
-export interface GlobalThemeContextType {
-    isDark: boolean;
-    setIsDark: (val: boolean) => void;
-}
-
-export const GlobalThemeContext = createContext<GlobalThemeContextType | undefined>(undefined);
+import { GlobalThemeContext } from "./GlobalThemeContextObject";
+export type { GlobalThemeContextType } from "./GlobalThemeContextObject";
 
 const sharedTypography = {
     fontFamily: '"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
