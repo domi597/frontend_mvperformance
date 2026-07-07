@@ -1,5 +1,3 @@
-import type { ICustomer } from "../interface/ICustomer";
-
 export interface RegisterRequest {
     vorname: string;
     nachname: string;
@@ -15,7 +13,10 @@ export interface RegisterRequest {
     kennzeichen: string;
 }
 
-export interface RegisterResponse {
-    kunde: ICustomer;
+/** Antwort direkt nach der Registrierung — es wird noch kein Token ausgestellt,
+ *  das Konto muss zuerst per E-Mail-Code bestätigt werden. */
+export interface PendingVerificationResponse {
+    email: string;
+    message: string;
 }
 

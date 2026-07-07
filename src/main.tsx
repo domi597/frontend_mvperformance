@@ -31,13 +31,13 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
-import DashboardPage from "./pages/admin/DashboardPage";
-import AppointmentsPage from "./pages/admin/AppointmentsPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage.tsx";
+import AdminAppointmentsPage from "./pages/admin/AdminAppointmentsPage.tsx";
 import AdminCalendarPage from "./pages/admin/AdminCalendarPage.tsx";
 import AdminOffersPage from "./pages/admin/AdminOffersPage";
 import AdminServicesPage from "./pages/admin/AdminServicesPage";
-import CustomersPage from "./pages/admin/CustomersPage";
-import SettingsPage from "./pages/admin/SettingsPage";
+import AdminCustomersPage from "./pages/admin/AdminCustomersPage.tsx";
+import AdminSettingsPage from "./pages/admin/AdminSettingsPage.tsx";
 import { TermsPage } from "./pages/TermsPage";
 import MyAccountPage from "./pages/MyAccountPage";
 import MyAppointmentsPage from "./pages/MyAppointmentsPage";
@@ -45,6 +45,7 @@ import MyAppointmentsPage from "./pages/MyAppointmentsPage";
 import { RequireAdmin } from "./utils/RequireAdmin.tsx";
 import { ScrollToTop } from "./utils/ScrollToTop.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import VerifyEmailPage from "./pages/VerifyEmailPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
                 children: [
                     { path: "/login", element: <LoginPage /> },
                     { path: "/registrieren", element: <RegisterPage /> },
+                    { path: "/email-bestaetigen", element: <VerifyEmailPage /> },
                     { path: "/passwort-vergessen", element: <ForgotPasswordPage /> },
                     { path: "/passwort-zuruecksetzen", element: <ResetPasswordPage /> },
                 ],
@@ -95,13 +97,13 @@ const router = createBrowserRouter([
                     </RequireAdmin>
                 ),
                 children: [
-                    { path: "/admin", element: <DashboardPage /> },
-                    { path: "/admin/termine", element: <AppointmentsPage /> },
+                    { path: "/admin", element: <AdminDashboardPage /> },
+                    { path: "/admin/termine", element: <AdminAppointmentsPage /> },
                     { path: "/admin/kalender", element: <AdminCalendarPage /> },
                     { path: "/admin/angebote", element: <AdminOffersPage /> },
                     { path: "/admin/leistungen", element: <AdminServicesPage /> },
-                    { path: "/admin/kunden", element: <CustomersPage /> },
-                    { path: "/admin/einstellungen", element: <SettingsPage /> },
+                    { path: "/admin/kunden", element: <AdminCustomersPage /> },
+                    { path: "/admin/einstellungen", element: <AdminSettingsPage /> },
                 ],
             },
         ],

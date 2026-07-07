@@ -1,7 +1,11 @@
-import { Outlet, Link as RouterLink } from "react-router-dom";
+import { Outlet, Link as RouterLink, useLocation } from "react-router-dom";
 import { Box, Container, Link, Paper, Typography } from "@mui/material";
 
 export const AuthLayout = () => {
+    const location = useLocation();
+    const isRegister = location.pathname.startsWith("/registrieren");
+    const cardMaxWidth = isRegister ? 720 : 560;
+
     return (
         <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
             <Box
@@ -32,24 +36,25 @@ export const AuthLayout = () => {
             </Box>
 
             <Container
-                maxWidth="sm"
+                maxWidth="md"
                 sx={{
                     flex: 1,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    py: 4,
+                    py: 5,
                 }}
             >
                 <Paper
                     variant="outlined"
                     sx={{
                         width: "100%",
-                        maxWidth: 560,
+                        maxWidth: cardMaxWidth,
                         overflow: "hidden",
+                        transition: "max-width 0.15s ease-in-out",
                     }}
                 >
-                    <Box sx={{ px: 3.5, pt: 3, pb: 2.5, borderBottom: 1, borderColor: "divider" }}>
+                    <Box sx={{ px: { xs: 3, sm: 4.5 }, pt: 3.5, pb: 3, borderBottom: 1, borderColor: "divider" }}>
                         <Typography variant="h6" fontWeight={700}>
                             Ihr Kundenkonto
                         </Typography>
@@ -58,13 +63,13 @@ export const AuthLayout = () => {
                         </Typography>
                     </Box>
 
-                    <Box sx={{ px: 3.5, py: 3 }}>
+                    <Box sx={{ px: { xs: 3, sm: 4.5 }, py: 3.5 }}>
                         <Outlet />
                     </Box>
 
                     <Box
                         sx={{
-                            px: 3.5,
+                            px: { xs: 3, sm: 4.5 },
                             py: 1.5,
                             borderTop: 1,
                             borderColor: "divider",

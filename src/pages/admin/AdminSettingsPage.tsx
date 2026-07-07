@@ -1,6 +1,6 @@
 import { useGlobalTheme } from "../../hooks/useGlobalTheme.ts";
 
-export default function SettingsPage() {
+export default function AdminSettingsPage() {
     const { isDark, setIsDark } = useGlobalTheme();
 
     return (

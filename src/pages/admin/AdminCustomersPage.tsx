@@ -10,7 +10,7 @@ function extractErrorMessage(err: unknown, fallback: string): string {
     return message ?? fallback;
 }
 
-export default function CustomersPage() {
+export default function AdminCustomersPage() {
     const [customers, setCustomers] = useState<ICustomer[]>([]);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(0);

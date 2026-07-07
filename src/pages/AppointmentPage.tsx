@@ -5,14 +5,21 @@ import {Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import DirectionsCarFilledOutlinedIcon from "@mui/icons-material/DirectionsCarFilledOutlined";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AuthService from "../service/AuthService";
 import { createAppointment } from "../api/appointmentApi";
 import { getServices, IService } from "../api/services";
 import { getOfferById, IOffer } from "../api/offers";
 import { getTimeslots, ITimeslot } from "../api/timeslotApi";
+import { getVehiclesByUser } from "../api/vehicleApi";
+import type { IVehicle } from "../interface/IVehicle";
 import { isValidAustrianPlate } from "../utils/validation";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+
+/** Sentinel-Wert für "eigenes/neues Fahrzeug eingeben" in der Fahrzeugauswahl. */
+const NEW_VEHICLE = "new" as const;
 
 const STEPS = ["Leistung wählen", "Termin wählen", "Ihre Daten", "Bestätigung"];
 
@@ -57,6 +64,12 @@ export default function AppointmentPage() {
     const [dataLoading, setDataLoading] = useState(true);
     const [dataError, setDataError]   = useState<string | null>(null);
 
+    /** Gespeicherte Fahrzeuge des angemeldeten Kunden, zur Auswahl in Schritt "Ihre Daten". */
+    const [vehicles, setVehicles]         = useState<IVehicle[]>([]);
+    const [vehiclesLoading, setVehiclesLoading] = useState(false);
+    /** Ausgewähltes Fahrzeug: eine Fahrzeug-ID (vorhandenes Fahrzeug) oder NEW_VEHICLE (manuell eingeben). */
+    const [selectedVehicleId, setSelectedVehicleId] = useState<number | typeof NEW_VEHICLE | null>(null);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -71,6 +84,31 @@ export default function AppointmentPage() {
         fetchData();
 
     }, []);
+
+    /**
+     * Lädt die gespeicherten Fahrzeuge des angemeldeten Kunden, sobald dieser
+     * bekannt ist. Ist bereits mindestens ein Fahrzeug vorhanden, wird es
+     * automatisch vorausgewählt; ansonsten fällt die Auswahl auf "Neues
+     * Fahrzeug eingeben" zurück.
+     */
+    useEffect(() => {
+        if (!isLoggedIn || !customer?.id) {
+            setSelectedVehicleId(NEW_VEHICLE);
+            return;
+        }
+
+        setVehiclesLoading(true);
+        getVehiclesByUser(customer.id)
+            .then((list) => {
+                setVehicles(list);
+                setSelectedVehicleId(list.length > 0 ? list[0].id : NEW_VEHICLE);
+            })
+            .catch(() => {
+                setSelectedVehicleId(NEW_VEHICLE);
+            })
+            .finally(() => setVehiclesLoading(false));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoggedIn, customer?.id]);
 
     /**
      * Once the service list has loaded, pre-selects the service the user
@@ -143,6 +181,27 @@ export default function AppointmentPage() {
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
             setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
+    /** True, wenn ein bereits gespeichertes Fahrzeug (statt "Neues Fahrzeug") ausgewählt ist. */
+    const isExistingVehicleSelected = typeof selectedVehicleId === "number";
+
+    /** Wählt eines der gespeicherten Fahrzeuge aus und übernimmt dessen Daten in das Formular. */
+    const selectVehicle = (vehicle: IVehicle) => {
+        setSelectedVehicleId(vehicle.id);
+        setForm((prev) => ({
+            ...prev,
+            brand: vehicle.brand,
+            model: vehicle.model,
+            buildYear: vehicle.buildYear != null ? String(vehicle.buildYear) : "",
+            licensePlate: vehicle.licensePlate ?? "",
+        }));
+    };
+
+    /** Wechselt zur manuellen Eingabe eines neuen Fahrzeugs und leert die Fahrzeugfelder. */
+    const selectNewVehicle = () => {
+        setSelectedVehicleId(NEW_VEHICLE);
+        setForm((prev) => ({ ...prev, brand: "", model: "", buildYear: "", licensePlate: "" }));
+    };
+
     /**
      * Determines whether the user may advance to the next step.
      * Each step has its own required fields that must be filled.
@@ -150,10 +209,13 @@ export default function AppointmentPage() {
     const canGoNext = (): boolean => {
         if (activeStep === 0) return selectedServices.length > 0;
         if (activeStep === 1) return !!form.date && !!selectedTime;
-        if (activeStep === 2)
-            return !!(form.firstName && form.lastName && form.email &&
-                form.phone && form.brand && form.model && form.licensePlate &&
+        if (activeStep === 2) {
+            if (!(form.firstName && form.lastName && form.email && form.phone)) return false;
+            // Bei einem bereits gespeicherten Fahrzeug sind die Fahrzeugdaten schon vollständig.
+            if (isExistingVehicleSelected) return true;
+            return !!(form.brand && form.model && form.licensePlate &&
                 isValidAustrianPlate(form.licensePlate) && form.licensePlate.trim() !== "");
+        }
         return true;
     };
 
@@ -247,6 +309,7 @@ export default function AppointmentPage() {
                 serviceType:  selectedServices.join(", "),
                 offerId:      selectedOffer?.id ?? null,
                 serviceIds:   selectedServiceIds,
+                vehicleId:    isExistingVehicleSelected ? (selectedVehicleId as number) : null,
                 brand:        form.brand,
                 model:        form.model,
                 year:         form.buildYear ? parseInt(form.buildYear) : null,
@@ -480,29 +543,103 @@ export default function AppointmentPage() {
             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5, textTransform: "uppercase", letterSpacing: 1 }}>
                 Fahrzeugdaten
             </Typography>
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField label="Marke"       value={form.brand}        onChange={set("brand")}        fullWidth required />
+
+            {isLoggedIn && vehiclesLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                    <CircularProgress size={24} />
+                </Box>
+            ) : isLoggedIn && vehicles.length > 0 ? (
+                <>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                        Wählen Sie eines Ihrer gespeicherten Fahrzeuge oder geben Sie ein neues ein.
+                    </Typography>
+                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                        {vehicles.map((v) => (
+                            <Grid key={v.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                                <Card
+                                    variant="outlined"
+                                    onClick={() => selectVehicle(v)}
+                                    sx={{
+                                        cursor: "pointer",
+                                        borderColor: selectedVehicleId === v.id ? "primary.main" : "divider",
+                                        bgcolor:     selectedVehicleId === v.id ? "rgba(198,40,40,0.07)" : "background.paper",
+                                        transition:  "border-color 150ms, background-color 150ms",
+                                        "&:hover": { borderColor: "primary.light" },
+                                    }}
+                                >
+                                    <CardContent sx={{ display: "flex", alignItems: "flex-start", gap: 1.5 }}>
+                                        <DirectionsCarFilledOutlinedIcon color={selectedVehicleId === v.id ? "primary" : "action"} sx={{ mt: 0.25 }} />
+                                        <Box>
+                                            <Typography variant="subtitle1" fontWeight={700}>
+                                                {v.brand} {v.model}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {v.licensePlate ?? "Kein Kennzeichen"}{v.buildYear ? ` · Baujahr ${v.buildYear}` : ""}
+                                            </Typography>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                            <Card
+                                variant="outlined"
+                                onClick={selectNewVehicle}
+                                sx={{
+                                    cursor: "pointer",
+                                    height: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    minHeight: 72,
+                                    borderColor: selectedVehicleId === NEW_VEHICLE ? "primary.main" : "divider",
+                                    bgcolor:     selectedVehicleId === NEW_VEHICLE ? "rgba(198,40,40,0.07)" : "background.paper",
+                                    borderStyle: "dashed",
+                                    "&:hover": { borderColor: "primary.light" },
+                                }}
+                            >
+                                <CardContent sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <AddCircleOutlineIcon color={selectedVehicleId === NEW_VEHICLE ? "primary" : "action"} />
+                                    <Typography variant="subtitle2" fontWeight={700}>Neues Fahrzeug</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    </Grid>
+                </>
+            ) : null}
+
+            {!isExistingVehicleSelected && (
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField label="Marke"       value={form.brand}        onChange={set("brand")}        fullWidth required />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextField label="Modell"      value={form.model}        onChange={set("model")}        fullWidth required />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <TextField label="Baujahr"     value={form.buildYear}    onChange={set("buildYear")}    fullWidth />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <TextField
+                            label="Kennzeichen"
+                            value={form.licensePlate}
+                            onChange={set("licensePlate")}
+                            fullWidth
+                            required
+                            placeholder="z.B. W-12345AB"
+                            error={form.licensePlate.trim() !== "" && !isValidAustrianPlate(form.licensePlate)}
+                            helperText={form.licensePlate.trim() !== "" && !isValidAustrianPlate(form.licensePlate) ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
+                        />
+                    </Grid>
+                    {isLoggedIn && (
+                        <Grid size={{ xs: 12 }}>
+                            <Typography variant="caption" color="text.secondary">
+                                Dieses Fahrzeug wird nach der Anfrage automatisch in Ihrem Konto gespeichert.
+                            </Typography>
+                        </Grid>
+                    )}
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField label="Modell"      value={form.model}        onChange={set("model")}        fullWidth required />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                    <TextField label="Baujahr"     value={form.buildYear}    onChange={set("buildYear")}    fullWidth />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 8 }}>
-                    <TextField
-                        label="Kennzeichen"
-                        value={form.licensePlate}
-                        onChange={set("licensePlate")}
-                        fullWidth
-                        required
-                        placeholder="z.B. W-12345AB"
-                        error={form.licensePlate.trim() !== "" && !isValidAustrianPlate(form.licensePlate)}
-                        helperText={form.licensePlate.trim() !== "" && !isValidAustrianPlate(form.licensePlate) ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
-                    />
-                </Grid>
-            </Grid>
+            )}
 
             <Divider sx={{ mb: 3 }} />
 

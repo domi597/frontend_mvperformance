@@ -12,7 +12,11 @@ const api = axios.create({
 /** Adds the Bearer token to every request that is not a public auth endpoint (login/register). */
 api.interceptors.request.use((config) => {
     const url = config.url ?? "";
-    const isPublicAuthEndpoint = url.includes("/api/auth/login") || url.includes("/api/auth/register");
+    const isPublicAuthEndpoint =
+        url.includes("/api/auth/login") ||
+        url.includes("/api/auth/register") ||
+        url.includes("/api/auth/verify-email") ||
+        url.includes("/api/auth/resend-verification");
 
     if (!isPublicAuthEndpoint) {
         const token = sessionStorage.getItem("token");

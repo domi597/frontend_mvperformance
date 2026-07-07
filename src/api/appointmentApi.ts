@@ -50,6 +50,7 @@ export interface CreateAppointmentRequest {
     serviceType: string;
     offerId: number | null;
     serviceIds: number[];
+    vehicleId?: number | null;
     brand: string;
     model: string;
     year: number | null;

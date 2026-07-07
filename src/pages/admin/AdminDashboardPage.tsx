@@ -43,7 +43,7 @@ function OfferCardSkeleton() {
     );
 }
 
-export default function DashboardPage() {
+export default function AdminDashboardPage() {
     const [termine, setTermine] = useState<IAppointment[]>([]);
     const [offers, setOffers] = useState<IOffer[]>([])
     const [isLoading, setIsLoading] = useState(true);

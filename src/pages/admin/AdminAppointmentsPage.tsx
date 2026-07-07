@@ -24,7 +24,7 @@ function AppointmentRowSkeleton() {
     );
 }
 
-function AppointmentsPage() {
+function AdminAppointmentsPage() {
     const [termine, setTermine] = useState<IAppointment[]>([]);
     const [filter, setFilter] = useState<FilterType>("ALLE");
     const [page, setPage] = useState<number>(1);
@@ -223,4 +223,4 @@ function AppointmentsPage() {
     );
 }
 
-export default AppointmentsPage;
+export default AdminAppointmentsPage;

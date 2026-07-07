@@ -56,6 +56,8 @@ export default function LoginPage() {
                 setError("E-Mail oder Passwort ist falsch.");
             } else if (status === 404) {
                 setError("Kein Konto mit dieser E-Mail gefunden.");
+            } else if (status === 403) {
+                navigate("/email-bestaetigen", { state: { email, from } });
             } else {
                 setError("Server nicht erreichbar. Bitte später versuchen.");
             }
