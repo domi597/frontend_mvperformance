@@ -14,7 +14,7 @@ import { getOfferById, IOffer } from "../api/offers";
 import { getTimeslots, ITimeslot } from "../api/timeslotApi";
 import { getVehiclesByUser } from "../api/vehicleApi";
 import type { IVehicle } from "../interface/IVehicle";
-import { isValidAustrianPlate } from "../utils/validation";
+import { isValidAustrianPlate, isValidBuildYear, sanitizePlateInput } from "../utils/validation";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
@@ -617,13 +617,22 @@ export default function AppointmentPage() {
                         <TextField label="Modell"      value={form.model}        onChange={set("model")}        fullWidth required />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                        <TextField label="Baujahr"     value={form.buildYear}    onChange={set("buildYear")}    fullWidth />
+                        <TextField
+                            label="Baujahr"
+                            value={form.buildYear}
+                            onChange={(e) => setForm((prev) => ({ ...prev, buildYear: e.target.value.replace(/[^0-9]/g, "").slice(0, 4) }))}
+                            fullWidth
+                            placeholder="z.B. 2019"
+                            slotProps={{ htmlInput: { inputMode: "numeric", pattern: "[0-9]*", maxLength: 4 } }}
+                            error={form.buildYear.trim() !== "" && !isValidBuildYear(form.buildYear)}
+                            helperText={form.buildYear.trim() !== "" && !isValidBuildYear(form.buildYear) ? "Ungültiges Baujahr" : ""}
+                        />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
                         <TextField
                             label="Kennzeichen"
                             value={form.licensePlate}
-                            onChange={set("licensePlate")}
+                            onChange={(e) => setForm((prev) => ({ ...prev, licensePlate: sanitizePlateInput(e.target.value) }))}
                             fullWidth
                             required
                             placeholder="z.B. W-12345AB"

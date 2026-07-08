@@ -10,7 +10,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import RegisterService from "../service/RegisterService";
 import type { RegisterRequest } from "../types/RegisterTypes";
-import { isValidAustrianPlate } from "../utils/validation";
+import { isValidAustrianPlate, isValidBuildYear, sanitizePlateInput } from "../utils/validation";
 
 const required = (val: string) => val.trim().length > 0;
 
@@ -84,6 +84,7 @@ export default function RegisterPage() {
         plz:          submitted && !required(form.plz),
         ort:          submitted && !required(form.ort),
         kennzeichen:  submitted && !isValidAustrianPlate(form.kennzeichen),
+        baujahr:      submitted && !isValidBuildYear(form.baujahr != null ? String(form.baujahr) : ""),
     };
 
     const isValid =
@@ -95,14 +96,23 @@ export default function RegisterPage() {
         required(form.strasse) &&
         required(form.plz) &&
         required(form.ort) &&
+        isValidAustrianPlate(form.kennzeichen) &&
+        isValidBuildYear(form.baujahr != null ? String(form.baujahr) : "") &&
         agbAccepted;
 
-    /** Returns an onChange handler for the given form field. Coerces `baujahr` to number. */
+    /** Returns an onChange handler for the given form field. Sanitizes `baujahr` and `kennzeichen`. */
     const set = (field: keyof RegisterRequest) =>
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const val = field === "baujahr"
-                ? (e.target.value ? Number(e.target.value) : null)
-                : e.target.value;
+            if (field === "baujahr") {
+                const digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+                setForm((prev) => ({ ...prev, baujahr: digits ? Number(digits) : null }));
+                return;
+            }
+            if (field === "kennzeichen") {
+                setForm((prev) => ({ ...prev, kennzeichen: sanitizePlateInput(e.target.value) }));
+                return;
+            }
+            const val = e.target.value;
             setForm((prev) => ({ ...prev, [field]: val }));
         };
 
@@ -287,13 +297,14 @@ export default function RegisterPage() {
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                             <TextField
                                 label="Baujahr"
-                                type="number"
                                 value={form.baujahr ?? ""}
                                 onChange={set("baujahr")}
                                 size="small"
                                 fullWidth
                                 placeholder="z.B. 2019"
-                                slotProps={{ htmlInput: { min: 1950, max: new Date().getFullYear() } }}
+                                slotProps={{ htmlInput: { inputMode: "numeric", pattern: "[0-9]*", maxLength: 4 } }}
+                                error={errors.baujahr}
+                                helperText={errors.baujahr ? "Ungültiges Baujahr" : ""}
                             />
                             <TextField
                                 label="Kennzeichen"
@@ -301,9 +312,9 @@ export default function RegisterPage() {
                                 onChange={set("kennzeichen")}
                                 size="small"
                                 fullWidth
-                                placeholder="z.B. GZ-12345AB"
+                                placeholder="z.B. LB-ABC123"
                                 error={errors.kennzeichen}
-                                helperText={errors.kennzeichen ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
+                                helperText={errors.kennzeichen ? "Ungültiges österreichisches Kennzeichen (z.B. LB-ABC123)" : ""}
                             />
                         </Stack>
                     </Stack>

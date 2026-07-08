@@ -9,7 +9,7 @@ import { MyAccountService } from "../service/MyAccountService";
 import type { ICustomer } from "../interface/ICustomer";
 import type { IVehicle } from "../interface/IVehicle";
 import type { IInfoRowProps } from "../interface/IInfoRowProps";
-import { isValidAustrianPlate } from "../utils/validation";
+import { isValidAustrianPlate, isValidBuildYear, sanitizePlateInput } from "../utils/validation";
 
 /** Small uppercase section heading. */
 function SectionLabel({ children }: { children: string }) {
@@ -433,23 +433,33 @@ export default function MyAccountPage() {
                     <Stack spacing={2} sx={{ mt: 0.5 }}>
                         <TextField label="Marke" value={vehicleForm.brand} onChange={(e) => setVehicleForm((f) => ({ ...f, brand: e.target.value }))} size="small" fullWidth autoFocus required />
                         <TextField label="Modell" value={vehicleForm.model} onChange={(e) => setVehicleForm((f) => ({ ...f, model: e.target.value }))} size="small" fullWidth required />
-                        <TextField label="Baujahr" value={vehicleForm.buildYear} onChange={(e) => setVehicleForm((f) => ({ ...f, buildYear: e.target.value }))} size="small" fullWidth type="number" slotProps={{ htmlInput: { min: 1900, max: new Date().getFullYear() } }} />
+                        <TextField
+                            label="Baujahr"
+                            value={vehicleForm.buildYear}
+                            onChange={(e) => setVehicleForm((f) => ({ ...f, buildYear: e.target.value.replace(/[^0-9]/g, "").slice(0, 4) }))}
+                            size="small"
+                            fullWidth
+                            placeholder="z.B. 2019"
+                            slotProps={{ htmlInput: { inputMode: "numeric", pattern: "[0-9]*", maxLength: 4 } }}
+                            error={vehicleForm.buildYear.trim() !== "" && !isValidBuildYear(vehicleForm.buildYear)}
+                            helperText={vehicleForm.buildYear.trim() !== "" && !isValidBuildYear(vehicleForm.buildYear) ? "Ungültiges Baujahr" : ""}
+                        />
                         <TextField
                             label="Kennzeichen"
                             value={vehicleForm.licensePlate}
-                            onChange={(e) => setVehicleForm((f) => ({ ...f, licensePlate: e.target.value }))}
+                            onChange={(e) => setVehicleForm((f) => ({ ...f, licensePlate: sanitizePlateInput(e.target.value) }))}
                             size="small"
                             fullWidth
-                            placeholder="z.B. W-12345AB"
+                            placeholder="z.B. LB-ABC123"
                             error={vehicleForm.licensePlate.trim() !== "" && !isValidAustrianPlate(vehicleForm.licensePlate)}
-                            helperText={vehicleForm.licensePlate.trim() !== "" && !isValidAustrianPlate(vehicleForm.licensePlate) ? "Ungültiges österreichisches Kennzeichen (z.B. W-12345AB)" : ""}
+                            helperText={vehicleForm.licensePlate.trim() !== "" && !isValidAustrianPlate(vehicleForm.licensePlate) ? "Ungültiges österreichisches Kennzeichen (z.B. LB-ABC123)" : ""}
                         />
                     </Stack>
                     {error && <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>{error}</Alert>}
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2.5 }}>
                     <Button onClick={() => setVehicleDialog({ open: false, editing: null })} disabled={vehicleSaving}>Abbrechen</Button>
-                    <Button variant="contained" onClick={saveVehicle} disabled={vehicleSaving || !vehicleForm.brand.trim() || !vehicleForm.model.trim() || !isValidAustrianPlate(vehicleForm.licensePlate)} sx={{ borderRadius: 2 }}>
+                    <Button variant="contained" onClick={saveVehicle} disabled={vehicleSaving || !vehicleForm.brand.trim() || !vehicleForm.model.trim() || !isValidAustrianPlate(vehicleForm.licensePlate) || !isValidBuildYear(vehicleForm.buildYear)} sx={{ borderRadius: 2 }}>
                         {vehicleSaving ? <CircularProgress size={16} color="inherit" /> : "Speichern"}
                     </Button>
                 </DialogActions>
